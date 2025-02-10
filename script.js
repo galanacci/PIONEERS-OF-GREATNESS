@@ -9,6 +9,8 @@ function typeAnimation() {
     const placeholder = document.getElementById('animated-placeholder');
     const currentPhrase = phrases[currentPhraseIndex];
 
+    if (!placeholder) return; // Guard clause for missing element
+
     if (isDeleting) {
         placeholder.textContent = currentPhrase.substring(0, currentCharIndex - 1);
         currentCharIndex--;
@@ -32,39 +34,58 @@ function typeAnimation() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const emailInput = document.getElementById('email');
+    const animatedPlaceholder = document.getElementById('animated-placeholder');
+    const emailForm = document.getElementById('email-form');
+    const statusDiv = document.getElementById('status');
+
+    if (!emailInput || !animatedPlaceholder || !emailForm || !statusDiv) {
+        console.error('Required elements not found');
+        return;
+    }
+
     typeAnimation();
 
-    document.getElementById('email').addEventListener('focus', function() {
-        document.getElementById('animated-placeholder').style.display = 'none';
+    emailInput.addEventListener('focus', () => {
+        animatedPlaceholder.style.display = 'none';
     });
 
-    document.getElementById('email').addEventListener('blur', function() {
-        if (this.value === '') {
-            document.getElementById('animated-placeholder').style.display = 'block';
+    emailInput.addEventListener('blur', () => {
+        if (emailInput.value === '') {
+            animatedPlaceholder.style.display = 'block';
         }
     });
 
-    document.getElementById('email-form').addEventListener('submit', function(e) {
+    emailForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        var email = document.getElementById('email').value;
-        var statusDiv = document.getElementById('status');
+        const email = emailInput.value.trim();
         
-        statusDiv.textContent = 'Greatness takes time...';
+        if (!email) {
+            statusDiv.textContent = 'Please enter a valid email address';
+            return;
+        }
+
+        statusDiv.textContent = 'Wait a moment...';
         
-        fetch('https://script.google.com/macros/s/AKfycbzIGpH52dMRf2CZhvQ4OVVEtNQrtKEOByTn8JsaNuvve5HM17hDOG9Q5rgfZc7jIXq1/exec', {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'text/plain',
-            },
-            body: JSON.stringify({ email: email })
-        })
-        .then(response => {
+        try {
+            const response = await fetch('https://script.google.com/macros/s/AKfycbyBn5PjNIwn4nG_pLb5WX_ShTs3qQuzc7O8-ggouHA-ejnaCKnT3AKRxGbWdv1pnpUv/exec', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email })
+            });
+
+            // Since no-cors mode doesn't return readable response
+            // We'll assume success if no error is thrown
             statusDiv.textContent = 'Thank you for joining!';
-            document.getElementById('email').value = '';
-        })
-        .catch(error => {
+            emailInput.value = '';
+            animatedPlaceholder.style.display = 'block';
+            
+        } catch (error) {
+            console.error("Error:", error);
             statusDiv.textContent = 'An error occurred. Please try again.';
-        });
+        }
     });
 });
