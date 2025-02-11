@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.textContent = 'Wait a moment...';
         
         try {
-            const response = await fetch('https://script.google.com/macros/s/AKfycbyBn5PjNIwn4nG_pLb5WX_ShTs3qQuzc7O8-ggouHA-ejnaCKnT3AKRxGbWdv1pnpUv/exec', {
+            const response = await fetch('https://script.google.com/macros/s/AKfycbzTAn7Ud_iKrspHrP_hUlrrGUGW7fnjbE2SLikfHq3ppeRJyFp8nYLzqZ1IjgtRePIn2A/exec', {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {
