@@ -208,7 +208,7 @@ button:hover {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    opacity: 50%;
+    opacity: 20%;
 }
 
 #container {
