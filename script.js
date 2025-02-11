@@ -1,36 +1,25 @@
-// Typing animation
-const phrases = ["Enter your email here...", "and join the movement!"];
-let currentPhraseIndex = 0;
-let currentCharIndex = 0;
-let isDeleting = false;
-let typingSpeed = 100;
-
-function typeAnimation() {
+function startScrolling() {
     const placeholder = document.getElementById('animated-placeholder');
-    const currentPhrase = phrases[currentPhraseIndex];
-
-    if (!placeholder) return; // Guard clause for missing element
-
-    if (isDeleting) {
-        placeholder.textContent = currentPhrase.substring(0, currentCharIndex - 1);
-        currentCharIndex--;
-    } else {
-        placeholder.textContent = currentPhrase.substring(0, currentCharIndex + 1);
-        currentCharIndex++;
-    }
-
-    if (!isDeleting && currentCharIndex === currentPhrase.length) {
-        isDeleting = true;
-        typingSpeed = 50;
-        setTimeout(typeAnimation, 800);
-    } else if (isDeleting && currentCharIndex === 0) {
-        isDeleting = false;
-        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-        typingSpeed = 100;
-        setTimeout(typeAnimation, 500);
-    } else {
-        setTimeout(typeAnimation, typingSpeed);
-    }
+    if (!placeholder) return;
+    
+    const text = "Enter your email here and join the movement!";
+    // Create container for scrolling animation
+    const container = document.createElement('div');
+    container.className = 'scrolling-text-container';
+    
+    // Add two copies of the text for seamless loop
+    const span1 = document.createElement('span');
+    span1.className = 'scrolling-text';
+    span1.textContent = text;
+    
+    const span2 = document.createElement('span');
+    span2.className = 'scrolling-text';
+    span2.textContent = text;
+    
+    container.appendChild(span1);
+    container.appendChild(span2);
+    placeholder.innerHTML = '';
+    placeholder.appendChild(container);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    typeAnimation();
+    startScrolling();
 
     emailInput.addEventListener('focus', () => {
         animatedPlaceholder.style.display = 'none';
