@@ -1,5 +1,5 @@
 // Typing animation
-const phrases = ["Enter your email here...", "To join our waiting list!"];
+const phrases = ["Enter your email here...", "and join the movement!"];
 let currentPhraseIndex = 0;
 let currentCharIndex = 0;
 let isDeleting = false;
