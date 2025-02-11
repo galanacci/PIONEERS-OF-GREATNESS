@@ -167,6 +167,29 @@ button:hover {
     font-family: 'Lora', serif;
     font-weight: 400;
     z-index: 10;
+    white-space: nowrap;
+    width: calc(100% - 30px);
+    overflow: hidden;
+}
+
+.scrolling-text-container {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 15s linear infinite;
+}
+
+.scrolling-text {
+    display: inline-block;
+    padding-right: 5px; /* Space between repetitions */
+}
+
+@keyframes scrollText {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 .logo-wrapper {
