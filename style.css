@@ -35,6 +35,25 @@ nav .logo-container img {
     nav { padding-top: 40px; }
 }
 
+/* Forge Denim Jacket Button */
+
+.forge-button {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: white;
+    border: 0.2px solid #673CAF;
+    background-color: #673CAF;
+    text-decoration: none;
+    z-index: 1000;
+}
+
 /* Email Form Styles */
 
 .container {
