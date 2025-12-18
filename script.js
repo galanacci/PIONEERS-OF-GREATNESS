@@ -2,7 +2,7 @@ function startScrolling() {
     const placeholder = document.getElementById('animated-placeholder');
     if (!placeholder) return;
     
-    const text = "Enter your email here and join the movement!";
+    const text = "ENTER YOUR EMAIL HERE...";
     // Create container for scrolling animation
     const container = document.createElement('div');
     container.className = 'scrolling-text-container';
@@ -78,3 +78,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
