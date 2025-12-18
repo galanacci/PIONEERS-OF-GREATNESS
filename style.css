@@ -37,6 +37,14 @@ nav .logo-container img {
 
 /* Forge Denim Jacket Button */
 
+.forge-container {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    z-index: 1000;
+    text-align: center;
+}
+
 .forge-button {
     display: inline-block;
     width: 100%;
@@ -199,7 +207,7 @@ button:hover {
 
 .scrolling-text {
     display: inline-block;
-    padding-right: 5px; /* Space between repetitions */
+    padding-right: 40px; /* Space between repetitions */
 }
 
 @keyframes scrollText {
@@ -230,8 +238,3 @@ button:hover {
     opacity: 50%;
 }
 
-#container {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}
