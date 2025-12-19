@@ -39,7 +39,7 @@ nav .logo-container img {
 
 .forge-container {
     position: fixed;
-    bottom: 10px; /* adjust between 50–80px as needed */
+    bottom: 5px; /* adjust between 50–80px as needed */
     left: 0;
     width: 100%;
     display: flex;
