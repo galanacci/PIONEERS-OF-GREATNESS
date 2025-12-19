@@ -53,6 +53,7 @@ nav .logo-container img {
   max-width: 420px;
   margin-bottom: 0; /* IMPORTANT: remove the 50px margin */
   pointer-events: auto; /* restores clicking */
+  background-color: #673CAF;
 }
 
 /* Email Form Styles */
@@ -71,7 +72,7 @@ nav .logo-container img {
     bottom: 0;
     left: 0;
     z-index: 1000;
-    background-color: #673CAF;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #email-form {
