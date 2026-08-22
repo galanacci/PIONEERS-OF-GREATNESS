@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTAn7Ud_iKrspHrP_hUlrrGUGW7fnjbE2SLikfHq3ppeRJyFp8nYLzqZ1IjgtRePIn2A/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8GEFnr3B71rMoERdZXbGLWCwa9lZnBflNqVtZ9ZSwpLdZ_-FcL3tqBrUZ66b1zymFPw/exec";
 
 function startScrolling() {
     const placeholder = document.getElementById("animated-placeholder");
