@@ -84,15 +84,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await response.json();
 
-            status.textContent = data.message;
+switch (data.status) {
 
-            if(data.status === "success"){
+    case "success":
 
-                emailInput.value = "";
+        status.textContent = "Welcome to the movement.";
+        status.style.color = "#7dff7d";
 
-                placeholder.style.display = "block";
+        emailInput.value = "";
+        placeholder.style.display = "block";
 
-            }
+        break;
+
+    case "duplicate":
+
+        status.textContent = "Already signed up.";
+        status.style.color = "#ffbf47";
+
+        break;
+
+    default:
+
+        status.textContent = "Something went wrong.";
+        status.style.color = "#ff6b6b";
+
+}
 
         }
 
