@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrXHACtOo08hlGwUsThMtkHuXlU1F5ktcRiVCMHHbB-gvX7LNEbBeVM-vC966yv6YZTA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjvkTDouoDXWbSvmKCsznmiRc51S5uP9BDBzBJ8CnEaHGTDFPODgH39ZJWg2XtSgQdUg/exec";
 
 function startScrolling() {
 
