@@ -1,7 +1,9 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8GEFnr3B71rMoERdZXbGLWCwa9lZnBflNqVtZ9ZSwpLdZ_-FcL3tqBrUZ66b1zymFPw/exec";
+const SCRIPT_URL = "Yhttps://script.google.com/macros/s/AKfycbwp-j2li8CAkYOtWTnqkYNG7xllMiwRwaw7rtwGU5pwErHtD4GJmk6PQQDX03MTrXiIVQ/exec";
 
 function startScrolling() {
+
     const placeholder = document.getElementById("animated-placeholder");
+
     if (!placeholder) return;
 
     const text = "ENTER YOUR EMAIL HERE...";
@@ -22,90 +24,83 @@ function startScrolling() {
 
     placeholder.innerHTML = "";
     placeholder.appendChild(container);
+
 }
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const emailInput = document.getElementById("email");
-    const animatedPlaceholder = document.getElementById("animated-placeholder");
-    const emailForm = document.getElementById("email-form");
-    const statusDiv = document.getElementById("status");
-
     startScrolling();
 
+    const form = document.getElementById("email-form");
+    const emailInput = document.getElementById("email");
+    const status = document.getElementById("status");
+    const placeholder = document.getElementById("animated-placeholder");
+
     emailInput.addEventListener("focus", () => {
-        animatedPlaceholder.style.display = "none";
+
+        placeholder.style.display = "none";
+
     });
 
     emailInput.addEventListener("blur", () => {
-        if (emailInput.value === "") {
-            animatedPlaceholder.style.display = "block";
+
+        if(emailInput.value === ""){
+
+            placeholder.style.display = "block";
+
         }
+
     });
 
-    emailForm.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async function(e){
 
         e.preventDefault();
 
-        const email = emailInput.value.trim().toLowerCase();
+        const email = emailInput.value.trim();
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(email === ""){
 
-        if (!emailRegex.test(email)) {
-            statusDiv.textContent = "Please enter a valid email.";
-            statusDiv.style.color = "#ff5555";
+            status.textContent = "Please enter an email.";
+
             return;
+
         }
 
-        statusDiv.textContent = "Joining...";
-        statusDiv.style.color = "#ffffff";
+        status.textContent = "Joining...";
 
-        try {
+        const formData = new FormData();
 
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: email
-                })
+        formData.append("email", email);
+
+        try{
+
+            const response = await fetch(SCRIPT_URL,{
+
+                method:"POST",
+
+                body:formData
+
             });
 
-            const result = await response.json();
+            const data = await response.json();
 
-            switch (result.status) {
+            status.textContent = data.message;
 
-                case "success":
+            if(data.status === "success"){
 
-                    statusDiv.textContent = result.message;
-                    statusDiv.style.color = "#8cff8c";
+                emailInput.value = "";
 
-                    emailInput.value = "";
-                    animatedPlaceholder.style.display = "block";
-
-                    break;
-
-                case "duplicate":
-
-                    statusDiv.textContent = result.message;
-                    statusDiv.style.color = "#ffd966";
-
-                    break;
-
-                default:
-
-                    statusDiv.textContent = result.message || "Something went wrong.";
-                    statusDiv.style.color = "#ff5555";
+                placeholder.style.display = "block";
 
             }
 
-        } catch (error) {
+        }
 
-            console.error(error);
+        catch(err){
 
-            statusDiv.textContent = "Unable to connect. Please try again.";
-            statusDiv.style.color = "#ff5555";
+            console.error(err);
+
+            status.textContent = "Unable to connect.";
 
         }
 
