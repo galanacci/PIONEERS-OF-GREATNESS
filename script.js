@@ -219,12 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    menuOverlay.addEventListener("click", (event) => {
-
-        if (event.target === menuOverlay) closeMenu();
-
-    });
-
     document.addEventListener("keydown", (event) => {
 
         if (!menuOverlay.classList.contains("is-open")) return;
