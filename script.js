@@ -129,8 +129,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuButton = document.querySelector(".menu-toggle");
     const menuOverlay = document.getElementById("menu-overlay");
     const menuPanel = menuOverlay?.querySelector(".menu-panel");
+    const menuItems = Array.from(menuPanel?.querySelectorAll(".menu-item") ?? []);
+    let selectedIndex = Math.max(0, menuItems.findIndex((item) => item.classList.contains("is-selected")));
 
-    if (!menuButton || !menuOverlay || !menuPanel) return;
+    if (!menuButton || !menuOverlay || !menuPanel || menuItems.length === 0) return;
+
+    function updateSelection(nextIndex) {
+
+        selectedIndex = (nextIndex + menuItems.length) % menuItems.length;
+
+        menuItems.forEach((item, index) => {
+
+            const isSelected = index === selectedIndex;
+            item.classList.toggle("is-selected", isSelected);
+            item.tabIndex = isSelected ? 0 : -1;
+            isSelected ? item.setAttribute("aria-current", "true") : item.removeAttribute("aria-current");
+
+        });
+
+    }
+
+    updateSelection(selectedIndex);
 
     function openMenu() {
 
@@ -138,7 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
         menuOverlay.setAttribute("aria-hidden", "false");
         menuButton.setAttribute("aria-expanded", "true");
         menuButton.setAttribute("aria-label", "Close menu");
-        menuPanel.focus();
+        updateSelection(selectedIndex);
+        menuItems[selectedIndex].focus();
 
     }
 
@@ -163,7 +183,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const menuItem = event.target.closest(".menu-item");
 
-        if (!menuItem || menuItem.getAttribute("aria-disabled") === "true") return;
+        if (!menuItem) return;
+
+        updateSelection(menuItems.indexOf(menuItem));
+
+        if (menuItem.getAttribute("aria-disabled") === "true") return;
 
         const action = menuItem.dataset.menuAction;
 
@@ -186,6 +210,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    menuPanel.addEventListener("pointerover", (event) => {
+
+        const menuItem = event.target.closest(".menu-item");
+
+        if (!menuItem) return;
+
+        updateSelection(menuItems.indexOf(menuItem));
+
+    });
+
     menuOverlay.addEventListener("click", (event) => {
 
         if (event.target === menuOverlay) closeMenu();
@@ -194,7 +228,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener("keydown", (event) => {
 
-        if (event.key === "Escape" && menuOverlay.classList.contains("is-open")) closeMenu();
+        if (!menuOverlay.classList.contains("is-open")) return;
+
+        if (event.key === "ArrowUp") {
+
+            event.preventDefault();
+            updateSelection(selectedIndex - 1);
+            menuItems[selectedIndex].focus();
+
+        } else if (event.key === "ArrowDown") {
+
+            event.preventDefault();
+            updateSelection(selectedIndex + 1);
+            menuItems[selectedIndex].focus();
+
+        } else if (event.key === "Enter") {
+
+            event.preventDefault();
+            menuItems[selectedIndex].click();
+
+        } else if (event.key === "Escape") {
+
+            event.preventDefault();
+            closeMenu();
+
+        }
 
     });
 
