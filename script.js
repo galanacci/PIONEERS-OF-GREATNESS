@@ -186,6 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    window.addEventListener("pog:return-to-menu", openMenu);
+
     menuPanel.addEventListener("click", (event) => {
 
         const menuItem = event.target.closest(".menu-item");
@@ -208,6 +210,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const destination = menuItem.dataset.menuUrl;
             if (destination) window.open(destination, "_blank", "noopener,noreferrer");
+
+        } else if (action === "room") {
+
+            const roomId = menuItem.dataset.roomTarget;
+            closeMenu();
+            window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId } }));
 
         } else if (action === "exit") {
 
@@ -321,5 +329,134 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     backgroundVideo.addEventListener("volumechange", updateAudioControl);
+
+});
+
+// Reusable PoG World room controller. Independent from waitlist and media logic.
+document.addEventListener("DOMContentLoaded", () => {
+
+    const rooms = Array.from(document.querySelectorAll(".world-room"));
+    const roomTransition = document.getElementById("room-transition");
+    const backgroundRegions = document.querySelectorAll("nav, #container, .container, .copyright, #menu-overlay");
+    let activeRoom = null;
+    let transitionTimers = [];
+
+    if (rooms.length === 0 || !roomTransition) return;
+
+    function clearTransitionTimers() {
+
+        transitionTimers.forEach((timer) => window.clearTimeout(timer));
+        transitionTimers = [];
+
+    }
+
+    function setBackgroundInert(isInert) {
+
+        backgroundRegions.forEach((region) => { region.inert = isInert; });
+
+    }
+
+    function showTransition() {
+
+        roomTransition.classList.add("is-active");
+        roomTransition.setAttribute("aria-hidden", "false");
+
+    }
+
+    function hideTransition() {
+
+        roomTransition.classList.remove("is-active");
+        roomTransition.setAttribute("aria-hidden", "true");
+
+    }
+
+    function openRoom(roomId) {
+
+        const nextRoom = rooms.find((room) => room.id === roomId);
+        if (!nextRoom) return;
+
+        clearTransitionTimers();
+        setBackgroundInert(true);
+        showTransition();
+
+        transitionTimers.push(window.setTimeout(() => {
+
+            rooms.forEach((room) => {
+                const isActive = room === nextRoom;
+                room.classList.toggle("is-open", isActive);
+                room.setAttribute("aria-hidden", String(!isActive));
+            });
+
+            activeRoom = nextRoom;
+            activeRoom.querySelector("[data-room-close]")?.focus();
+
+        }, 320));
+
+        transitionTimers.push(window.setTimeout(hideTransition, 520));
+
+    }
+
+    function returnToMenu() {
+
+        if (!activeRoom) return;
+
+        clearTransitionTimers();
+        showTransition();
+
+        transitionTimers.push(window.setTimeout(() => {
+
+            activeRoom.classList.remove("is-open");
+            activeRoom.setAttribute("aria-hidden", "true");
+            activeRoom = null;
+            setBackgroundInert(false);
+            window.dispatchEvent(new CustomEvent("pog:return-to-menu"));
+
+        }, 240));
+
+        transitionTimers.push(window.setTimeout(hideTransition, 440));
+
+    }
+
+    window.addEventListener("pog:open-room", (event) => {
+
+        openRoom(event.detail?.roomId);
+
+    });
+
+    rooms.forEach((room) => {
+
+        room.querySelector("[data-room-close]")?.addEventListener("click", returnToMenu);
+
+    });
+
+    document.addEventListener("keydown", (event) => {
+
+        if (!activeRoom) return;
+
+        if (event.key === "Escape") {
+
+            event.preventDefault();
+            returnToMenu();
+            return;
+
+        }
+
+        if (event.key !== "Tab") return;
+
+        const focusable = Array.from(activeRoom.querySelectorAll("button:not([disabled]), a[href]"));
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+
+    });
 
 });
