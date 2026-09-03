@@ -450,8 +450,4 @@ button:hover {
     .menu-overlay {
         transition: none;
     }
-
-    .scrolling-text-container {
-        animation: none;
-    }
 }
