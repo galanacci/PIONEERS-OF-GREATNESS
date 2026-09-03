@@ -129,11 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuButton = document.querySelector(".menu-toggle");
     const menuOverlay = document.getElementById("menu-overlay");
     const menuPanel = menuOverlay?.querySelector(".menu-panel");
+    const menuList = menuPanel?.querySelector(".menu-list");
     const menuItems = Array.from(menuPanel?.querySelectorAll(".menu-item") ?? []);
     const pageRegions = document.querySelectorAll("nav, #container, .container, .copyright");
     let selectedIndex = Math.max(0, menuItems.findIndex((item) => item.classList.contains("is-selected")));
 
-    if (!menuButton || !menuOverlay || !menuPanel || menuItems.length === 0) return;
+    if (!menuButton || !menuOverlay || !menuPanel || !menuList || menuItems.length === 0) return;
 
     function updateSelection(nextIndex) {
 
@@ -160,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
         menuButton.setAttribute("aria-expanded", "true");
         menuButton.setAttribute("aria-label", "Close menu");
         pageRegions.forEach((region) => { region.inert = true; });
+        menuList.classList.remove("is-keyboard-nav");
         updateSelection(selectedIndex);
         menuItems[selectedIndex].focus();
 
@@ -216,6 +218,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuPanel.addEventListener("pointerover", (event) => {
 
+        menuList.classList.remove("is-keyboard-nav");
+
         const menuItem = event.target.closest(".menu-item");
 
         if (!menuItem) return;
@@ -227,6 +231,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", (event) => {
 
         if (!menuOverlay.classList.contains("is-open")) return;
+
+        if (["Tab", "ArrowUp", "ArrowDown"].includes(event.key)) {
+            menuList.classList.add("is-keyboard-nav");
+        }
 
         if (event.key === "Tab") {
 
