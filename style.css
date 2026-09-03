@@ -364,7 +364,7 @@ button:hover {
 .menu-item:hover {
     border: 0;
     background: transparent;
-    color: white;
+    color: #673CAF;
 }
 
 /* Locked chapters remain selectable, but intentionally unavailable. */
