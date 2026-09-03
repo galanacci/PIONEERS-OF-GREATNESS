@@ -270,7 +270,7 @@ button:hover {
 
 .scrolling-text {
     display: inline-block;
-    padding-right: 40px; /* Space between repetitions */
+    padding-right: 12px;
 }
 
 @keyframes scrollText {
