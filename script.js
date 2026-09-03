@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuOverlay = document.getElementById("menu-overlay");
     const menuPanel = menuOverlay?.querySelector(".menu-panel");
     const menuList = menuPanel?.querySelector(".menu-list");
+    const menuAudioButton = menuPanel?.querySelector(".audio-toggle");
     const menuItems = Array.from(menuPanel?.querySelectorAll(".menu-item") ?? []);
     const pageRegions = document.querySelectorAll("nav, #container, .container, .copyright");
     let selectedIndex = Math.max(0, menuItems.findIndex((item) => item.classList.contains("is-selected")));
@@ -232,15 +233,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!menuOverlay.classList.contains("is-open")) return;
 
-        if (["Tab", "ArrowUp", "ArrowDown"].includes(event.key)) {
+        if (["ArrowUp", "ArrowDown"].includes(event.key)) {
             menuList.classList.add("is-keyboard-nav");
         }
 
         if (event.key === "Tab") {
 
             event.preventDefault();
-            updateSelection(selectedIndex + (event.shiftKey ? -1 : 1));
-            menuItems[selectedIndex].focus();
+
+            if (document.activeElement === menuAudioButton) {
+                menuList.classList.add("is-keyboard-nav");
+                menuItems[selectedIndex].focus();
+            } else {
+                menuList.classList.remove("is-keyboard-nav");
+                menuAudioButton.focus();
+            }
+
             return;
 
         }

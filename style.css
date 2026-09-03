@@ -315,18 +315,21 @@ button:hover {
     gap: 8px;
     min-height: 36px;
     padding: 8px 10px;
-    border-color: white;
-    color: white;
+    border-color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.65);
+    opacity: 0.45;
     font-family: 'Lora', serif;
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.12em;
-    transition: color 160ms ease, border-color 160ms ease;
+    transition: color 160ms ease, border-color 160ms ease, opacity 160ms ease;
 }
 
-.audio-toggle:hover {
+.audio-toggle:hover,
+.audio-toggle:focus-visible {
     border-color: white;
     color: #673CAF;
+    opacity: 1;
 }
 
 .audio-toggle:focus-visible {
