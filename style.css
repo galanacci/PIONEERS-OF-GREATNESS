@@ -267,3 +267,34 @@ button:hover {
     z-index: 0;
     opacity: 50%;
 }
+
+/* Fullscreen Menu Overlay */
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.86);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 220ms ease, visibility 0s linear 220ms;
+}
+
+.menu-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+.menu-panel {
+    width: min(86vw, 640px);
+    min-height: 50vh;
+    outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {

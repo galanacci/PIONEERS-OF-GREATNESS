@@ -36,13 +36,17 @@
                 <div id="animated-placeholder"></div>
             </div>
             <button type="submit"><span class="button-text">➔</span><span class="button-arrow">➔</span></button>
-            <button type="button" class="menu-toggle" aria-label="Open menu">
+            <button type="button" class="menu-toggle" aria-label="Open menu" aria-controls="menu-overlay" aria-expanded="false">
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
             </button>
         </form>
         <div id="status"></div>
+    </div>
+
+    <div id="menu-overlay" class="menu-overlay" aria-hidden="true">
+        <div class="menu-panel" role="dialog" aria-modal="true" aria-label="PIONEERS OF GREATNESS menu" tabindex="-1"></div>
     </div>
 
     <div class="copyright">

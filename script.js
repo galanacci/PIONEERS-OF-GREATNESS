@@ -123,3 +123,52 @@ switch (data.status) {
     });
 
 });
+// Fullscreen menu overlay controls. Kept separate from the waitlist logic.
+document.addEventListener("DOMContentLoaded", () => {
+
+    const menuButton = document.querySelector(".menu-toggle");
+    const menuOverlay = document.getElementById("menu-overlay");
+    const menuPanel = menuOverlay?.querySelector(".menu-panel");
+
+    if (!menuButton || !menuOverlay || !menuPanel) return;
+
+    function openMenu() {
+
+        menuOverlay.classList.add("is-open");
+        menuOverlay.setAttribute("aria-hidden", "false");
+        menuButton.setAttribute("aria-expanded", "true");
+        menuButton.setAttribute("aria-label", "Close menu");
+        menuPanel.focus();
+
+    }
+
+    function closeMenu() {
+
+        menuOverlay.classList.remove("is-open");
+        menuOverlay.setAttribute("aria-hidden", "true");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Open menu");
+        menuButton.focus();
+
+    }
+
+    menuButton.addEventListener("click", () => {
+
+        const isOpen = menuOverlay.classList.contains("is-open");
+        isOpen ? closeMenu() : openMenu();
+
+    });
+
+    menuOverlay.addEventListener("click", (event) => {
+
+        if (event.target === menuOverlay) closeMenu();
+
+    });
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape" && menuOverlay.classList.contains("is-open")) closeMenu();
+
+    });
+
+});
