@@ -367,6 +367,13 @@ button:hover {
     color: #673CAF;
 }
 
+/* Keyboard selection echoes the P°G purple without overpowering the menu. */
+.menu-item:focus-visible {
+    outline: 1px solid #673CAF;
+    outline-offset: 3px;
+    background-color: rgba(103, 60, 175, 0.12);
+}
+
 /* Locked chapters remain selectable, but intentionally unavailable. */
 .menu-item[aria-disabled="true"] {
     padding-right: 48px;
