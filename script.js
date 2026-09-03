@@ -200,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const destination = menuItem.dataset.menuUrl;
             if (destination) window.open(destination, "_blank", "noopener,noreferrer");
-            closeMenu();
 
         } else if (action === "exit") {
 
