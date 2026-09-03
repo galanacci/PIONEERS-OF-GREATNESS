@@ -59,7 +59,7 @@ function buildArchive(items) {
         const videoId = item.contentDetails.videoId;
 
         return {
-            episode: `EPISODE ${String(index + 1).padStart(3, "0")}`,
+            episode: `EPISODE ${String(available.length - index).padStart(3, "0")}`,
             playlistPosition: Number.isInteger(snippet.position) ? snippet.position : index,
             videoId,
             title: snippet.title || "UNTITLED",
