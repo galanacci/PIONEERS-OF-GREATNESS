@@ -632,6 +632,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const isSelected = index === selectedIndex;
             item.classList.toggle("is-current", isSelected);
             item.querySelector("button")?.setAttribute("aria-pressed", String(isSelected));
+            const status = item.querySelector(".documentary-episode-status");
+            if (status) status.textContent = isSelected ? "NOW SHOWING" : "SELECT";
         });
 
         if (shouldFocus) list.children[selectedIndex]?.querySelector("button")?.focus();

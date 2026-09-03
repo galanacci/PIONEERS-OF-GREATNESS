@@ -953,15 +953,6 @@ button:hover {
     color: #9b75d9;
 }
 
-.documentary-episode.is-current .documentary-episode-status::before {
-    content: "NOW SHOWING";
-    font-size: 10px;
-}
-
-.documentary-episode.is-current .documentary-episode-status {
-    font-size: 0;
-}
-
 .documentary-state {
     padding: clamp(80px, 14vh, 140px) 0;
     color: rgba(255, 255, 255, 0.45);
