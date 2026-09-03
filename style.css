@@ -393,6 +393,11 @@ button:hover {
     color: rgba(255, 255, 255, 0.4);
 }
 
+.menu-item[aria-disabled="true"]:focus-visible {
+    outline-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
 .menu-item[aria-disabled="true"]::after {
     content: "\1F512\FE0E";
     position: absolute;
