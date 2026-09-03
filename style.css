@@ -132,6 +132,8 @@ input[type="email"]::placeholder {
 #email-form > button[type="submit"],
 #email-form > button[type="submit"]:hover {
     border-left: 0;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 #email-form > button[type="submit"]:hover {
@@ -258,7 +260,7 @@ button:hover {
     font-weight: 400;
     z-index: 10;
     white-space: nowrap;
-    width: calc(100% - 30px);
+    width: calc(100% - 14px);
     overflow: hidden;
 }
 
