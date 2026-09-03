@@ -113,6 +113,16 @@ input[type="email"]::placeholder {
     color: transparent;
 }
 
+#email-form input[type="email"] {
+    margin-right: 0;
+    border-right: 0;
+}
+
+#email-form > button[type="submit"],
+#email-form > button[type="submit"]:hover {
+    border-left: 0;
+}
+
 button {
     padding: 10px 15px;
     font-size: 16px;
