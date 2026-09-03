@@ -1,0 +1,66 @@
+name: Sync Instagram Field Notes
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 7 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: instagram-field-notes-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out development branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build Field Notes archive
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          FIELD_NOTES_SINCE: "2026-01-01T00:00:00Z"
+        run: node scripts/sync-instagram.mjs
+
+      - name: Open or update review pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if git diff --quiet -- data/field-notes.json src/field-notes; then
+            echo "No new Field Notes found."
+            exit 0
+          fi
+
+          branch="automation/field-notes-sync"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add data/field-notes.json src/field-notes
+          git commit -m "Synced Instagram Field Notes"
+          git push --force-with-lease origin "$branch"
+
+          existing_pr="$(gh pr list --head "$branch" --base dev --state open --json number --jq '.[0].number')"
+          if [ -z "$existing_pr" ]; then
+            gh pr create \
+              --base dev \
+              --head "$branch" \
+              --title "Sync Instagram Field Notes" \
+              --body "Automated review of Instagram posts published since 1 January 2026. Merge only after checking captions, image order and presentation."
+          else
+            echo "Updated pull request #$existing_pr."
+          fi
