@@ -272,3 +272,46 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// Background audio starts muted so autoplay remains reliable across browsers.
+document.addEventListener("DOMContentLoaded", () => {
+
+    const backgroundVideo = document.querySelector(".background-video");
+    const audioButton = document.querySelector(".audio-toggle");
+    const audioLabel = audioButton?.querySelector(".audio-label");
+
+    if (!backgroundVideo || !audioButton || !audioLabel) return;
+
+    function updateAudioControl() {
+
+        const soundIsOn = !backgroundVideo.muted;
+        audioButton.setAttribute("aria-pressed", String(soundIsOn));
+        audioButton.setAttribute("aria-label", soundIsOn ? "Mute background audio" : "Turn background audio on");
+        audioLabel.textContent = soundIsOn ? "SOUND ON" : "SOUND OFF";
+
+    }
+
+    backgroundVideo.muted = true;
+    updateAudioControl();
+
+    audioButton.addEventListener("click", async () => {
+
+        backgroundVideo.muted = !backgroundVideo.muted;
+
+        if (backgroundVideo.paused) {
+
+            try {
+                await backgroundVideo.play();
+            } catch (error) {
+                console.error("Background video could not resume.", error);
+            }
+
+        }
+
+        updateAudioControl();
+
+    });
+
+    backgroundVideo.addEventListener("volumechange", updateAudioControl);
+
+});
