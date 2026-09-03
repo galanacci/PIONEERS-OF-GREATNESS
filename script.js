@@ -563,3 +563,139 @@ document.addEventListener("DOMContentLoaded", () => {
     loadFieldNotes();
 
 });
+
+// UNCUT Documentary renderer. The public YouTube playlist remains the source of truth.
+document.addEventListener("DOMContentLoaded", () => {
+
+    const feature = document.getElementById("documentary-feature");
+    const list = document.getElementById("documentary-list");
+
+    if (!feature || !list) return;
+
+    let episodes = [];
+    let selectedIndex = 0;
+
+    function showState(message) {
+
+        const state = document.createElement("p");
+        state.className = "documentary-state";
+        state.textContent = message;
+        feature.replaceChildren(state);
+        list.replaceChildren();
+
+    }
+
+    function formatDate(timestamp) {
+
+        return new Intl.DateTimeFormat("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }).format(new Date(timestamp)).toUpperCase();
+
+    }
+
+    function selectEpisode(nextIndex, shouldFocus = false) {
+
+        selectedIndex = (nextIndex + episodes.length) % episodes.length;
+        const episode = episodes[selectedIndex];
+
+        const player = document.createElement("iframe");
+        player.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(episode.videoId)}?rel=0`;
+        player.title = `UNCUT — ${episode.title}`;
+        player.loading = "lazy";
+        player.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        player.referrerPolicy = "strict-origin-when-cross-origin";
+        player.allowFullscreen = true;
+
+        const frame = document.createElement("div");
+        frame.className = "documentary-player";
+        frame.append(player);
+
+        const meta = document.createElement("div");
+        meta.className = "documentary-feature-meta";
+
+        const number = document.createElement("span");
+        number.textContent = episode.episode;
+
+        const date = document.createElement("time");
+        date.dateTime = episode.publishedAt;
+        date.textContent = formatDate(episode.publishedAt);
+        meta.append(number, date);
+
+        const title = document.createElement("h2");
+        title.textContent = episode.title;
+
+        feature.replaceChildren(frame, meta, title);
+
+        Array.from(list.children).forEach((item, index) => {
+            const isSelected = index === selectedIndex;
+            item.classList.toggle("is-current", isSelected);
+            item.querySelector("button")?.setAttribute("aria-pressed", String(isSelected));
+        });
+
+        if (shouldFocus) list.children[selectedIndex]?.querySelector("button")?.focus();
+
+    }
+
+    function createEpisodeItem(episode, index) {
+
+        const item = document.createElement("li");
+        item.className = "documentary-episode";
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "documentary-episode-button";
+        button.setAttribute("aria-pressed", "false");
+
+        const number = document.createElement("span");
+        number.className = "documentary-episode-number";
+        number.textContent = episode.episode;
+
+        const title = document.createElement("span");
+        title.className = "documentary-episode-title";
+        title.textContent = episode.title;
+
+        const status = document.createElement("span");
+        status.className = "documentary-episode-status";
+        status.textContent = "SELECT";
+
+        button.append(number, title, status);
+        button.addEventListener("click", () => selectEpisode(index));
+        button.addEventListener("keydown", (event) => {
+            if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+            event.preventDefault();
+            selectEpisode(selectedIndex + (event.key === "ArrowDown" ? 1 : -1), true);
+        });
+        item.append(button);
+        return item;
+
+    }
+
+    async function loadDocumentary() {
+
+        try {
+            const response = await fetch("data/documentary.json", { cache: "no-cache" });
+            if (!response.ok) throw new Error(`Documentary request failed: ${response.status}`);
+
+            const payload = await response.json();
+            episodes = Array.isArray(payload.episodes) ? payload.episodes : [];
+
+            if (episodes.length === 0) {
+                showState("UNCUT ARCHIVE SYNC PENDING");
+                return;
+            }
+
+            list.replaceChildren(...episodes.map(createEpisodeItem));
+            selectEpisode(0);
+
+        } catch (error) {
+            console.error("UNCUT archive could not be loaded.", error);
+            showState("SCREENING ROOM TEMPORARILY UNAVAILABLE");
+        }
+
+    }
+
+    loadDocumentary();
+
+});

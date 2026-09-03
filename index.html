@@ -62,19 +62,18 @@
         </div>
     </div>
 
-    <section id="documentary-room" class="world-room" aria-hidden="true" aria-labelledby="documentary-title">
-        <div class="world-room-content">
+    <section id="documentary-room" class="world-room documentary-room" aria-hidden="true" aria-labelledby="documentary-title">
+        <div class="world-room-content documentary-content">
             <button type="button" class="room-return" data-room-close>&larr; MENU</button>
-            <p class="room-kicker">DOCUMENTARY</p>
-            <h1 id="documentary-title">Building PIONEERS OF GREATNESS</h1>
+            <header class="documentary-header">
+                <p class="room-kicker">DOCUMENTARY SCREENING ROOM</p>
+                <h1 id="documentary-title">UNCUT</h1>
+                <p class="documentary-intro">The building of PIONEERS OF GREATNESS, documented without polish.</p>
+            </header>
             <div class="room-divider" aria-hidden="true"></div>
-            <p class="room-season">SEASON ONE</p>
-            <ol class="episode-list">
-                <li class="episode is-current">
-                    <span>EPISODE 001</span>
-                    <span class="episode-status">NOW SHOWING</span>
-                </li>
-            </ol>
+            <div id="documentary-feature" class="documentary-feature" aria-live="polite"></div>
+            <p class="room-season">EPISODE ARCHIVE</p>
+            <ol id="documentary-list" class="documentary-list" aria-label="UNCUT episodes"></ol>
             <div class="room-divider" aria-hidden="true"></div>
             <a class="room-watch" href="https://www.youtube.com/playlist?list=PL_UEBZlt-mUL5Hc2zGP4_Xsr6ayZAtWs3" target="_blank" rel="noopener noreferrer">WATCH ON YOUTUBE</a>
         </div>
