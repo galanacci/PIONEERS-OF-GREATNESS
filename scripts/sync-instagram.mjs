@@ -193,7 +193,9 @@ async function run() {
 
     const existingArchive = await readExistingArchive();
     const existingById = new Map((existingArchive.notes || []).map((note) => [note.id, note]));
-    const media = await fetchMedia();
+    // Field Notes is an editorial archive of feed posts, not a mirror of Reels.
+    const media = (await fetchMedia())
+        .filter((item) => item.permalink?.includes("/p/"));
     let imported = 0;
     let updated = 0;
 
@@ -225,7 +227,10 @@ async function run() {
     }
 
     const notes = assignEntryNumbers(
-        [...existingById.values()].filter((note) => Date.parse(note.timestamp) >= Date.parse(since))
+        [...existingById.values()].filter((note) => (
+            Date.parse(note.timestamp) >= Date.parse(since)
+            && note.instagramUrl?.includes("/p/")
+        ))
     );
 
     const archive = {
