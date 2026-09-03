@@ -131,6 +131,32 @@ button:hover {
     color: #673CAF;
 }
 
+.menu-toggle {
+    order: -1;
+    box-sizing: border-box;
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
+    padding: 0 11px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.menu-line {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+}
+
+.menu-toggle:focus-visible {
+    outline: 2px solid #673CAF;
+    outline-offset: 3px;
+}
+
 #status {
     width: 100%;
     margin-top: 10px;
