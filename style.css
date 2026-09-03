@@ -137,6 +137,11 @@ input[type="email"]::placeholder {
     border-left: 0;
 }
 
+#email-form > button[type="submit"]:hover {
+    border-color: white;
+    color: #673CAF;
+}
+
 button {
     padding: 10px 15px;
     font-size: 16px;
