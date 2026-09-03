@@ -113,6 +113,20 @@ input[type="email"]::placeholder {
     color: transparent;
 }
 
+#email-form {
+    align-items: center;
+}
+
+#email-form .input-container {
+    display: flex;
+}
+
+#email-form input[type="email"],
+#email-form > button[type="submit"] {
+    box-sizing: border-box;
+    height: 42px;
+}
+
 #email-form input[type="email"] {
     margin-right: 0;
     border-right: 0;
