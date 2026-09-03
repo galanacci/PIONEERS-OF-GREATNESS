@@ -374,6 +374,15 @@ button:hover {
     background-color: rgba(103, 60, 175, 0.12);
 }
 
+/* Enter/click confirms an actionable selection with a complete purple state. */
+.menu-item.is-activated,
+.menu-item:not([aria-disabled="true"]):active {
+    color: #673CAF;
+    outline: 1px solid #673CAF;
+    outline-offset: 3px;
+    background-color: rgba(103, 60, 175, 0.22);
+}
+
 /* Locked chapters remain selectable, but intentionally unavailable. */
 .menu-item[aria-disabled="true"] {
     padding-right: 48px;

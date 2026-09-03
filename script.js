@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const isSelected = index === selectedIndex;
             item.classList.toggle("is-selected", isSelected);
+            item.classList.remove("is-activated");
             item.tabIndex = isSelected ? 0 : -1;
             isSelected ? item.setAttribute("aria-current", "true") : item.removeAttribute("aria-current");
 
@@ -189,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (menuItem.getAttribute("aria-disabled") === "true") return;
 
+        menuItem.classList.add("is-activated");
         const action = menuItem.dataset.menuAction;
 
         if (action === "waitlist") {
