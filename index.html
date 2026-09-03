@@ -32,17 +32,17 @@
     <div class="container">
         <form id="email-form">
             <div class="input-container">
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" autocomplete="email" aria-label="Email address" required>
                 <div id="animated-placeholder"></div>
             </div>
-            <button type="submit"><span class="button-text">➔</span><span class="button-arrow">➔</span></button>
+            <button type="submit" aria-label="Join the waitlist"><span class="button-text">➔</span><span class="button-arrow">➔</span></button>
             <button type="button" class="menu-toggle" aria-label="Open menu" aria-controls="menu-overlay" aria-expanded="false">
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
                 <span class="menu-line"></span>
             </button>
         </form>
-        <div id="status"></div>
+        <div id="status" role="status" aria-live="polite"></div>
     </div>
 
     <div id="menu-overlay" class="menu-overlay" aria-hidden="true">

@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuOverlay = document.getElementById("menu-overlay");
     const menuPanel = menuOverlay?.querySelector(".menu-panel");
     const menuItems = Array.from(menuPanel?.querySelectorAll(".menu-item") ?? []);
+    const pageRegions = document.querySelectorAll("nav, #container, .container, .copyright");
     let selectedIndex = Math.max(0, menuItems.findIndex((item) => item.classList.contains("is-selected")));
 
     if (!menuButton || !menuOverlay || !menuPanel || menuItems.length === 0) return;
@@ -158,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
         menuOverlay.setAttribute("aria-hidden", "false");
         menuButton.setAttribute("aria-expanded", "true");
         menuButton.setAttribute("aria-label", "Close menu");
+        pageRegions.forEach((region) => { region.inert = true; });
         updateSelection(selectedIndex);
         menuItems[selectedIndex].focus();
 
@@ -169,6 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
         menuOverlay.setAttribute("aria-hidden", "true");
         menuButton.setAttribute("aria-expanded", "false");
         menuButton.setAttribute("aria-label", "Open menu");
+        pageRegions.forEach((region) => { region.inert = false; });
         menuButton.focus();
 
     }
@@ -224,6 +227,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("keydown", (event) => {
 
         if (!menuOverlay.classList.contains("is-open")) return;
+
+        if (event.key === "Tab") {
+
+            event.preventDefault();
+            updateSelection(selectedIndex + (event.shiftKey ? -1 : 1));
+            menuItems[selectedIndex].focus();
+            return;
+
+        }
 
         if (event.key === "ArrowUp") {
 

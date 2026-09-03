@@ -71,7 +71,7 @@ nav .logo-container img {
 .container {
     text-align: center;
     width: 100%;
-    padding-bottom: 40px;
+    padding-bottom: 50px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -87,6 +87,7 @@ nav .logo-container img {
 
 #email-form {
     display: flex;
+    align-items: center;
     justify-content: center;
     z-index: 1000;
     margin-bottom: 0;
@@ -113,10 +114,6 @@ input[type="email"]::placeholder {
     color: transparent;
 }
 
-#email-form {
-    align-items: center;
-}
-
 #email-form .input-container {
     display: flex;
 }
@@ -140,6 +137,17 @@ input[type="email"]::placeholder {
 #email-form > button[type="submit"]:hover {
     border-color: white;
     color: #673CAF;
+}
+
+#email-form input[type="email"]:focus-visible,
+#email-form > button[type="submit"]:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 1px #673CAF;
+}
+
+.menu-toggle,
+#email-form > button[type="submit"] {
+    transition: color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 button {
@@ -214,7 +222,7 @@ button:hover {
         padding: 10px 15px;
     }
     .container {
-        padding-bottom: 20px;
+        padding-bottom: 50px;
     }
 }
 
@@ -231,10 +239,6 @@ button:hover {
     opacity: 100;
     z-index: 1000;
     font-weight: 700;
-}
-
-.container {
-    padding-bottom: 50px;
 }
 
 .input-container {
@@ -334,6 +338,9 @@ button:hover {
     margin: 0;
     padding: 0;
     list-style: none;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .menu-list li + li {
@@ -355,10 +362,6 @@ button:hover {
     line-height: 1.2;
     text-align: left;
     cursor: pointer;
-}
-
-.menu-item[aria-disabled="true"] {
-    cursor: default;
 }
 
 .menu-item:hover {
@@ -387,6 +390,7 @@ button:hover {
 .menu-item[aria-disabled="true"] {
     padding-right: 48px;
     color: rgba(255, 255, 255, 0.4);
+    cursor: default;
 }
 
 .menu-item[aria-disabled="true"]:hover {
@@ -421,8 +425,28 @@ button:hover {
     font-size: 0.7em;
 }
 
+@media (max-height: 560px) {
+    .menu-panel {
+        min-height: 0;
+    }
+
+    .menu-list li + li {
+        margin-top: 8px;
+    }
+
+    .menu-item {
+        padding-top: 6px;
+        padding-bottom: 6px;
+        font-size: 16px;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .menu-overlay {
         transition: none;
+    }
+
+    .scrolling-text-container {
+        animation: none;
     }
 }
