@@ -469,12 +469,16 @@ button:hover {
 }
 
 .menu-item.is-selected::before {
-    content: "▶";
+    content: "";
     position: absolute;
     left: 8px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 0.7em;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid currentColor;
 }
 
 @media (max-height: 560px) {
