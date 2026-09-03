@@ -32,12 +32,68 @@
     <div class="container">
         <form id="email-form">
             <div class="input-container">
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" autocomplete="email" aria-label="Email address" required>
                 <div id="animated-placeholder"></div>
             </div>
-            <button type="submit"><span class="button-text">➔</span><span class="button-arrow">➔</span></button>
+            <button type="submit" aria-label="Join the waitlist"><span class="button-text">➔</span><span class="button-arrow">➔</span></button>
+            <button type="button" class="menu-toggle" aria-label="Open menu" aria-controls="menu-overlay" aria-expanded="false">
+                <span class="menu-line"></span>
+                <span class="menu-line"></span>
+                <span class="menu-line"></span>
+            </button>
         </form>
-        <div id="status"></div>
+        <div id="status" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="menu-overlay" class="menu-overlay" aria-hidden="true">
+        <div class="menu-panel" role="dialog" aria-modal="true" aria-label="PIONEERS OF GREATNESS menu" tabindex="-1">
+            <ul class="menu-list" role="menu">
+                <li><button type="button" class="menu-item is-selected" role="menuitem" data-menu-action="waitlist">WAITLIST</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" aria-disabled="true">FOUNDER</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="documentary-room">DOCUMENTARY</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="field-notes-room">FIELD NOTES</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" aria-disabled="true">ARCHIVE</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="exit">EXIT</button></li>
+            </ul>
+            <button type="button" class="audio-toggle" aria-label="Turn background audio on" aria-pressed="false">
+                <span class="audio-dot" aria-hidden="true"></span>
+                <span class="audio-label">SOUND OFF</span>
+            </button>
+        </div>
+    </div>
+
+    <section id="documentary-room" class="world-room documentary-room" aria-hidden="true" aria-labelledby="documentary-title">
+        <div class="world-room-content documentary-content">
+            <button type="button" class="room-return" data-room-close>&larr; MENU</button>
+            <header class="documentary-header">
+                <p class="room-kicker">DOCUMENTARY SCREENING ROOM</p>
+                <h1 id="documentary-title">UNCUT</h1>
+                <p class="documentary-intro">The building of PIONEERS OF GREATNESS, documented without polish.</p>
+            </header>
+            <div class="room-divider" aria-hidden="true"></div>
+            <div id="documentary-feature" class="documentary-feature" aria-live="polite"></div>
+            <p class="room-season">EPISODE ARCHIVE</p>
+            <ol id="documentary-list" class="documentary-list" aria-label="UNCUT episodes"></ol>
+            <div class="room-divider" aria-hidden="true"></div>
+            <a class="room-watch" href="https://www.youtube.com/playlist?list=PL_UEBZlt-mUL5Hc2zGP4_Xsr6ayZAtWs3" target="_blank" rel="noopener noreferrer">WATCH ON YOUTUBE</a>
+        </div>
+    </section>
+
+    <section id="field-notes-room" class="world-room field-notes-room" aria-hidden="true" aria-labelledby="field-notes-title">
+        <div class="world-room-content field-notes-content">
+            <button type="button" class="room-return" data-room-close>&larr; MENU</button>
+            <header class="field-notes-header">
+                <p class="room-kicker">JOURNAL ROOM</p>
+                <h1 id="field-notes-title">FIELD NOTES</h1>
+                <p class="field-notes-intro">Fragments from the making of PIONEERS OF GREATNESS.</p>
+            </header>
+            <div class="room-divider" aria-hidden="true"></div>
+            <div id="field-notes-list" class="field-notes-list" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <div id="room-transition" class="room-transition" aria-hidden="true">
+        <span role="status" aria-live="polite">LOADING...</span>
     </div>
 
     <div class="copyright">
