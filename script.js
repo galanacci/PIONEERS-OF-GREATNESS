@@ -159,6 +159,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    menuPanel.addEventListener("click", (event) => {
+
+        const menuItem = event.target.closest(".menu-item");
+
+        if (!menuItem || menuItem.getAttribute("aria-disabled") === "true") return;
+
+        const action = menuItem.dataset.menuAction;
+
+        if (action === "waitlist") {
+
+            closeMenu();
+            document.getElementById("email")?.focus();
+
+        } else if (action === "external") {
+
+            const destination = menuItem.dataset.menuUrl;
+            if (destination) window.open(destination, "_blank", "noopener,noreferrer");
+            closeMenu();
+
+        } else if (action === "exit") {
+
+            closeMenu();
+
+        }
+
+    });
+
     menuOverlay.addEventListener("click", (event) => {
 
         if (event.target === menuOverlay) closeMenu();
