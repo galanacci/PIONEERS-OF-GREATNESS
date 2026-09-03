@@ -327,13 +327,16 @@ button:hover {
 
 .audio-toggle:hover,
 .audio-toggle:focus-visible {
+    border: 0;
+    outline: 0;
     color: #673CAF;
     opacity: 1;
 }
 
 .audio-toggle:focus-visible {
-    outline: 2px solid #673CAF;
-    outline-offset: 3px;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
 }
 
 .audio-dot {
