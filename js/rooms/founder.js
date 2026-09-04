@@ -21,6 +21,11 @@ function wait(milliseconds) {
     return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
+function readingPause(paragraph) {
+    const wordCount = paragraph.trim().split(/\s+/).length;
+    return Math.min(9500, Math.max(5500, wordCount * 320));
+}
+
 export function initFounder() {
     const introduction = document.getElementById("founder-introduction");
     const copy = document.getElementById("founder-introduction-copy");
@@ -73,17 +78,18 @@ export function initFounder() {
 
     async function typeParagraph(paragraph, token) {
         const element = document.createElement("p");
-        copy.append(element);
+        copy.replaceChildren(element);
         if (reducedMotion) {
             element.textContent = paragraph;
-            await wait(500);
-            return;
+            return element;
         }
         for (const character of paragraph) {
             if (token !== sequence) return;
             element.textContent += character;
-            await wait(character === " " ? 22 : 38);
+            const punctuationPause = /[.!?]/.test(character) ? 240 : 0;
+            await wait((character === " " ? 28 : 48) + punctuationPause);
         }
+        return element;
     }
 
     async function playIntroduction() {
@@ -95,13 +101,19 @@ export function initFounder() {
         try {
             const content = await loadPoem();
             await wait(reducedMotion ? 200 : 1200);
-            for (const paragraph of content.paragraphs) {
+            for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
-                await typeParagraph(paragraph, token);
-                await wait(reducedMotion ? 350 : 1400);
+                const element = await typeParagraph(paragraph, token);
+                if (!element || token !== sequence) return;
+                await wait(readingPause(paragraph));
+                const isFinalParagraph = index === content.paragraphs.length - 1;
+                if (!isFinalParagraph && !reducedMotion) {
+                    element.classList.add("is-leaving");
+                    await wait(700);
+                }
             }
             if (token !== sequence) return;
-            await wait(reducedMotion ? 200 : 1000);
+            await wait(reducedMotion ? 800 : 2200);
             enter.hidden = false;
             enter.focus();
         } catch (error) {

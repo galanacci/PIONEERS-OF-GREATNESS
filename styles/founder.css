@@ -43,6 +43,8 @@ body.founder-introduction-active {
 .founder-introduction-copy {
     min-height: min(52vh, 460px);
     margin-top: clamp(50px, 10vh, 100px);
+    display: flex;
+    align-items: flex-start;
 }
 
 .founder-introduction-copy p {
@@ -54,6 +56,12 @@ body.founder-introduction-active {
     letter-spacing: 0.025em;
     line-height: 1.8;
     white-space: pre-wrap;
+    opacity: 1;
+    transition: opacity 700ms ease;
+}
+
+.founder-introduction-copy p.is-leaving {
+    opacity: 0;
 }
 
 .founder-introduction-actions {
@@ -149,6 +157,10 @@ body.founder-introduction-active {
 
 @media (prefers-reduced-motion: reduce) {
     .founder-introduction {
+        transition: none;
+    }
+
+    .founder-introduction-copy p {
         transition: none;
     }
 }
