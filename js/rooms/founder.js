@@ -49,7 +49,6 @@ export function initFounder() {
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
     ));
-    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let sequence = 0;
     let poem = null;
 
@@ -113,21 +112,21 @@ export function initFounder() {
         enter.hidden = true;
         try {
             const content = await loadPoem();
-            await wait(reducedMotion ? 200 : 1200);
+            await wait(1200);
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
                 const pacing = pacingFor(index);
                 const element = await typeParagraph(paragraph, token, pacing);
                 if (!element || token !== sequence) return;
-                await wait(reducedMotion ? Math.min(2200, pacing.hold) : pacing.hold);
+                await wait(pacing.hold);
                 const isFinalParagraph = index === content.paragraphs.length - 1;
-                if (!isFinalParagraph && !reducedMotion) {
+                if (!isFinalParagraph) {
                     element.classList.add("is-leaving");
                     await wait(700);
                 }
             }
             if (token !== sequence) return;
-            await wait(reducedMotion ? 800 : 2200);
+            await wait(2200);
             copy.querySelector(".is-active")?.classList.remove("is-active");
             copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
@@ -155,10 +154,10 @@ export function initFounder() {
     async function enterFounderPath() {
         transition.classList.add("is-active");
         transition.setAttribute("aria-hidden", "false");
-        await wait(reducedMotion ? 350 : 900);
+        await wait(900);
         if (hasCompletedIntroduction()) showReturningChoice();
         else playIntroduction();
-        await wait(reducedMotion ? 0 : 250);
+        await wait(250);
         transition.classList.remove("is-active");
         transition.setAttribute("aria-hidden", "true");
     }

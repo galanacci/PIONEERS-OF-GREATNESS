@@ -458,14 +458,3 @@ body.founder-introduction-active {
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .founder-introduction {
-        transition: none;
-    }
-
-    .founder-introduction-copy p {
-        transition: none;
-        animation: none;
-    }
-
-}
