@@ -52,7 +52,7 @@ export function validateDocumentary(payload) {
 export function validateGreatnessPoem(payload) {
     assert(payload && typeof payload === "object", "GREATNESS poem payload must be an object.");
     assert(Number.isInteger(payload.version) && payload.version > 0, "GREATNESS poem version must be a positive integer.");
-    assert(payload.title === "THE BEGINNING — GREATNESS POEM", "GREATNESS poem title must be THE BEGINNING — GREATNESS POEM.");
+    assert(payload.title === "GREATNESS POEM", "GREATNESS poem title must be GREATNESS POEM.");
     assert(typeof payload.placeholder === "boolean", "GREATNESS poem placeholder flag must be boolean.");
     assert(Array.isArray(payload.paragraphs) && payload.paragraphs.length > 0, "GREATNESS poem must contain at least one paragraph.");
     assert(payload.paragraphs.every((paragraph) => typeof paragraph === "string" && paragraph.trim()), "GREATNESS poem paragraphs cannot be empty.");

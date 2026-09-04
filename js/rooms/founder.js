@@ -39,12 +39,13 @@ function pacingFor(index) {
 export function initFounder() {
     const introduction = document.getElementById("founder-introduction");
     const copy = document.getElementById("founder-introduction-copy");
+    const poemReveal = document.getElementById("founder-poem-reveal");
     const actions = document.getElementById("founder-introduction-actions");
     const enter = document.getElementById("founder-introduction-enter");
     const replay = introduction?.querySelector("[data-founder-replay]");
     const enterFounder = introduction?.querySelector("[data-founder-enter]");
     const transition = document.getElementById("room-transition");
-    if (!introduction || !copy || !actions || !enter || !replay || !enterFounder || !transition) return;
+    if (!introduction || !copy || !poemReveal || !actions || !enter || !replay || !enterFounder || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -106,7 +107,9 @@ export function initFounder() {
     async function playIntroduction() {
         openIntroduction();
         const token = sequence;
+        copy.hidden = false;
         copy.replaceChildren();
+        poemReveal.hidden = true;
         copy.setAttribute("aria-busy", "true");
         actions.hidden = true;
         enter.hidden = true;
@@ -127,7 +130,14 @@ export function initFounder() {
             }
             if (token !== sequence) return;
             await wait(2200);
-            copy.querySelector(".is-active")?.classList.remove("is-active");
+            const finalParagraph = copy.querySelector(".is-active");
+            finalParagraph?.classList.remove("is-active");
+            finalParagraph?.classList.add("is-leaving");
+            await wait(700);
+            copy.replaceChildren();
+            copy.hidden = true;
+            poemReveal.hidden = false;
+            await wait(2400);
             copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
             enter.focus();
@@ -144,7 +154,9 @@ export function initFounder() {
 
     function showReturningChoice() {
         openIntroduction();
+        copy.hidden = false;
         copy.replaceChildren();
+        poemReveal.hidden = true;
         copy.setAttribute("aria-busy", "false");
         enter.hidden = true;
         actions.hidden = false;
