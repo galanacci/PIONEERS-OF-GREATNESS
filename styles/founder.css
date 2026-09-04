@@ -64,6 +64,22 @@ body.founder-introduction-active {
     opacity: 0;
 }
 
+.founder-introduction-copy p.is-active::after {
+    content: "";
+    display: inline-block;
+    width: 0.08em;
+    height: 1em;
+    margin-left: 0.18em;
+    background: currentColor;
+    vertical-align: -0.12em;
+    animation: founder-cursor 900ms steps(1, end) infinite;
+}
+
+@keyframes founder-cursor {
+    0%, 48% { opacity: 1; }
+    49%, 100% { opacity: 0; }
+}
+
 .founder-introduction-actions {
     display: flex;
     align-items: center;
@@ -162,5 +178,10 @@ body.founder-introduction-active {
 
     .founder-introduction-copy p {
         transition: none;
+    }
+
+    .founder-introduction-copy p.is-active::after {
+        animation: none;
+        opacity: 1;
     }
 }

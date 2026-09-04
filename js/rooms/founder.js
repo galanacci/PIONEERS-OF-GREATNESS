@@ -79,6 +79,7 @@ export function initFounder() {
 
     async function typeParagraph(paragraph, token) {
         const element = document.createElement("p");
+        element.className = "is-active";
         copy.replaceChildren(element);
         if (reducedMotion) {
             element.textContent = paragraph;
@@ -97,6 +98,7 @@ export function initFounder() {
         openIntroduction();
         const token = sequence;
         copy.replaceChildren();
+        copy.setAttribute("aria-busy", "true");
         actions.hidden = true;
         enter.hidden = true;
         try {
@@ -115,6 +117,8 @@ export function initFounder() {
             }
             if (token !== sequence) return;
             await wait(reducedMotion ? 800 : 2200);
+            copy.querySelector(".is-active")?.classList.remove("is-active");
+            copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
             enter.focus();
         } catch (error) {
@@ -122,6 +126,7 @@ export function initFounder() {
             const state = document.createElement("p");
             state.textContent = "THE BEGINNING IS TEMPORARILY UNAVAILABLE.";
             copy.replaceChildren(state);
+            copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
             enter.focus();
         }
@@ -130,6 +135,7 @@ export function initFounder() {
     function showReturningChoice() {
         openIntroduction();
         copy.replaceChildren();
+        copy.setAttribute("aria-busy", "false");
         enter.hidden = true;
         actions.hidden = false;
         enterFounder.focus();
