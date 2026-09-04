@@ -27,13 +27,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
+
+      - name: Install pinned build dependencies
+        run: npm ci
 
       - name: Build UNCUT episode archive
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_PLAYLIST_ID: "PL_UEBZlt-mUL5Hc2zGP4_Xsr6ayZAtWs3"
         run: node scripts/sync-youtube.mjs
+
+      - name: Validate generated archives
+        run: npm run validate
 
       - name: Open or update review pull request
         env:

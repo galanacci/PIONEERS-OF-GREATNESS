@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pioneersofgreatness.com/schemas/documentary.schema.json",
+  "type": "object",
+  "required": ["playlistId", "syncedAt", "episodes"],
+  "properties": {
+    "playlistId": { "type": "string", "minLength": 1 },
+    "syncedAt": { "type": "string", "format": "date-time" },
+    "episodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["episode", "playlistPosition", "videoId", "title", "description", "publishedAt", "thumbnail", "youtubeUrl"],
+        "properties": {
+          "episode": { "type": "string", "pattern": "^EPISODE [0-9]{3,}$" },
+          "playlistPosition": { "type": "integer", "minimum": 0 },
+          "videoId": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" },
+          "publishedAt": { "type": "string", "format": "date-time" },
+          "thumbnail": { "type": "string", "pattern": "^https://" },
+          "youtubeUrl": { "type": "string", "pattern": "^https://www\\.youtube\\.com/watch" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pioneersofgreatness.com/schemas/field-notes.schema.json",
+  "type": "object",
+  "required": ["generatedAt", "since", "notes"],
+  "properties": {
+    "generatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "since": { "type": "string", "format": "date-time" },
+    "notes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "entry", "timestamp", "caption", "mediaType", "images", "instagramUrl"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "entry": { "type": "string", "pattern": "^FIELD NOTE [0-9]{3,}$" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "caption": { "type": "string" },
+          "mediaType": { "type": "string" },
+          "images": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "\\.webp$" } },
+          "instagramUrl": { "type": "string", "pattern": "^https://(www\\.)?instagram\\.com/p/" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

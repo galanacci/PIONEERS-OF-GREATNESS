@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { validateDocumentary } from "./validate-content.mjs";
 
 const apiKey = process.env.YOUTUBE_API_KEY;
 const playlistId = process.env.YOUTUBE_PLAYLIST_ID || "PL_UEBZlt-mUL5Hc2zGP4_Xsr6ayZAtWs3";
@@ -79,12 +80,18 @@ function buildArchive(items) {
 
 const items = await fetchPlaylist();
 const episodes = buildArchive(items);
+if (episodes.length === 0) {
+    throw new Error("YouTube returned no playable episodes; archive update aborted.");
+}
 
-await mkdir(dirname(archivePath), { recursive: true });
-await writeFile(archivePath, `${JSON.stringify({
+const archive = {
     playlistId,
     syncedAt: new Date().toISOString(),
     episodes
-}, null, 2)}\n`, "utf8");
+};
+validateDocumentary(archive);
+
+await mkdir(dirname(archivePath), { recursive: true });
+await writeFile(archivePath, `${JSON.stringify(archive, null, 2)}\n`, "utf8");
 
 console.log(`Synced ${episodes.length} UNCUT episode${episodes.length === 1 ? "" : "s"}.`);

@@ -1,0 +1,14 @@
+{
+  "name": "pioneers-of-greatness-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-content.mjs",
+    "sync:field-notes": "node scripts/sync-instagram.mjs",
+    "sync:documentary": "node scripts/sync-youtube.mjs",
+    "test": "npm run validate"
+  },
+  "dependencies": {
+    "sharp": "0.34.3"
+  }
+}
