@@ -6,7 +6,7 @@ function startScrolling() {
 
     if (!placeholder) return;
 
-    const text = "ENTER YOUR EMAIL HERE...";
+    const text = "ENTER EMAIL TO JOIN THE WAITLIST...";
 
     const container = document.createElement("div");
     container.className = "scrolling-text-container";
