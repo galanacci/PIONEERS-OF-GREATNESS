@@ -1,4 +1,4 @@
-const COMPLETION_KEY = "pog:founder-introduction:v1";
+const COMPLETION_KEY = "pog:founder-introduction:v2";
 const ROOM_ID = "founder-room";
 
 function hasCompletedIntroduction() {
