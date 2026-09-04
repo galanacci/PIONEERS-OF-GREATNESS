@@ -33,7 +33,7 @@ Run `npm test` first.
 - Enable the operating system's reduced-motion setting.
 - Menu and room transitions become immediate.
 - Placeholder and image effects do not cause disorienting motion.
-- THE BEGINNING preserves its essential character-by-character writing and reading pauses; decorative fades and cursor blinking are removed.
+- THE BEGINNING preserves its essential character-by-character writing, reading pauses and blinking writing cursor; only the larger decorative fades are removed.
 
 ## Pipeline integrity
 

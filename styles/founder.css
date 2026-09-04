@@ -180,8 +180,4 @@ body.founder-introduction-active {
         transition: none;
     }
 
-    .founder-introduction-copy p.is-active::after {
-        animation: none;
-        opacity: 1;
-    }
 }
