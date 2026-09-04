@@ -47,6 +47,39 @@ body.founder-introduction-active {
     align-items: flex-start;
 }
 
+.founder-introduction-copy[hidden],
+.founder-poem-reveal[hidden] {
+    display: none;
+}
+
+.founder-poem-reveal {
+    position: fixed;
+    inset: 8vh 10vw 18vh;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    animation: founder-paragraph-enter 1100ms ease both;
+}
+
+.founder-poem-reveal img {
+    display: block;
+    width: auto;
+    max-width: min(68vw, 720px);
+    height: auto;
+    max-height: 68vh;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.founder-introduction-enter {
+    position: fixed;
+    z-index: 2;
+    bottom: clamp(24px, 5vh, 56px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .founder-introduction-copy p {
     max-width: 650px;
     margin: 0 0 clamp(24px, 4vh, 42px);
@@ -423,6 +456,14 @@ body.founder-introduction-active {
     .founder-introduction-copy {
         min-height: 52vh;
         margin-top: 54px;
+    }
+
+    .founder-poem-reveal { inset: 24px 18px 78px; }
+
+    .founder-poem-reveal img {
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
     }
 
     .founder-introduction-actions {
