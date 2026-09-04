@@ -133,11 +133,12 @@ export function initFounder() {
             const finalParagraph = copy.querySelector(".is-active");
             finalParagraph?.classList.remove("is-active");
             finalParagraph?.classList.add("is-leaving");
-            await wait(700);
+            await wait(250);
+            poemReveal.hidden = false;
+            await wait(450);
             copy.replaceChildren();
             copy.hidden = true;
-            poemReveal.hidden = false;
-            await wait(2400);
+            await wait(1700);
             copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
             enter.focus();

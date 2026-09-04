@@ -53,30 +53,31 @@ body.founder-introduction-active {
 }
 
 .founder-poem-reveal {
-    width: min(100%, 520px);
-    margin: clamp(34px, 6vh, 64px) auto 0;
+    position: fixed;
+    inset: clamp(28px, 6vh, 68px) clamp(24px, 6vw, 90px) clamp(72px, 12vh, 130px);
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    margin: 0;
     animation: founder-paragraph-enter 1100ms ease both;
 }
 
 .founder-poem-reveal img {
     display: block;
-    width: 100%;
-    max-height: 58vh;
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
     object-fit: contain;
     background: rgba(255, 255, 255, 0.03);
 }
 
-.founder-poem-reveal figcaption {
-    margin-top: 16px;
-    color: rgba(255, 255, 255, 0.46);
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    line-height: 1.7;
-}
-
-.founder-poem-reveal figcaption span {
-    color: rgba(255, 255, 255, 0.78);
+.founder-introduction-enter {
+    position: fixed;
+    z-index: 2;
+    bottom: clamp(24px, 5vh, 56px);
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .founder-introduction-copy p {
@@ -457,13 +458,7 @@ body.founder-introduction-active {
         margin-top: 54px;
     }
 
-    .founder-poem-reveal {
-        margin-top: 34px;
-    }
-
-    .founder-poem-reveal img {
-        max-height: 56vh;
-    }
+    .founder-poem-reveal { inset: 24px 18px 78px; }
 
     .founder-introduction-actions {
         align-items: flex-start;
