@@ -1,0 +1,20 @@
+:root {
+    --color-background: #000;
+    --color-text: #fff;
+    --color-accent: #673caf;
+    --color-accent-light: #9b75d9;
+    --color-muted: rgba(255, 255, 255, 0.58);
+    --color-line: rgba(255, 255, 255, 0.16);
+    --space-1: 8px;
+    --space-2: 12px;
+    --space-3: 18px;
+    --space-4: 24px;
+    --space-5: 40px;
+    --time-fast: 160ms;
+    --time-medium: 220ms;
+    --font-brand: "Lora", serif;
+    --layer-page: 1000;
+    --layer-menu: 1500;
+    --layer-room: 1600;
+    --layer-transition: 2000;
+}
