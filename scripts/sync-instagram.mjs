@@ -1,9 +1,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { join } from "node:path";
+import sharp from "sharp";
+import { validateFieldNotes } from "./validate-content.mjs";
 
 const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
 const userId = process.env.INSTAGRAM_USER_ID || "me";
-const since = process.env.FIELD_NOTES_SINCE || "2026-01-01T00:00:00Z";
+// Instagram launched in 2010, so this captures the account's complete available history.
+const since = process.env.FIELD_NOTES_SINCE || "2010-01-01T00:00:00Z";
 const apiVersion = process.env.INSTAGRAM_API_VERSION || "v24.0";
 const graphBase = `https://graph.instagram.com/${apiVersion}`;
 const archivePath = join("data", "field-notes.json");
@@ -100,22 +103,6 @@ function mediaSources(item) {
 
 }
 
-function extensionFrom(response, sourceUrl) {
-
-    const contentType = response.headers.get("content-type")?.split(";")[0].trim();
-    const knownTypes = {
-        "image/jpeg": ".jpg",
-        "image/png": ".png",
-        "image/webp": ".webp"
-    };
-
-    if (knownTypes[contentType]) return knownTypes[contentType];
-
-    const candidate = extname(new URL(sourceUrl).pathname).toLowerCase();
-    return [".jpg", ".jpeg", ".png", ".webp"].includes(candidate) ? candidate : ".jpg";
-
-}
-
 async function downloadImage(url, destinationWithoutExtension) {
 
     const response = await fetch(url, {
@@ -126,10 +113,13 @@ async function downloadImage(url, destinationWithoutExtension) {
         throw new Error(`Media download failed (${response.status}).`);
     }
 
-    const extension = extensionFrom(response, url);
-    const destination = `${destinationWithoutExtension}${extension}`;
+    const destination = `${destinationWithoutExtension}.webp`;
     const bytes = Buffer.from(await response.arrayBuffer());
-    await writeFile(destination, bytes);
+    await sharp(bytes)
+        .rotate()
+        .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 82, effort: 5 })
+        .toFile(destination);
     return destination.replaceAll("\\", "/");
 
 }
@@ -196,6 +186,9 @@ async function run() {
     // Field Notes is an editorial archive of feed posts, not a mirror of Reels.
     const media = (await fetchMedia())
         .filter((item) => item.permalink?.includes("/p/"));
+    if (media.length === 0) {
+        throw new Error("Instagram returned no eligible regular posts; archive update aborted.");
+    }
     let imported = 0;
     let updated = 0;
 
@@ -241,6 +234,7 @@ async function run() {
         notes
     };
 
+    await validateFieldNotes(archive);
     await writeFile(archivePath, `${JSON.stringify(archive, null, 2)}\n`, "utf8");
     console.log(`Field Notes sync complete: ${imported} imported, ${updated} updated, ${notes.length} total.`);
 

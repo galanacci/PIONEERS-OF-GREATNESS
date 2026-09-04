@@ -28,7 +28,7 @@ The workflow also checks for new posts every Monday morning. It never publishes 
 
 ## Content rules
 
-The sync includes posts dated from `2026-01-01T00:00:00Z` onward and records:
+The sync includes the account's complete available post history (using `2010-01-01T00:00:00Z`, Instagram's launch year, as the lower boundary) and records:
 
 - original caption
 - publication date
