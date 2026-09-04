@@ -24,6 +24,18 @@
 .field-note-nav--previous::before { left: 18px; transform: rotate(-135deg); }
 .field-note-nav--next::before { right: 18px; transform: rotate(45deg); }
 
+.field-note-nav:hover,
+.field-note-nav:focus-visible {
+    border: 0;
+    outline: 0;
+    background: transparent;
+}
+
+.field-note-nav:hover::before,
+.field-note-nav:focus-visible::before {
+    border-color: var(--color-accent);
+}
+
 .field-note-media:hover .field-note-nav,
 .field-note-media:focus-within .field-note-nav,
 .field-note-nav:focus-visible { opacity: 1; outline: 0; }
