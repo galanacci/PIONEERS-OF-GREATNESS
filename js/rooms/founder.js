@@ -81,10 +81,6 @@ export function initFounder() {
         const element = document.createElement("p");
         element.className = "is-active";
         copy.replaceChildren(element);
-        if (reducedMotion) {
-            element.textContent = paragraph;
-            return element;
-        }
         for (const character of paragraph) {
             if (token !== sequence) return;
             element.textContent += character;
