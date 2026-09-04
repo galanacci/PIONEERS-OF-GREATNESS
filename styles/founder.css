@@ -127,6 +127,47 @@ body.founder-introduction-active {
     letter-spacing: 0.16em;
 }
 
+.founder-origin {
+    width: min(100%, 680px);
+    margin: 0 auto;
+}
+
+.founder-origin img {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: rgba(255, 255, 255, 0.04);
+    filter: saturate(0.82) contrast(1.04);
+}
+
+.founder-origin figcaption {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.42fr) minmax(0, 1fr);
+    gap: clamp(20px, 5vw, 56px);
+    margin-top: 20px;
+}
+
+.founder-origin figcaption span {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+}
+
+.founder-origin figcaption time {
+    display: block;
+    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.founder-origin figcaption p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: clamp(14px, 1.7vw, 18px);
+    letter-spacing: 0.025em;
+    line-height: 1.7;
+}
+
 .founder-placeholders p {
     display: flex;
     justify-content: space-between;
@@ -168,6 +209,15 @@ body.founder-introduction-active {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
+    }
+
+    .founder-origin {
+        width: 100%;
+    }
+
+    .founder-origin figcaption {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 }
 
