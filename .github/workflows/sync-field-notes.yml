@@ -36,7 +36,7 @@ jobs:
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
-          FIELD_NOTES_SINCE: "2026-01-01T00:00:00Z"
+          FIELD_NOTES_SINCE: "2010-01-01T00:00:00Z"
         run: node scripts/sync-instagram.mjs
 
       - name: Validate generated archives
@@ -66,7 +66,7 @@ jobs:
               --base dev \
               --head "$branch" \
               --title "Sync Instagram Field Notes" \
-              --body "Automated review of Instagram posts published since 1 January 2026. Merge only after checking captions, image order and presentation."
+              --body "Automated review of all available regular Instagram posts. Reels remain excluded. Merge only after checking captions, image order and presentation."
           else
             echo "Updated pull request #$existing_pr."
           fi

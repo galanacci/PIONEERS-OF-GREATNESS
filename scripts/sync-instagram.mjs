@@ -5,7 +5,8 @@ import { validateFieldNotes } from "./validate-content.mjs";
 
 const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
 const userId = process.env.INSTAGRAM_USER_ID || "me";
-const since = process.env.FIELD_NOTES_SINCE || "2026-01-01T00:00:00Z";
+// Instagram launched in 2010, so this captures the account's complete available history.
+const since = process.env.FIELD_NOTES_SINCE || "2010-01-01T00:00:00Z";
 const apiVersion = process.env.INSTAGRAM_API_VERSION || "v24.0";
 const graphBase = `https://graph.instagram.com/${apiVersion}`;
 const archivePath = join("data", "field-notes.json");
