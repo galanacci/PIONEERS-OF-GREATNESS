@@ -58,6 +58,7 @@ body.founder-introduction-active {
     white-space: pre-wrap;
     opacity: 1;
     transition: opacity 700ms ease;
+    animation: founder-paragraph-enter 700ms ease both;
 }
 
 .founder-introduction-copy p.is-leaving {
@@ -78,6 +79,11 @@ body.founder-introduction-active {
 @keyframes founder-cursor {
     0%, 48% { opacity: 1; }
     49%, 100% { opacity: 0; }
+}
+
+@keyframes founder-paragraph-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .founder-introduction-actions {
@@ -459,6 +465,7 @@ body.founder-introduction-active {
 
     .founder-introduction-copy p {
         transition: none;
+        animation: none;
     }
 
 }
