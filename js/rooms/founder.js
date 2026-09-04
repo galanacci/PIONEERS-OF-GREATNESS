@@ -1,5 +1,3 @@
-import { founderMission, founderNotes } from "../data/founder-content.js";
-
 const COMPLETION_KEY = "pog:founder-introduction:v2";
 const ROOM_ID = "founder-room";
 
@@ -35,20 +33,8 @@ export function initFounder() {
     const enter = document.getElementById("founder-introduction-enter");
     const replay = introduction?.querySelector("[data-founder-replay]");
     const enterFounder = introduction?.querySelector("[data-founder-enter]");
-    const cinematic = document.getElementById("founder-cinematic");
-    const cinematicTitle = cinematic?.querySelector("[data-founder-cinematic-title]");
-    const cinematicStill = cinematic?.querySelector("[data-founder-cinematic-still]");
-    const cinematicChapter = cinematic?.querySelector("[data-founder-cinematic-chapter]");
-    const storyEnter = cinematic?.querySelector("[data-founder-story-enter]");
-    const mission = document.getElementById("founder-mission-data");
-    const noteOverlay = document.getElementById("founder-note");
-    const noteLabel = document.getElementById("founder-note-label");
-    const noteTitle = document.getElementById("founder-note-title");
-    const noteCopy = document.getElementById("founder-note-copy");
-    const noteClose = noteOverlay?.querySelector("[data-founder-note-close]");
-    const founderRoom = document.getElementById(ROOM_ID);
     const transition = document.getElementById("room-transition");
-    if (!introduction || !copy || !actions || !enter || !replay || !enterFounder || !cinematic || !storyEnter || !mission || !noteOverlay || !noteClose || !transition) return;
+    if (!introduction || !copy || !actions || !enter || !replay || !enterFounder || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -56,20 +42,6 @@ export function initFounder() {
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let sequence = 0;
     let poem = null;
-    let noteTrigger = null;
-
-    const missionRows = [
-        ["PROJECT", founderMission.project], ["LOCATION", founderMission.location], ["STATUS", founderMission.status],
-        ["CURRENT OBJECTIVE", founderMission.objective], ["COLLECTION", founderMission.collection],
-        ["CURRENT PRIORITIES", founderMission.priorities.join("\n")], ["UPDATED", founderMission.updated]
-    ];
-    mission.replaceChildren(...missionRows.map(([label, value]) => {
-        const row = document.createElement("div");
-        const term = document.createElement("dt"); term.textContent = label;
-        const detail = document.createElement("dd"); detail.textContent = value;
-        if (label === "UPDATED") detail.dataset.datetime = founderMission.updatedDatetime;
-        row.append(term, detail); return row;
-    }));
 
     async function loadPoem() {
         if (poem) return poem;
@@ -105,28 +77,10 @@ export function initFounder() {
         window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: ROOM_ID } }));
     }
 
-    async function playPostPoemCinematic() {
-        copy.replaceChildren();
-        enter.hidden = true;
-        actions.hidden = true;
-        cinematic.hidden = false;
-        cinematicTitle.hidden = false;
-        cinematicStill.hidden = true;
-        cinematicChapter.hidden = true;
-        await wait(reducedMotion ? 100 : 1500);
-        cinematicTitle.hidden = true;
-        cinematicStill.hidden = false;
-        await wait(reducedMotion ? 100 : 4200);
-        cinematicStill.hidden = true;
-        cinematicChapter.hidden = false;
-        storyEnter.focus();
-    }
-
     async function typeParagraph(paragraph, token) {
         const element = document.createElement("p");
         element.className = "is-active";
         copy.replaceChildren(element);
-        if (reducedMotion) { element.textContent = paragraph; return element; }
         for (const character of paragraph) {
             if (token !== sequence) return;
             element.textContent += character;
@@ -161,7 +115,8 @@ export function initFounder() {
             await wait(reducedMotion ? 800 : 2200);
             copy.querySelector(".is-active")?.classList.remove("is-active");
             copy.setAttribute("aria-busy", "false");
-            await playPostPoemCinematic();
+            enter.hidden = false;
+            enter.focus();
         } catch (error) {
             console.error("THE BEGINNING could not be loaded.", error);
             const state = document.createElement("p");
@@ -179,7 +134,6 @@ export function initFounder() {
         copy.setAttribute("aria-busy", "false");
         enter.hidden = true;
         actions.hidden = false;
-        cinematic.hidden = true;
         enterFounder.focus();
     }
 
@@ -196,27 +150,8 @@ export function initFounder() {
 
     window.addEventListener("pog:founder-requested", enterFounderPath);
     replay.addEventListener("click", playIntroduction);
-    enterFounder.addEventListener("click", playPostPoemCinematic);
-    enter.addEventListener("click", playPostPoemCinematic);
-    storyEnter.addEventListener("click", enterRoom);
-    document.querySelectorAll("[data-founder-note-open]").forEach((button) => button.addEventListener("click", () => {
-        const note = founderNotes.find((item) => item.id === button.dataset.founderNoteOpen);
-        if (!note) return;
-        noteTrigger = button; noteLabel.textContent = `FOUNDER NOTE ${note.id}`; noteTitle.textContent = note.title;
-        noteCopy.replaceChildren(...note.paragraphs.map((text) => { const p = document.createElement("p"); p.textContent = text; return p; }));
-        noteOverlay.hidden = false; noteOverlay.setAttribute("aria-hidden", "false"); founderRoom.inert = true; noteClose.focus();
-    }));
-    const closeNote = () => { noteOverlay.hidden = true; noteOverlay.setAttribute("aria-hidden", "true"); founderRoom.inert = false; noteTrigger?.focus(); };
-    noteClose.addEventListener("click", closeNote);
-    document.querySelector("[data-founder-continue]")?.addEventListener("click", () => founderRoom.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" }));
-    const scenes = document.querySelectorAll("#founder-room .founder-chapter, #founder-room .founder-ending");
-    if (reducedMotion || !("IntersectionObserver" in window)) scenes.forEach((scene) => scene.classList.add("is-revealed"));
-    else {
-        const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-            if (entry.isIntersecting) { entry.target.classList.add("is-revealed"); observer.unobserve(entry.target); }
-        }), { threshold: 0.18 });
-        scenes.forEach((scene) => observer.observe(scene));
-    }
+    enterFounder.addEventListener("click", enterRoom);
+    enter.addEventListener("click", enterRoom);
     introduction.addEventListener("keydown", (event) => {
         if (event.key === "Escape") event.preventDefault();
         if (event.key === "Enter" && !enter.hidden) { event.preventDefault(); enterRoom(); }
@@ -228,8 +163,4 @@ export function initFounder() {
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && !noteOverlay.hidden) { event.preventDefault(); event.stopImmediatePropagation(); closeNote(); }
-    }, true);
-    window.addEventListener("pog:room-closing", (event) => { if (event.detail?.roomId === ROOM_ID && !noteOverlay.hidden) closeNote(); });
 }
