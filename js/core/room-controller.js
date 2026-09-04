@@ -45,7 +45,9 @@ export function initRoomController() {
         timers.push(setTimeout(hideTransition, reduced ? 0 : delay.close + 200));
     };
     window.addEventListener("pog:open-room", (event) => openRoom(event.detail?.roomId));
-    rooms.forEach((room) => room.querySelector("[data-room-close]")?.addEventListener("click", closeRoom));
+    rooms.forEach((room) => {
+        room.querySelectorAll("[data-room-close]").forEach((button) => button.addEventListener("click", closeRoom));
+    });
     document.addEventListener("keydown", (event) => {
         if (!activeRoom) return;
         if (event.key === "Escape") { event.preventDefault(); closeRoom(); return; }
