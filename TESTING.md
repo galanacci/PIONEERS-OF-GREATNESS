@@ -14,6 +14,7 @@ Run `npm test` first.
 ## Keyboard
 
 - Menu: Up/Down, Enter, Escape and Tab work; locked items stay grey.
+- Founder: the first visit cannot be escaped, ENTER opens the room, and returning visitors can Tab between replay and direct entry.
 - Rooms: focus starts on MENU, remains trapped inside, and Escape returns to the menu.
 - Field Notes carousels respond to Left/Right when their image area is focused.
 - UNCUT episode buttons respond to Up/Down.
@@ -31,6 +32,7 @@ Run `npm test` first.
 - Enable the operating system's reduced-motion setting.
 - Menu and room transitions become immediate.
 - Placeholder and image effects do not cause disorienting motion.
+- THE BEGINNING preserves paragraph order and reading pauses without character-by-character typing.
 
 ## Pipeline integrity
 

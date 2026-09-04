@@ -14,6 +14,7 @@ Every interactive room must be registered in `js/room-registry.js` and have a ma
 
 ## Current rooms
 
+- `founder-room`: reached through the versioned `THE BEGINNING` introduction. First-time visitors complete the ritual; returning visitors can replay it or enter directly.
 - `documentary-room`: UNCUT screening room, grouped by release year. Its YouTube iframe is removed on exit so hidden playback cannot continue.
 - `field-notes-room`: Instagram-derived journal. Multi-image entries expose pointer and keyboard carousel controls.
 

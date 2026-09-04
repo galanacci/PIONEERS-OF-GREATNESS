@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 
 const FIELD_NOTES_PATH = "data/field-notes.json";
 const DOCUMENTARY_PATH = "data/documentary.json";
+const GREATNESS_POEM_PATH = "data/greatness-poem.json";
 
 function assert(condition, message) {
     if (!condition) throw new Error(message);
@@ -48,9 +49,23 @@ export function validateDocumentary(payload) {
     });
 }
 
+export function validateGreatnessPoem(payload) {
+    assert(payload && typeof payload === "object", "GREATNESS poem payload must be an object.");
+    assert(Number.isInteger(payload.version) && payload.version > 0, "GREATNESS poem version must be a positive integer.");
+    assert(payload.title === "THE BEGINNING", "GREATNESS poem title must be THE BEGINNING.");
+    assert(typeof payload.placeholder === "boolean", "GREATNESS poem placeholder flag must be boolean.");
+    assert(Array.isArray(payload.paragraphs) && payload.paragraphs.length > 0, "GREATNESS poem must contain at least one paragraph.");
+    assert(payload.paragraphs.every((paragraph) => typeof paragraph === "string" && paragraph.trim()), "GREATNESS poem paragraphs cannot be empty.");
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [fieldNotes, documentary] = await Promise.all([readJson(FIELD_NOTES_PATH), readJson(DOCUMENTARY_PATH)]);
+    const [fieldNotes, documentary, greatnessPoem] = await Promise.all([
+        readJson(FIELD_NOTES_PATH),
+        readJson(DOCUMENTARY_PATH),
+        readJson(GREATNESS_POEM_PATH)
+    ]);
     await validateFieldNotes(fieldNotes);
     validateDocumentary(documentary);
-    console.log(`Content valid: ${fieldNotes.notes.length} Field Notes and ${documentary.episodes.length} UNCUT episodes.`);
+    validateGreatnessPoem(greatnessPoem);
+    console.log(`Content valid: ${fieldNotes.notes.length} Field Notes, ${documentary.episodes.length} UNCUT episodes and THE BEGINNING v${greatnessPoem.version}.`);
 }

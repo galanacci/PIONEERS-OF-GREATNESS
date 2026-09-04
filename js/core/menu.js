@@ -37,6 +37,10 @@ export function initMenu() {
         if (item.getAttribute("aria-disabled") === "true") return;
         item.classList.add("is-activated");
         if (item.dataset.menuAction === "waitlist") { close(false); document.getElementById("email")?.focus(); }
+        else if (item.dataset.menuAction === "founder") {
+            close(false);
+            window.dispatchEvent(new CustomEvent("pog:founder-requested"));
+        }
         else if (item.dataset.menuAction === "room" && isKnownRoom(item.dataset.roomTarget)) {
             close(false);
             window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: item.dataset.roomTarget } }));

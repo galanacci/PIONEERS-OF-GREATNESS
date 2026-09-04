@@ -56,7 +56,7 @@
         <div class="menu-panel" role="dialog" aria-modal="true" aria-label="PIONEERS OF GREATNESS menu" tabindex="-1">
             <ul class="menu-list" role="menu">
                 <li><button type="button" class="menu-item is-selected" role="menuitem" data-menu-action="waitlist">WAITLIST</button></li>
-                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" aria-disabled="true">FOUNDER</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="founder">FOUNDER</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="documentary-room">DOCUMENTARY</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="field-notes-room">FIELD NOTES</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" aria-disabled="true">COLLECTIONS</button></li>
@@ -68,6 +68,37 @@
             </button>
         </div>
     </div>
+
+    <section id="founder-introduction" class="founder-introduction" aria-hidden="true" aria-labelledby="founder-introduction-title">
+        <div class="founder-introduction-inner">
+            <h1 id="founder-introduction-title">THE BEGINNING</h1>
+            <div id="founder-introduction-copy" class="founder-introduction-copy" aria-live="polite"></div>
+            <div id="founder-introduction-actions" class="founder-introduction-actions" hidden>
+                <button type="button" data-founder-replay>REPLAY THE BEGINNING</button>
+                <button type="button" data-founder-enter>ENTER FOUNDER</button>
+            </div>
+            <button type="button" id="founder-introduction-enter" class="founder-introduction-enter" hidden>ENTER</button>
+        </div>
+    </section>
+
+    <section id="founder-room" class="world-room founder-room" aria-hidden="true" aria-labelledby="founder-title">
+        <div class="world-room-content founder-content">
+            <button type="button" class="room-return" data-room-close>&larr; MENU</button>
+            <header class="founder-header">
+                <p class="room-kicker">THE PERSON BEHIND THE PHILOSOPHY</p>
+                <h1 id="founder-title">FOUNDER</h1>
+                <p class="founder-room-note">THE STORY CONTINUES HERE.</p>
+            </header>
+            <div class="room-divider" aria-hidden="true"></div>
+            <div class="founder-placeholders" aria-label="Founder room chapters coming soon">
+                <p>PORTRAIT <span>TO BE REVEALED</span></p>
+                <p>STATEMENT <span>TO BE REVEALED</span></p>
+                <p>TIMELINE <span>TO BE REVEALED</span></p>
+                <p>PRINCIPLES <span>TO BE REVEALED</span></p>
+                <p>CURRENT MISSION <span>TO BE REVEALED</span></p>
+            </div>
+        </div>
+    </section>
 
     <section id="documentary-room" class="world-room documentary-room" aria-hidden="true" aria-labelledby="documentary-title">
         <div class="world-room-content documentary-content">
