@@ -21,9 +21,19 @@ function wait(milliseconds) {
     return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
-function readingPause(paragraph) {
-    const wordCount = paragraph.trim().split(/\s+/).length;
-    return Math.min(9500, Math.max(5500, wordCount * 320));
+// Each passage has its own spoken rhythm. Longer passages move a little faster,
+// while turning points and the final statement are allowed to breathe.
+const POEM_PACING = [
+    { character: 52, space: 30, comma: 170, sentence: 520, question: 900, hold: 7200 },
+    { character: 47, space: 27, comma: 240, sentence: 620, question: 620, hold: 6400 },
+    { character: 54, space: 32, comma: 260, sentence: 760, question: 760, hold: 7800 },
+    { character: 50, space: 30, comma: 220, sentence: 680, question: 680, hold: 8600 },
+    { character: 42, space: 24, comma: 190, sentence: 720, question: 720, hold: 9800 },
+    { character: 49, space: 29, comma: 300, sentence: 900, question: 900, hold: 11000 }
+];
+
+function pacingFor(index) {
+    return POEM_PACING[index] ?? POEM_PACING.at(-1);
 }
 
 export function initFounder() {
@@ -77,15 +87,19 @@ export function initFounder() {
         window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: ROOM_ID } }));
     }
 
-    async function typeParagraph(paragraph, token) {
+    async function typeParagraph(paragraph, token, pacing) {
         const element = document.createElement("p");
         element.className = "is-active";
         copy.replaceChildren(element);
         for (const character of paragraph) {
             if (token !== sequence) return;
             element.textContent += character;
-            const punctuationPause = /[.!?]/.test(character) ? 240 : 0;
-            await wait((character === " " ? 28 : 48) + punctuationPause);
+            let delay = character === " " ? pacing.space : pacing.character;
+            if (character === ",") delay += pacing.comma;
+            else if (character === "?") delay += pacing.question;
+            else if (/[.!]/.test(character)) delay += pacing.sentence;
+            else if (/[—;]/.test(character)) delay += pacing.comma + 120;
+            await wait(delay);
         }
         return element;
     }
@@ -102,9 +116,10 @@ export function initFounder() {
             await wait(reducedMotion ? 200 : 1200);
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
-                const element = await typeParagraph(paragraph, token);
+                const pacing = pacingFor(index);
+                const element = await typeParagraph(paragraph, token, pacing);
                 if (!element || token !== sequence) return;
-                await wait(readingPause(paragraph));
+                await wait(reducedMotion ? Math.min(2200, pacing.hold) : pacing.hold);
                 const isFinalParagraph = index === content.paragraphs.length - 1;
                 if (!isFinalParagraph && !reducedMotion) {
                     element.classList.add("is-leaving");
