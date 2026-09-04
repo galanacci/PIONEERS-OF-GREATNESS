@@ -33,7 +33,8 @@ export function initFounder() {
     const enter = document.getElementById("founder-introduction-enter");
     const replay = introduction?.querySelector("[data-founder-replay]");
     const enterFounder = introduction?.querySelector("[data-founder-enter]");
-    if (!introduction || !copy || !actions || !enter || !replay || !enterFounder) return;
+    const transition = document.getElementById("room-transition");
+    if (!introduction || !copy || !actions || !enter || !replay || !enterFounder || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -134,10 +135,18 @@ export function initFounder() {
         enterFounder.focus();
     }
 
-    window.addEventListener("pog:founder-requested", () => {
+    async function enterFounderPath() {
+        transition.classList.add("is-active");
+        transition.setAttribute("aria-hidden", "false");
+        await wait(reducedMotion ? 350 : 900);
         if (hasCompletedIntroduction()) showReturningChoice();
         else playIntroduction();
-    });
+        await wait(reducedMotion ? 0 : 250);
+        transition.classList.remove("is-active");
+        transition.setAttribute("aria-hidden", "true");
+    }
+
+    window.addEventListener("pog:founder-requested", enterFounderPath);
     replay.addEventListener("click", playIntroduction);
     enterFounder.addEventListener("click", enterRoom);
     enter.addEventListener("click", enterRoom);

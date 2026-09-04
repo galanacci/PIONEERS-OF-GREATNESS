@@ -8,7 +8,8 @@ export function initRoomController() {
     let activeRoom = null;
     let timers = [];
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const delay = reduced ? { open: 0, finish: 0, close: 0 } : { open: 320, finish: 520, close: 240 };
+    // Room entry holds on LOADING... long enough to feel like crossing a threshold.
+    const delay = reduced ? { open: 350, finish: 350, close: 0 } : { open: 900, finish: 1150, close: 240 };
     const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
     const inert = (value) => background.forEach((region) => { region.inert = value; });
     const showTransition = () => { transition.classList.add("is-active"); transition.setAttribute("aria-hidden", "false"); };

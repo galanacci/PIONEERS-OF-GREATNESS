@@ -6,7 +6,7 @@ body.founder-introduction-active {
 .founder-introduction {
     position: fixed;
     inset: 0;
-    z-index: calc(var(--layer-transition) + 100);
+    z-index: calc(var(--layer-room) + 100);
     display: grid;
     place-items: center;
     box-sizing: border-box;
