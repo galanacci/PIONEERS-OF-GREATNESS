@@ -178,6 +178,19 @@ body.founder-introduction-active {
     padding-bottom: 0;
 }
 
+.founder-header {
+    padding-top: clamp(44px, 7vh, 84px);
+}
+
+.founder-room-intro {
+    max-width: 620px;
+    margin: clamp(24px, 4vh, 38px) 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: clamp(14px, 1.7vw, 18px);
+    letter-spacing: 0.025em;
+    line-height: 1.7;
+}
+
 .visually-hidden {
     position: absolute;
     width: 1px;
