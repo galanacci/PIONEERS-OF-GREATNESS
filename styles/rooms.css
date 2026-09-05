@@ -156,10 +156,6 @@
     -webkit-user-drag: none;
 }
 
-.room-transition img.is-pattern {
-    width: min(62vw, 440px);
-}
-
 .room-transition.is-active {
     opacity: 1;
     visibility: visible;
@@ -193,9 +189,6 @@
         height: 160px;
     }
 
-    .room-transition img.is-pattern {
-        width: min(78vw, 330px);
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {

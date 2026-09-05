@@ -3,25 +3,15 @@ import { isKnownRoom } from "../room-registry.js";
 export function initRoomController() {
     const rooms = [...document.querySelectorAll(".world-room")];
     const transition = document.getElementById("room-transition");
-    const transitionArt = document.getElementById("room-transition-art");
     const background = document.querySelectorAll("nav, #container, .container, .copyright, #menu-overlay");
     if (!rooms.length || !transition) return;
     let activeRoom = null;
     let timers = [];
-    let transitionIndex = 0;
-    const transitionGraphics = ["src/ui/loader-a7f3.webp", "src/ui/loader-c2d8.webp"];
-    transitionGraphics.forEach((source) => { const image = new Image(); image.src = source; });
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Room entry holds on LOADING... long enough to feel like crossing a threshold.
-    const delay = reduced ? { open: 350, finish: 350, close: 0 } : { open: 900, finish: 1150, close: 240 };
+    // Every room entry gets one deliberate second on the POG Fighters loading screen.
+    const entryDelay = 1000;
     const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
     const inert = (value) => background.forEach((region) => { region.inert = value; });
     const showTransition = () => {
-        if (transitionArt) {
-            transitionArt.src = transitionGraphics[transitionIndex];
-            transitionArt.classList.toggle("is-pattern", transitionIndex === 1);
-            transitionIndex = (transitionIndex + 1) % transitionGraphics.length;
-        }
         transition.classList.add("is-active");
         transition.setAttribute("aria-hidden", "false");
     };
@@ -40,21 +30,18 @@ export function initRoomController() {
             activeRoom = next;
             activeRoom.querySelector("[data-room-close]")?.focus();
             window.dispatchEvent(new CustomEvent("pog:room-opened", { detail: { roomId } }));
-        }, delay.open));
-        timers.push(setTimeout(hideTransition, delay.finish));
+        }, entryDelay));
+        timers.push(setTimeout(hideTransition, entryDelay));
     };
     const closeRoom = () => {
         if (!activeRoom) return;
         const room = activeRoom;
-        clearTimers(); showTransition();
+        clearTimers();
         window.dispatchEvent(new CustomEvent("pog:room-closing", { detail: { roomId: room.id } }));
-        timers.push(setTimeout(() => {
-            room.classList.remove("is-open"); room.setAttribute("aria-hidden", "true"); activeRoom = null;
-            inert(false);
-            window.dispatchEvent(new CustomEvent("pog:room-closed", { detail: { roomId: room.id } }));
-            window.dispatchEvent(new CustomEvent("pog:return-to-menu"));
-        }, delay.close));
-        timers.push(setTimeout(hideTransition, reduced ? 0 : delay.close + 200));
+        room.classList.remove("is-open"); room.setAttribute("aria-hidden", "true"); activeRoom = null;
+        inert(false);
+        window.dispatchEvent(new CustomEvent("pog:room-closed", { detail: { roomId: room.id } }));
+        window.dispatchEvent(new CustomEvent("pog:return-to-menu"));
     };
     window.addEventListener("pog:open-room", (event) => openRoom(event.detail?.roomId));
     window.addEventListener("pog:show-transition", showTransition);

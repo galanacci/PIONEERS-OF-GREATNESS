@@ -164,10 +164,9 @@ export function initFounder() {
 
     async function enterFounderPath() {
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
-        await wait(900);
+        await wait(1000);
         if (hasCompletedIntroduction()) showReturningChoice();
         else playIntroduction();
-        await wait(250);
         window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
