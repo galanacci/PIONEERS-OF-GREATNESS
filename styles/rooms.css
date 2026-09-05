@@ -134,14 +134,26 @@
     inset: 0;
     z-index: 2000;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 26px;
     background-color: black;
     color: white;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 160ms ease, visibility 0s linear 160ms;
+}
+
+.room-transition img {
+    display: block;
+    width: min(40vw, 260px);
+    height: 190px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 .room-transition.is-active {
@@ -171,6 +183,12 @@
     .episode {
         gap: 12px;
     }
+
+    .room-transition img {
+        width: min(58vw, 230px);
+        height: 160px;
+    }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

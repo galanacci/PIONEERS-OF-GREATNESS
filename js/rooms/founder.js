@@ -163,14 +163,11 @@ export function initFounder() {
     }
 
     async function enterFounderPath() {
-        transition.classList.add("is-active");
-        transition.setAttribute("aria-hidden", "false");
-        await wait(900);
+        window.dispatchEvent(new CustomEvent("pog:show-transition"));
+        await wait(1000);
         if (hasCompletedIntroduction()) showReturningChoice();
         else playIntroduction();
-        await wait(250);
-        transition.classList.remove("is-active");
-        transition.setAttribute("aria-hidden", "true");
+        window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
     window.addEventListener("pog:founder-requested", enterFounderPath);
