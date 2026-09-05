@@ -111,8 +111,12 @@ input[type="email"] {
 }
 
 input[type="email"]::placeholder {
-    color: rgba(255, 255, 255, 0.52);
+    color: transparent;
     opacity: 1;
+}
+
+#email-form.is-direct-entry input[type="email"]::placeholder {
+    color: rgba(255, 255, 255, 0.52);
 }
 
 #email-form .input-container {
@@ -247,6 +251,37 @@ button:hover {
 .input-container {
     position: relative;
     display: inline-block;
+}
+
+#animated-placeholder {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: calc(100% - 14px);
+    overflow: hidden;
+    transform: translateY(-50%);
+    color: white;
+    pointer-events: none;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+#animated-placeholder[hidden] { display: none; }
+
+.scrolling-text-container {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 15s linear infinite;
+}
+
+.scrolling-text {
+    display: inline-block;
+    padding-right: 12px;
+}
+
+@keyframes scrollText {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
 }
 
 .logo-wrapper {

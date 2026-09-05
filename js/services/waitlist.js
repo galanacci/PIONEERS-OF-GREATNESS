@@ -4,7 +4,29 @@ export function initWaitlist() {
     const form = document.getElementById("email-form");
     const email = document.getElementById("email");
     const status = document.getElementById("status");
-    if (!form || !email || !status) return;
+    const placeholder = document.getElementById("animated-placeholder");
+    if (!form || !email || !status || !placeholder) return;
+
+    const marquee = document.createElement("span");
+    marquee.className = "scrolling-text-container";
+    for (let index = 0; index < 2; index += 1) {
+        const text = document.createElement("span");
+        text.className = "scrolling-text";
+        text.textContent = "ENTER EMAIL TO JOIN THE WAITLIST...";
+        marquee.append(text);
+    }
+    placeholder.replaceChildren(marquee);
+
+    window.addEventListener("pog:waitlist-requested", () => {
+        form.classList.add("is-direct-entry");
+        placeholder.hidden = true;
+    });
+    email.addEventListener("input", () => { placeholder.hidden = form.classList.contains("is-direct-entry") || email.value !== ""; });
+    email.addEventListener("blur", () => {
+        if (email.value !== "") return;
+        form.classList.remove("is-direct-entry");
+        placeholder.hidden = false;
+    });
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const value = email.value.trim();
@@ -19,7 +41,11 @@ export function initWaitlist() {
             const [message, color] = states[data.status] || ["Something went wrong.", "#ff6b6b"];
             status.textContent = message;
             status.style.color = color;
-            if (data.status === "success") email.value = "";
+            if (data.status === "success") {
+                email.value = "";
+                form.classList.remove("is-direct-entry");
+                placeholder.hidden = false;
+            }
         } catch (error) {
             console.error("Waitlist request failed.", error);
             status.textContent = "Unable to connect.";
