@@ -137,7 +137,6 @@ export function initFounder() {
             copy.replaceChildren();
             copy.hidden = true;
             poemReveal.hidden = false;
-            await wait(1700);
             copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
             enter.focus();
