@@ -4,19 +4,7 @@ export function initWaitlist() {
     const form = document.getElementById("email-form");
     const email = document.getElementById("email");
     const status = document.getElementById("status");
-    const placeholder = document.getElementById("animated-placeholder");
-    if (!form || !email || !status || !placeholder) return;
-    const marquee = document.createElement("div");
-    marquee.className = "scrolling-text-container";
-    for (let index = 0; index < 2; index += 1) {
-        const text = document.createElement("span");
-        text.className = "scrolling-text";
-        text.textContent = "ENTER EMAIL TO JOIN THE WAITLIST...";
-        marquee.append(text);
-    }
-    placeholder.replaceChildren(marquee);
-    email.addEventListener("focus", () => { placeholder.hidden = true; });
-    email.addEventListener("blur", () => { placeholder.hidden = email.value !== ""; });
+    if (!form || !email || !status) return;
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const value = email.value.trim();
@@ -31,7 +19,7 @@ export function initWaitlist() {
             const [message, color] = states[data.status] || ["Something went wrong.", "#ff6b6b"];
             status.textContent = message;
             status.style.color = color;
-            if (data.status === "success") { email.value = ""; placeholder.hidden = false; }
+            if (data.status === "success") email.value = "";
         } catch (error) {
             console.error("Waitlist request failed.", error);
             status.textContent = "Unable to connect.";

@@ -35,12 +35,6 @@ nav .logo-container img {
     nav { padding-top: 40px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .scrolling-text-container {
-        animation: none;
-    }
-}
-
 /* Forge Denim Jacket Button */
 
 .forge-container {
@@ -117,7 +111,8 @@ input[type="email"] {
 }
 
 input[type="email"]::placeholder {
-    color: transparent;
+    color: rgba(255, 255, 255, 0.52);
+    opacity: 1;
 }
 
 #email-form .input-container {
@@ -252,42 +247,6 @@ button:hover {
 .input-container {
     position: relative;
     display: inline-block;
-}
-
-#animated-placeholder {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgb(255, 255, 255);
-    pointer-events: none;
-    font-size: 16px;
-    font-family: 'Lora', serif;
-    font-weight: 400;
-    z-index: 10;
-    white-space: nowrap;
-    width: calc(100% - 14px);
-    overflow: hidden;
-}
-
-.scrolling-text-container {
-    display: inline-block;
-    white-space: nowrap;
-    animation: scrollText 15s linear infinite;
-}
-
-.scrolling-text {
-    display: inline-block;
-    padding-right: 12px;
-}
-
-@keyframes scrollText {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
 }
 
 .logo-wrapper {
