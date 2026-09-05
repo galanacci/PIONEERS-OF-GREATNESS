@@ -181,24 +181,19 @@ button:hover {
     width: 42px;
     height: 42px;
     margin-right: 10px;
-    padding: 0;
+    padding: 0 11px;
     display: inline-flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    gap: 4px;
     flex-shrink: 0;
 }
 
-.menu-toggle img {
+.menu-line {
     display: block;
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    transition: opacity 160ms ease;
-}
-
-.menu-toggle:hover img,
-.menu-toggle:focus-visible img {
-    opacity: 0.72;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
 }
 
 .menu-toggle:focus-visible {
