@@ -29,10 +29,37 @@
 }
 
 .field-notes-list {
+    padding-top: clamp(40px, 7vh, 72px);
+}
+
+.field-notes-years {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: clamp(34px, 6vh, 64px);
+}
+
+.field-notes-year {
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.52);
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+}
+
+.field-notes-year:hover,
+.field-notes-year:focus-visible,
+.field-notes-year.is-current {
+    border-color: #673CAF;
+    outline: 0;
+    color: #fff;
+}
+
+.field-notes-chapter {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(44px, 7vw, 90px) clamp(24px, 5vw, 70px);
-    padding-top: clamp(40px, 7vh, 72px);
 }
 
 .field-note {
@@ -121,7 +148,7 @@
         margin-top: 76px;
     }
 
-    .field-notes-list {
+    .field-notes-chapter {
         grid-template-columns: 1fr;
     }
 

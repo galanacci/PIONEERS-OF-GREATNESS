@@ -7,6 +7,7 @@ export async function initDocumentary() {
     let episodes = [];
     let selected = 0;
     let buttons = [];
+    let initialized = false;
     const stopPlayback = () => feature.querySelector("iframe")?.remove();
     const selectEpisode = (index, focus = false) => {
         selected = (index + episodes.length) % episodes.length;
@@ -47,30 +48,40 @@ export async function initDocumentary() {
         });
         item.append(button); buttons.push(button); return item;
     };
-    try {
-        const response = await fetch("data/documentary.json", { cache: "no-cache" });
-        if (!response.ok) throw new Error(`Documentary request failed: ${response.status}`);
-        const payload = await response.json(); episodes = Array.isArray(payload.episodes) ? payload.episodes : [];
-        if (!episodes.length) throw new Error("Documentary archive is empty.");
-        const years = new Map();
-        episodes.forEach((episode, index) => {
-            const year = new Date(episode.publishedAt).getFullYear();
-            if (!years.has(year)) years.set(year, []);
-            years.get(year).push({ episode, index });
-        });
-        const chapters = [...years.entries()].map(([year, entries]) => {
-            const section = document.createElement("section"); section.className = "documentary-chapter";
-            const heading = document.createElement("h3"); heading.className = "documentary-year"; heading.textContent = String(year);
-            const list = document.createElement("ol"); list.className = "documentary-list"; list.setAttribute("aria-label", `UNCUT episodes from ${year}`);
-            list.append(...entries.map(({ episode, index }) => createEpisode(episode, index)));
-            section.append(heading, list); return section;
-        });
-        archive.replaceChildren(...chapters); selectEpisode(0);
-    } catch (error) {
-        console.error("Documentary could not be loaded.", error);
-        const state = document.createElement("p"); state.className = "documentary-state"; state.textContent = "SCREENING ROOM TEMPORARILY UNAVAILABLE";
-        feature.replaceChildren(state); archive.replaceChildren();
-    }
+    const load = async () => {
+        if (initialized) return;
+        initialized = true;
+        try {
+            const response = await fetch("data/documentary.json", { cache: "no-cache" });
+            if (!response.ok) throw new Error(`Documentary request failed: ${response.status}`);
+            const payload = await response.json(); episodes = Array.isArray(payload.episodes) ? payload.episodes : [];
+            if (!episodes.length) throw new Error("Documentary archive is empty.");
+            const years = new Map();
+            episodes.forEach((episode, index) => {
+                const year = new Date(episode.publishedAt).getFullYear();
+                if (!years.has(year)) years.set(year, []);
+                years.get(year).push({ episode, index });
+            });
+            const chapters = [...years.entries()].map(([year, entries]) => {
+                const section = document.createElement("section"); section.className = "documentary-chapter";
+                const heading = document.createElement("h3"); heading.className = "documentary-year"; heading.textContent = String(year);
+                const list = document.createElement("ol"); list.className = "documentary-list"; list.setAttribute("aria-label", `UNCUT episodes from ${year}`);
+                list.append(...entries.map(({ episode, index }) => createEpisode(episode, index)));
+                section.append(heading, list); return section;
+            });
+            archive.replaceChildren(...chapters);
+            if (feature.closest(".world-room")?.classList.contains("is-open")) selectEpisode(0);
+        } catch (error) {
+            initialized = false;
+            console.error("Documentary could not be loaded.", error);
+            const state = document.createElement("p"); state.className = "documentary-state"; state.textContent = "SCREENING ROOM TEMPORARILY UNAVAILABLE";
+            feature.replaceChildren(state); archive.replaceChildren();
+        }
+    };
     window.addEventListener("pog:room-closing", (event) => { if (event.detail?.roomId === "documentary-room") stopPlayback(); });
-    window.addEventListener("pog:room-opened", (event) => { if (event.detail?.roomId === "documentary-room" && episodes.length && !feature.querySelector("iframe")) selectEpisode(selected); });
+    window.addEventListener("pog:room-opened", (event) => {
+        if (event.detail?.roomId !== "documentary-room") return;
+        if (!initialized) load();
+        else if (episodes.length && !feature.querySelector("iframe")) selectEpisode(selected);
+    });
 }

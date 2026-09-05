@@ -1,14 +1,14 @@
 # Release Test Checklist
 
-Run `npm test` first.
+Run `npm test` first. It validates every generated archive and exercises the critical journeys in desktop and mobile Chromium. GitHub repeats the same checks on every push and pull request.
 
 ## Desktop
 
 - Background video autoplays muted; sound control works without an outline.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
 - Menu opens, does not close from backdrop clicks, and all pointer states are intentional.
-- Field Notes loads every entry; carousel arrows change only the current card.
-- UNCUT loads, chapters are ordered newest first, and episode numbering remains correct.
+- Field Notes waits until the room opens, defaults to the newest year and switches cleanly between year chapters; carousel arrows change only the current card.
+- UNCUT waits until the room opens, chapters are ordered newest first, and episode numbering remains correct.
 - Leaving UNCUT by MENU or Escape stops playback.
 
 ## Keyboard
@@ -28,12 +28,11 @@ Run `npm test` first.
 - Room headings, archives, carousel controls and return buttons remain usable.
 - External links open correctly.
 
-## Reduced motion
+## Motion
 
-- Enable the operating system's reduced-motion setting.
-- Menu and room transitions become immediate.
-- Placeholder and image effects do not cause disorienting motion.
-- THE BEGINNING preserves its essential character-by-character writing, reading pauses and blinking writing cursor; only the larger decorative fades are removed.
+- Menu and room transitions remain deliberate and consistent.
+- GREATNESS POEM preserves its character-by-character writing, one-second paragraph pauses, fades and blinking writing cursor on desktop and mobile.
+- The final poem paragraph clears before the Greatness Tee image and ENTER appear together.
 
 ## Pipeline integrity
 

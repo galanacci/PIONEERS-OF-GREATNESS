@@ -4,11 +4,15 @@
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate-content.mjs",
+    "test:browser": "playwright test",
     "sync:field-notes": "node scripts/sync-instagram.mjs",
     "sync:documentary": "node scripts/sync-youtube.mjs",
-    "test": "npm run validate"
+    "test": "npm run validate && npm run test:browser"
   },
   "dependencies": {
-    "sharp": "0.34.3"
+    "sharp": "0.35.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
   }
 }
