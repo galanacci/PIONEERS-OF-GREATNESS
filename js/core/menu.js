@@ -36,7 +36,11 @@ export function initMenu() {
         select(items.indexOf(item));
         if (item.getAttribute("aria-disabled") === "true") return;
         item.classList.add("is-activated");
-        if (item.dataset.menuAction === "waitlist") { close(false); document.getElementById("email")?.focus(); }
+        if (item.dataset.menuAction === "waitlist") {
+            close(false);
+            window.dispatchEvent(new CustomEvent("pog:waitlist-requested"));
+            document.getElementById("email")?.focus();
+        }
         else if (item.dataset.menuAction === "founder") {
             close(false);
             window.dispatchEvent(new CustomEvent("pog:founder-requested"));

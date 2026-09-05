@@ -24,11 +24,11 @@ function wait(milliseconds) {
 // Each passage has its own spoken rhythm. Longer passages move a little faster,
 // while turning points and the final statement are allowed to breathe.
 const POEM_PACING = [
-    { character: 52, space: 30, comma: 170, sentence: 520, question: 900, hold: 3600 },
-    { character: 47, space: 27, comma: 240, sentence: 620, question: 620, hold: 3000 },
-    { character: 54, space: 32, comma: 260, sentence: 760, question: 760, hold: 3900 },
-    { character: 50, space: 30, comma: 220, sentence: 680, question: 680, hold: 4200 },
-    { character: 42, space: 24, comma: 190, sentence: 720, question: 720, hold: 4700 },
+    { character: 52, space: 30, comma: 170, sentence: 520, question: 900, hold: 1000 },
+    { character: 47, space: 27, comma: 240, sentence: 620, question: 620, hold: 1000 },
+    { character: 54, space: 32, comma: 260, sentence: 760, question: 760, hold: 1000 },
+    { character: 50, space: 30, comma: 220, sentence: 680, question: 680, hold: 1000 },
+    { character: 42, space: 24, comma: 190, sentence: 720, question: 720, hold: 1000 },
     { character: 49, space: 29, comma: 300, sentence: 900, question: 900, hold: 5600 }
 ];
 
@@ -137,7 +137,6 @@ export function initFounder() {
             copy.replaceChildren();
             copy.hidden = true;
             poemReveal.hidden = false;
-            await wait(1700);
             copy.setAttribute("aria-busy", "false");
             enter.hidden = false;
             enter.focus();

@@ -39,8 +39,8 @@
     <div class="container">
         <form id="email-form">
             <div class="input-container">
-                <input type="email" id="email" name="email" autocomplete="email" aria-label="Email address" required>
-                <div id="animated-placeholder"></div>
+                <input type="email" id="email" name="email" autocomplete="email" aria-label="Email address" placeholder="ENTER EMAIL HERE..." required>
+                <div id="animated-placeholder" aria-hidden="true"></div>
             </div>
             <button type="submit" aria-label="Join the waitlist"><span class="button-text">➔</span><span class="button-arrow">➔</span></button>
             <button type="button" class="menu-toggle" aria-label="Open menu" aria-controls="menu-overlay" aria-expanded="false">
@@ -55,7 +55,7 @@
     <div id="menu-overlay" class="menu-overlay" aria-hidden="true">
         <div class="menu-panel" role="dialog" aria-modal="true" aria-label="PIONEERS OF GREATNESS menu" tabindex="-1">
             <ul class="menu-list" role="menu">
-                <li><button type="button" class="menu-item is-selected" role="menuitem" data-menu-action="waitlist">WAITLIST</button></li>
+                <li><button type="button" class="menu-item is-selected" role="menuitem" data-menu-action="waitlist">JOIN WAITLIST</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="founder">FOUNDER</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="documentary-room">DOCUMENTARY</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="field-notes-room">FIELD NOTES</button></li>
@@ -93,9 +93,31 @@
         <div class="world-room-content founder-content">
             <button type="button" class="room-return" data-room-close>&larr; MENU</button>
 
+            <header class="founder-header">
+                <p class="room-kicker">THE PERSON BEHIND THE PHILOSOPHY</p>
+                <h1 id="founder-title">FOUNDER</h1>
+                <p class="founder-room-intro">The story behind PIONEERS OF GREATNESS.</p>
+            </header>
+            <div class="room-divider" aria-hidden="true"></div>
+
+            <section class="founder-mission-film" aria-labelledby="founder-mission-film-title">
+                <p class="room-kicker">MISSION STATEMENT</p>
+                <h2 id="founder-mission-film-title">EMPTY THE CREATIVE POTENTIAL WITHIN.</h2>
+                <p class="founder-mission-film-intro">My mission is to empty myself of my creative potential and inspire others to do the same. PIONEERS OF GREATNESS is the vehicle through which I am doing so.</p>
+                <div class="founder-mission-player">
+                    <video id="founder-mission-video" preload="metadata" playsinline poster="src/founder/mission-statement-poster.webp">
+                        <source src="src/founder/mission-statement.mp4" type="video/mp4">
+                    </video>
+                    <button type="button" class="founder-mission-play" aria-controls="founder-mission-video">
+                        <span class="founder-play-symbol" aria-hidden="true"></span>
+                        <span data-founder-play-label>PLAY</span>
+                    </button>
+                </div>
+            </section>
+            <div class="room-divider" aria-hidden="true"></div>
+
             <section class="founder-chapter founder-origin-chapter" aria-labelledby="founder-origin-title">
                 <p class="founder-chapter-number">01 — THE BEGINNING</p>
-                <h1 id="founder-title" class="visually-hidden">FOUNDER</h1>
                 <figure class="founder-origin">
                     <img src="src/founder/the-beginning-room.webp" width="1500" height="2000" loading="lazy" decoding="async" alt="The London bedroom workspace where PIONEERS OF GREATNESS began">
                     <figcaption>

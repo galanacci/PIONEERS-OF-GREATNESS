@@ -78,6 +78,12 @@ body.founder-introduction-active {
     bottom: clamp(24px, 5vh, 56px);
     left: 50%;
     transform: translateX(-50%);
+    animation: founder-enter-reveal 1100ms ease both;
+}
+
+@keyframes founder-enter-reveal {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .founder-introduction-copy p {
@@ -170,6 +176,91 @@ body.founder-introduction-active {
     width: min(86vw, 920px);
     justify-content: flex-start;
     padding-bottom: 0;
+}
+
+.founder-header {
+    padding-top: clamp(44px, 7vh, 84px);
+}
+
+.founder-room-intro {
+    max-width: 620px;
+    margin: clamp(24px, 4vh, 38px) 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: clamp(14px, 1.7vw, 18px);
+    letter-spacing: 0.025em;
+    line-height: 1.7;
+}
+
+.founder-mission-film {
+    padding: clamp(70px, 12vh, 130px) 0;
+}
+
+.founder-mission-film h2 {
+    max-width: 760px;
+    margin: 22px 0 0;
+    font-family: var(--font-brand);
+    font-size: clamp(30px, 5.6vw, 64px);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.08;
+}
+
+.founder-mission-film-intro {
+    max-width: 610px;
+    margin: 28px 0 clamp(44px, 7vh, 72px);
+    color: rgba(255, 255, 255, 0.66);
+    font-size: clamp(14px, 1.7vw, 18px);
+    line-height: 1.7;
+}
+
+.founder-mission-player {
+    position: relative;
+    width: min(100%, 520px);
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.founder-mission-player video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: contain;
+    background: #000;
+}
+
+.founder-mission-play {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border: 0;
+    background: rgba(0, 0, 0, 0.14);
+    color: white;
+    font-family: var(--font-brand);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+}
+
+.founder-mission-play[hidden] { display: none; }
+
+.founder-mission-play:hover,
+.founder-mission-play:focus-visible {
+    border: 0;
+    outline: 0;
+    color: var(--color-accent-light);
+}
+
+.founder-play-symbol {
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 13px solid currentColor;
 }
 
 .visually-hidden {
@@ -479,6 +570,8 @@ body.founder-introduction-active {
     .founder-content {
         width: calc(100% - 36px);
     }
+
+    .founder-mission-player { width: min(100%, 420px); }
 
     .founder-origin {
         width: 100%;
