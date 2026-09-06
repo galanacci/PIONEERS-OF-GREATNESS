@@ -54,6 +54,17 @@ export async function initFieldNotes() {
     const list = document.getElementById("field-notes-list");
     if (!list) return;
     let initialized = false;
+    const waitForFirstImage = async () => {
+        const image = list.querySelector(".field-note-media img");
+        if (!image || image.complete) return;
+        await Promise.race([
+            new Promise((resolve) => {
+                image.addEventListener("load", resolve, { once: true });
+                image.addEventListener("error", resolve, { once: true });
+            }),
+            new Promise((resolve) => window.setTimeout(resolve, 4000))
+        ]);
+    };
     const showState = (message) => { const state = document.createElement("p"); state.className = "field-notes-state"; state.textContent = message; list.replaceChildren(state); };
     const load = async () => {
         if (initialized) return;
@@ -150,7 +161,10 @@ export async function initFieldNotes() {
             showState("ARCHIVE TEMPORARILY UNAVAILABLE");
         }
     };
-    window.addEventListener("pog:room-opened", (event) => {
-        if (event.detail?.roomId === "field-notes-room") load();
+    window.addEventListener("pog:room-opened", async (event) => {
+        if (event.detail?.roomId !== "field-notes-room") return;
+        await load();
+        await waitForFirstImage();
+        window.dispatchEvent(new CustomEvent("pog:room-ready", { detail: { roomId: "field-notes-room" } }));
     });
 }

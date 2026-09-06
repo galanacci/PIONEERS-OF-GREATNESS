@@ -237,6 +237,7 @@ export function initFounderHub() {
         load().then(() => {
             showHub(false);
             buttons[selected]?.focus();
+            window.dispatchEvent(new CustomEvent("pog:room-ready", { detail: { roomId: ROOM_ID } }));
         });
     });
     window.addEventListener("pog:room-closing", (event) => {

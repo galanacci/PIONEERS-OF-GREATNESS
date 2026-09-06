@@ -53,17 +53,29 @@ export function initFounder() {
     ));
     let sequence = 0;
     let poem = null;
+    let poemPromise = null;
 
     async function loadPoem() {
         if (poem) return poem;
-        const response = await fetch("data/greatness-poem.json", { cache: "no-cache" });
-        if (!response.ok) throw new Error(`GREATNESS poem request failed: ${response.status}`);
-        const payload = await response.json();
-        if (!Array.isArray(payload.paragraphs) || payload.paragraphs.length === 0) {
-            throw new Error("GREATNESS poem contains no paragraphs.");
+        if (!poemPromise) {
+            poemPromise = fetch("data/greatness-poem.json", { cache: "no-cache" })
+                .then((response) => {
+                    if (!response.ok) throw new Error(`GREATNESS poem request failed: ${response.status}`);
+                    return response.json();
+                })
+                .then((payload) => {
+                    if (!Array.isArray(payload.paragraphs) || payload.paragraphs.length === 0) {
+                        throw new Error("GREATNESS poem contains no paragraphs.");
+                    }
+                    poem = payload;
+                    return poem;
+                })
+                .catch((error) => {
+                    poemPromise = null;
+                    throw error;
+                });
         }
-        poem = payload;
-        return poem;
+        return poemPromise;
     }
 
     function openIntroduction() {
@@ -155,8 +167,9 @@ export function initFounder() {
 
     async function enterFounderPath() {
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
-        await wait(1000);
+        const poemReady = loadPoem().catch(() => null);
         playIntroduction({ allowSkip: hasCompletedIntroduction() });
+        await Promise.all([wait(1000), poemReady]);
         window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 

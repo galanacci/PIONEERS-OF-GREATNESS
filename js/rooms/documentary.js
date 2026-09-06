@@ -8,6 +8,14 @@ export async function initDocumentary() {
     let selected = 0;
     let buttons = [];
     let initialized = false;
+    const waitForFeature = async () => {
+        const iframe = feature.querySelector("iframe");
+        if (!iframe || iframe.dataset.ready === "true") return;
+        await Promise.race([
+            new Promise((resolve) => iframe.addEventListener("load", resolve, { once: true })),
+            new Promise((resolve) => window.setTimeout(resolve, 4000))
+        ]);
+    };
     const stopPlayback = () => feature.querySelector("iframe")?.remove();
     const selectEpisode = (index, focus = false) => {
         selected = (index + episodes.length) % episodes.length;
@@ -19,6 +27,7 @@ export async function initDocumentary() {
         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
         iframe.referrerPolicy = "strict-origin-when-cross-origin";
         iframe.allowFullscreen = true;
+        iframe.addEventListener("load", () => { iframe.dataset.ready = "true"; });
         const player = document.createElement("div"); player.className = "documentary-player"; player.append(iframe);
         const meta = document.createElement("div"); meta.className = "documentary-feature-meta";
         const number = document.createElement("span"); number.textContent = episode.episode;
@@ -79,9 +88,11 @@ export async function initDocumentary() {
         }
     };
     window.addEventListener("pog:room-closing", (event) => { if (event.detail?.roomId === "documentary-room") stopPlayback(); });
-    window.addEventListener("pog:room-opened", (event) => {
+    window.addEventListener("pog:room-opened", async (event) => {
         if (event.detail?.roomId !== "documentary-room") return;
-        if (!initialized) load();
+        if (!initialized) await load();
         else if (episodes.length && !feature.querySelector("iframe")) selectEpisode(selected);
+        await waitForFeature();
+        window.dispatchEvent(new CustomEvent("pog:room-ready", { detail: { roomId: "documentary-room" } }));
     });
 }

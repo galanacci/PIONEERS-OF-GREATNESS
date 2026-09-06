@@ -7,8 +7,13 @@ export function initRoomController() {
     if (!rooms.length || !transition) return;
     let activeRoom = null;
     let timers = [];
-    // Every room entry gets one deliberate second on the POG Fighters loading screen.
-    const entryDelay = 1000;
+    let transitionEntry = null;
+    let entrySequence = 0;
+    // The veil stays for at least one second, and remains until the destination
+    // has built its first visible state. The fallback prevents a failed room
+    // from trapping a visitor behind LOADING forever.
+    const minimumEntryDelay = 1000;
+    const maximumEntryDelay = 6000;
     const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
     const inert = (value) => background.forEach((region) => { region.inert = value; });
     const showTransition = () => {
@@ -31,6 +36,8 @@ export function initRoomController() {
         const next = rooms.find((room) => room.id === roomId);
         if (!next) return;
         clearTimers();
+        entrySequence += 1;
+        transitionEntry = null;
         inert(true);
         if (skipTransition) {
             hideTransition();
@@ -38,15 +45,29 @@ export function initRoomController() {
             return;
         }
         showTransition();
-        timers.push(setTimeout(() => {
-            revealRoom(next, roomId);
-        }, entryDelay));
-        timers.push(setTimeout(hideTransition, entryDelay));
+        const token = entrySequence;
+        const startedAt = performance.now();
+        let completed = false;
+        const complete = () => {
+            if (completed || token !== entrySequence) return;
+            completed = true;
+            const remaining = Math.max(0, minimumEntryDelay - (performance.now() - startedAt));
+            timers.push(setTimeout(() => {
+                if (token === entrySequence) hideTransition();
+            }, remaining));
+        };
+        transitionEntry = { roomId, token, complete };
+        timers.push(setTimeout(complete, maximumEntryDelay));
+        // Build the destination underneath the loading veil immediately.
+        revealRoom(next, roomId);
     };
     const closeRoom = () => {
         if (!activeRoom) return;
         const room = activeRoom;
         clearTimers();
+        entrySequence += 1;
+        transitionEntry = null;
+        hideTransition();
         window.dispatchEvent(new CustomEvent("pog:room-closing", { detail: { roomId: room.id } }));
         room.classList.remove("is-open"); room.setAttribute("aria-hidden", "true"); activeRoom = null;
         inert(false);
@@ -56,6 +77,9 @@ export function initRoomController() {
     window.addEventListener("pog:open-room", (event) => openRoom(event.detail?.roomId, {
         skipTransition: event.detail?.skipTransition === true
     }));
+    window.addEventListener("pog:room-ready", (event) => {
+        if (event.detail?.roomId === transitionEntry?.roomId) transitionEntry.complete();
+    });
     window.addEventListener("pog:show-transition", showTransition);
     window.addEventListener("pog:hide-transition", hideTransition);
     rooms.forEach((room) => {

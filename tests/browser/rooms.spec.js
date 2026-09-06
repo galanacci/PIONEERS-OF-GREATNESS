@@ -71,6 +71,7 @@ test("the poem is unskippable once and skippable on return without another loadi
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 2500 });
     await page.locator("#founder-introduction-skip").click();
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/);
@@ -82,8 +83,10 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
         detail: { roomId: "founder-room" }
     })));
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/, { timeout: 2500 });
+    await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
     await expect(page.locator(".founder-hub-item")).toHaveCount(5);
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 2500 });
     await expect(page.locator(".founder-legacy")).toBeHidden();
     if (page.viewportSize()?.width < 560) {
         const hubFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
