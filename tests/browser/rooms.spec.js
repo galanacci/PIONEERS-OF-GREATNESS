@@ -86,7 +86,8 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-control.is-previous")).toBeDisabled();
     await page.locator(".founder-origin-control.is-next").click();
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 02 / 03");
-    await expect(page.locator(".founder-media-placeholder")).toBeVisible();
+    await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
+    await expect(page.locator(".founder-origin-copy")).toContainText("The philosophy came before the brand.");
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
     await expect(page.locator(".founder-origin-video source")).toHaveAttribute("src", "src/founder/mission-statement.mp4");

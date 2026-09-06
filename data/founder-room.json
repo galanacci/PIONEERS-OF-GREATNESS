@@ -32,11 +32,15 @@
       "number": "02",
       "title": "AN IDEA BEFORE A BRAND",
       "media": {
-        "type": "placeholder",
-        "label": "PLACEHOLDER_IMAGE_EARLY_WORKSPACE_OR_SKETCH"
+        "type": "image",
+        "src": "src/founder/greatness-poem-original.webp",
+        "alt": "The original handwritten GREATNESS poem by GALANACCI",
+        "width": 1600,
+        "height": 2118
       },
       "copy": [
-        "Before there were products, there was the idea."
+        "The philosophy came before the brand.",
+        "GREATNESS was the idea that PIONEERS OF GREATNESS would grow from."
       ]
     },
     {
