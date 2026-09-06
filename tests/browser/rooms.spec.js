@@ -45,6 +45,15 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
     await expect(page.locator("#email")).toHaveAttribute("placeholder", "ENTER EMAIL HERE...");
 });
 
+test("Founder mission film leads its statement", async ({ page }) => {
+    await page.goto("/");
+    const filmLeads = await page.locator(".founder-mission-film").evaluate((section) => (
+        section.firstElementChild?.classList.contains("founder-mission-player")
+        && section.lastElementChild?.classList.contains("founder-mission-film-intro")
+    ));
+    expect(filmLeads).toBe(true);
+});
+
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {
     let requests = 0;
     page.on("request", (request) => {

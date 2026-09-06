@@ -207,7 +207,7 @@ body.founder-introduction-active {
 
 .founder-mission-film-intro {
     max-width: 610px;
-    margin: 28px 0 clamp(44px, 7vh, 72px);
+    margin: 28px 0 0;
     color: rgba(255, 255, 255, 0.66);
     font-size: clamp(14px, 1.7vw, 18px);
     line-height: 1.7;
@@ -216,7 +216,7 @@ body.founder-introduction-active {
 .founder-mission-player {
     position: relative;
     width: min(100%, 520px);
-    margin: 0 auto;
+    margin: 0 auto clamp(44px, 7vh, 72px);
     background: rgba(255, 255, 255, 0.03);
 }
 
