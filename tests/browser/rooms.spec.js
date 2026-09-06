@@ -89,6 +89,7 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator("#founder-experience")).toBeVisible();
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 01 / 03");
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE SHARED BEDROOM, WHERE IT STARTED");
+    await expect(page.locator(".founder-origin-frame-date")).toHaveText("24 NOVEMBER 2021");
     await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/the-beginning-room.webp");
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     await expect(page.locator(".founder-origin-control.is-previous")).toBeDisabled();
@@ -110,6 +111,9 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FOUNDER");
     await expect(page.locator(".founder-origin-video source")).toHaveAttribute("src", "src/founder/mission-statement.mp4");
+    if (page.viewportSize()?.width < 560) {
+        await expect(page.locator(".founder-origin-video video")).toHaveCSS("object-fit", "cover");
+    }
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     await expect(page.locator(".founder-origin-control.is-next")).toBeDisabled();
     if (page.viewportSize()?.width < 560) {
