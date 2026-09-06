@@ -10,6 +10,8 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
 - Menu opens, does not close from backdrop clicks, and all pointer states are intentional.
 - Field Notes waits until the room opens, defaults to the newest year and switches cleanly through the top-right year selector; carousel arrows change only the current card.
+- Field Notes year selector aligns with RETURN TO MENU at wide, intermediate and mobile widths; its closed background remains transparent.
+- Desktop archive scrollbars show a slim indicator with no visible track.
 - UNCUT waits until the room opens, chapters are ordered newest first, and episode numbering remains correct.
 - Leaving UNCUT by MENU or Escape stops playback.
 
