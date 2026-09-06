@@ -59,6 +59,8 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     expect(Math.abs(returnBox.y - yearBox.y)).toBeLessThanOrEqual(4);
     expect(await page.locator(".field-notes-year-select").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
     expect(await page.locator(".field-notes-year-select").evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("0px");
+    await page.locator(".field-notes-year-select").focus();
+    expect(await page.locator(".field-notes-years").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
     if (testInfo.project.name === "desktop") {
         await page.setViewportSize({ width: 625, height: 900 });
         const mediumReturnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();

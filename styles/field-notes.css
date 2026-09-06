@@ -101,9 +101,13 @@
     outline: 0;
 }
 
-.field-notes-years:hover,
-.field-notes-years:focus-within {
+.field-notes-years:hover {
     color: #fff;
+}
+
+.field-notes-years:focus-within,
+.field-notes-years:active {
+    color: #673CAF;
 }
 
 .field-notes-chapter {
