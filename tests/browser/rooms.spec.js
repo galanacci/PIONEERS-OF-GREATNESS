@@ -38,7 +38,7 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
     await expect(page.locator("#email")).toHaveAttribute("placeholder", "ENTER EMAIL HERE...");
 });
 
-test("Field Notes waits for entry and renders one year chapter", async ({ page }) => {
+test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {
     let requests = 0;
     page.on("request", (request) => {
         if (request.url().endsWith("/data/field-notes.json")) requests += 1;
@@ -53,6 +53,10 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     const returnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
     const yearBox = await page.locator(".field-notes-year-select").boundingBox();
     expect(returnBox.x + returnBox.width).toBeLessThan(yearBox.x);
+    const viewport = page.viewportSize();
+    const expectedEdge = testInfo.project.name === "mobile" ? 24 : 40;
+    expect(Math.abs(viewport.width - yearBox.x - yearBox.width - expectedEdge)).toBeLessThanOrEqual(1);
+    expect(Math.abs(returnBox.y - yearBox.y)).toBeLessThanOrEqual(4);
     await expect(page.locator(".field-notes-chapter .field-note").first()).toBeVisible();
     expect(requests).toBe(1);
 });

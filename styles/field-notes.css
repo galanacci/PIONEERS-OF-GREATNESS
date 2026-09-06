@@ -3,17 +3,6 @@
     overflow-y: auto;
 }
 
-/* Keep scrolling year controls visually beneath the fixed return control. */
-.field-notes-room::before {
-    content: "";
-    position: fixed;
-    inset: 0 0 auto;
-    z-index: 1;
-    height: 82px;
-    background: linear-gradient(#000 68%, rgba(0, 0, 0, 0));
-    pointer-events: none;
-}
-
 .field-notes-room .room-return {
     z-index: 2;
 }
@@ -51,7 +40,12 @@
     position: fixed;
     top: 40px;
     right: 40px;
+    left: auto;
     z-index: 2;
+    display: block;
+    width: auto;
+    padding: 0;
+    background: transparent;
 }
 
 .field-notes-year-select {
@@ -163,10 +157,6 @@
 }
 
 @media (max-width: 680px) {
-    .field-notes-room::before {
-        height: 66px;
-    }
-
     .field-notes-header {
         margin-top: 76px;
     }
