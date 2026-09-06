@@ -81,6 +81,19 @@ body.founder-introduction-active {
     animation: founder-enter-reveal 1100ms ease both;
 }
 
+.founder-introduction-skip {
+    position: fixed;
+    z-index: 2;
+    top: clamp(24px, 5vh, 48px);
+    right: clamp(24px, 5vw, 64px);
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.founder-introduction-skip:hover,
+.founder-introduction-skip:focus-visible {
+    color: var(--color-accent-light) !important;
+}
+
 @keyframes founder-enter-reveal {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -136,6 +149,7 @@ body.founder-introduction-active {
 }
 
 .founder-introduction-actions[hidden],
+.founder-introduction-skip[hidden],
 .founder-introduction-enter[hidden] {
     display: none;
 }

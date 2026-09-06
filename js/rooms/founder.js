@@ -42,10 +42,11 @@ export function initFounder() {
     const poemReveal = document.getElementById("founder-poem-reveal");
     const actions = document.getElementById("founder-introduction-actions");
     const enter = document.getElementById("founder-introduction-enter");
+    const skip = document.getElementById("founder-introduction-skip");
     const replay = introduction?.querySelector("[data-founder-replay]");
     const enterFounder = introduction?.querySelector("[data-founder-enter]");
     const transition = document.getElementById("room-transition");
-    if (!introduction || !copy || !poemReveal || !actions || !enter || !replay || !enterFounder || !transition) return;
+    if (!introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterFounder || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -81,10 +82,10 @@ export function initFounder() {
         background.forEach((element) => { element.inert = false; });
     }
 
-    function enterRoom() {
+    function enterRoom(skipTransition = false) {
         rememberCompletion();
         closeIntroduction();
-        window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: ROOM_ID } }));
+        window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: ROOM_ID, skipTransition } }));
     }
 
     async function typeParagraph(paragraph, token, pacing) {
@@ -104,7 +105,7 @@ export function initFounder() {
         return element;
     }
 
-    async function playIntroduction() {
+    async function playIntroduction({ allowSkip = hasCompletedIntroduction() } = {}) {
         openIntroduction();
         const token = sequence;
         copy.hidden = false;
@@ -113,6 +114,7 @@ export function initFounder() {
         copy.setAttribute("aria-busy", "true");
         actions.hidden = true;
         enter.hidden = true;
+        skip.hidden = !allowSkip;
         try {
             const content = await loadPoem();
             await wait(1200);
@@ -137,6 +139,7 @@ export function initFounder() {
             copy.hidden = true;
             poemReveal.hidden = false;
             copy.setAttribute("aria-busy", "false");
+            skip.hidden = true;
             enter.hidden = false;
             enter.focus();
         } catch (error) {
@@ -150,29 +153,18 @@ export function initFounder() {
         }
     }
 
-    function showReturningChoice() {
-        openIntroduction();
-        copy.hidden = false;
-        copy.replaceChildren();
-        poemReveal.hidden = true;
-        copy.setAttribute("aria-busy", "false");
-        enter.hidden = true;
-        actions.hidden = false;
-        enterFounder.focus();
-    }
-
     async function enterFounderPath() {
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
         await wait(1000);
-        if (hasCompletedIntroduction()) showReturningChoice();
-        else playIntroduction();
+        playIntroduction({ allowSkip: hasCompletedIntroduction() });
         window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
     window.addEventListener("pog:founder-requested", enterFounderPath);
-    replay.addEventListener("click", playIntroduction);
-    enterFounder.addEventListener("click", enterRoom);
-    enter.addEventListener("click", enterRoom);
+    replay.addEventListener("click", () => playIntroduction({ allowSkip: true }));
+    enterFounder.addEventListener("click", () => enterRoom());
+    enter.addEventListener("click", () => enterRoom());
+    skip.addEventListener("click", () => enterRoom(true));
     introduction.addEventListener("keydown", (event) => {
         if (event.key === "Escape") event.preventDefault();
         if (event.key === "Enter" && !enter.hidden) { event.preventDefault(); enterRoom(); }

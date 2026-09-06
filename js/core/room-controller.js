@@ -16,20 +16,30 @@ export function initRoomController() {
         transition.setAttribute("aria-hidden", "false");
     };
     const hideTransition = () => { transition.classList.remove("is-active"); transition.setAttribute("aria-hidden", "true"); };
-    const openRoom = (roomId) => {
+    const revealRoom = (next, roomId) => {
+        rooms.forEach((room) => {
+            const open = room === next;
+            room.classList.toggle("is-open", open);
+            room.setAttribute("aria-hidden", String(!open));
+        });
+        activeRoom = next;
+        activeRoom.querySelector("[data-room-close]")?.focus();
+        window.dispatchEvent(new CustomEvent("pog:room-opened", { detail: { roomId } }));
+    };
+    const openRoom = (roomId, { skipTransition = false } = {}) => {
         if (!isKnownRoom(roomId)) return;
         const next = rooms.find((room) => room.id === roomId);
         if (!next) return;
-        clearTimers(); inert(true); showTransition();
+        clearTimers();
+        inert(true);
+        if (skipTransition) {
+            hideTransition();
+            revealRoom(next, roomId);
+            return;
+        }
+        showTransition();
         timers.push(setTimeout(() => {
-            rooms.forEach((room) => {
-                const open = room === next;
-                room.classList.toggle("is-open", open);
-                room.setAttribute("aria-hidden", String(!open));
-            });
-            activeRoom = next;
-            activeRoom.querySelector("[data-room-close]")?.focus();
-            window.dispatchEvent(new CustomEvent("pog:room-opened", { detail: { roomId } }));
+            revealRoom(next, roomId);
         }, entryDelay));
         timers.push(setTimeout(hideTransition, entryDelay));
     };
@@ -43,7 +53,9 @@ export function initRoomController() {
         window.dispatchEvent(new CustomEvent("pog:room-closed", { detail: { roomId: room.id } }));
         window.dispatchEvent(new CustomEvent("pog:return-to-menu"));
     };
-    window.addEventListener("pog:open-room", (event) => openRoom(event.detail?.roomId));
+    window.addEventListener("pog:open-room", (event) => openRoom(event.detail?.roomId, {
+        skipTransition: event.detail?.skipTransition === true
+    }));
     window.addEventListener("pog:show-transition", showTransition);
     window.addEventListener("pog:hide-transition", hideTransition);
     rooms.forEach((room) => {

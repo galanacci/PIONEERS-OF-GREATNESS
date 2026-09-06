@@ -54,6 +54,24 @@ test("Founder mission film leads its statement", async ({ page }) => {
     expect(filmLeads).toBe(true);
 });
 
+test("the poem is unskippable once and skippable on return without another loading screen", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:founder-requested")));
+    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
+    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
+    await expect(page.locator("#founder-introduction-skip")).toBeHidden();
+
+    await page.reload();
+    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:founder-requested")));
+    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
+    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
+    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/);
+});
+
 test("Founder opens into the interactive five-chapter hub", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
