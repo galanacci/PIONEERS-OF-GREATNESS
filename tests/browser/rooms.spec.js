@@ -48,7 +48,11 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     await openMenu(page);
     await page.getByRole("menuitem", { name: "FIELD NOTES" }).click();
     await expect(page.locator("#field-notes-room")).toHaveClass(/is-open/, { timeout: 2500 });
-    await expect(page.locator(".field-notes-year").first()).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(".field-notes-year-select")).toBeVisible();
+    await expect(page.locator(".field-notes-year-select")).toHaveValue("2026");
+    const returnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
+    const yearBox = await page.locator(".field-notes-year-select").boundingBox();
+    expect(returnBox.x + returnBox.width).toBeLessThan(yearBox.x);
     await expect(page.locator(".field-notes-chapter .field-note").first()).toBeVisible();
     expect(requests).toBe(1);
 });

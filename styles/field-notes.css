@@ -48,24 +48,28 @@
 }
 
 .field-notes-years {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: clamp(34px, 6vh, 64px);
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    z-index: 2;
 }
 
-.field-notes-year {
-    padding: 8px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: rgba(255, 255, 255, 0.52);
-    font: inherit;
-    font-size: 11px;
+.field-notes-year-select {
+    padding: 6px 4px;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0;
+    background: #000;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: 'Lora', serif;
+    font-size: 10px;
+    font-weight: 600;
     letter-spacing: 0.16em;
+    cursor: pointer;
 }
 
-.field-notes-year:hover,
-.field-notes-year:focus-visible,
-.field-notes-year.is-current {
+.field-notes-year-select:hover,
+.field-notes-year-select:focus-visible {
     border-color: #673CAF;
     outline: 0;
     color: #fff;
@@ -165,6 +169,11 @@
 
     .field-notes-header {
         margin-top: 76px;
+    }
+
+    .field-notes-years {
+        top: 24px;
+        right: 24px;
     }
 
     .field-notes-chapter {

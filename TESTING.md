@@ -9,7 +9,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
 - Menu opens, does not close from backdrop clicks, and all pointer states are intentional.
-- Field Notes waits until the room opens, defaults to the newest year and switches cleanly between year chapters; carousel arrows change only the current card.
+- Field Notes waits until the room opens, defaults to the newest year and switches cleanly through the top-right year selector; carousel arrows change only the current card.
 - UNCUT waits until the room opens, chapters are ordered newest first, and episode numbering remains correct.
 - Leaving UNCUT by MENU or Escape stops playback.
 

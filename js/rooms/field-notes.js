@@ -74,28 +74,23 @@ export async function initFieldNotes() {
             const controls = document.createElement("nav");
             controls.className = "field-notes-years";
             controls.setAttribute("aria-label", "Field Notes chapters by year");
+            const select = document.createElement("select");
+            select.className = "field-notes-year-select";
+            select.setAttribute("aria-label", "Select Field Notes year");
             const chapter = document.createElement("div");
             chapter.className = "field-notes-chapter";
-            const buttons = yearEntries.map(([year, notes], index) => {
-                const button = document.createElement("button");
-                button.type = "button";
-                button.className = "field-notes-year";
-                button.textContent = year;
-                const selectYear = () => {
-                    buttons.forEach((candidate) => {
-                        const current = candidate === button;
-                        candidate.classList.toggle("is-current", current);
-                        candidate.setAttribute("aria-pressed", String(current));
-                    });
-                    chapter.replaceChildren(...notes.map(createNote));
-                };
-                button.addEventListener("click", selectYear);
-                button.setAttribute("aria-pressed", String(index === 0));
-                controls.append(button);
-                if (index === 0) queueMicrotask(selectYear);
-                return button;
+            const notesByYear = new Map(yearEntries);
+            yearEntries.forEach(([year]) => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = year;
+                select.append(option);
             });
+            const selectYear = () => chapter.replaceChildren(...notesByYear.get(select.value).map(createNote));
+            select.addEventListener("change", selectYear);
+            controls.append(select);
             list.replaceChildren(controls, chapter);
+            selectYear();
         } catch (error) {
             initialized = false;
             console.error("Field Notes could not be loaded.", error);
