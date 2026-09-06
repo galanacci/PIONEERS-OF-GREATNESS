@@ -19,6 +19,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 
 - Menu: Up/Down, Enter, Escape and Tab work; locked items stay grey.
 - FOUNDER, DOCUMENTARY and FIELD NOTES build behind the LOADING veil; it stays visible for at least one second and fades only after the destination reports its first visible state ready. WAITLIST and EXIT remain immediate.
+- The LOADING veil appears instantly when a destination is selected, preventing a one-frame glimpse of the landing page on mobile; only its exit fades.
 - Founder: the poem plays automatically on every visit; each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next. The first visit cannot be skipped, while returning visitors can use SKIP to enter the Founder Hub immediately without a second loading screen.
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.

@@ -180,7 +180,8 @@
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transition-delay: 0s;
+    /* Cover the outgoing surface before the browser can paint an intermediate frame. */
+    transition: none;
 }
 
 .room-transition-label {

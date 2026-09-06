@@ -11,6 +11,12 @@ test("presentation controls match the viewing device", async ({ page }, testInfo
     expect(await page.locator(".room-transition-label").evaluate((element) => (
         getComputedStyle(element, "::after").animationName
     ))).toBe("room-loading-dots");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:show-transition")));
+    await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
+    expect(await page.locator("#room-transition").evaluate((element) => (
+        getComputedStyle(element).transitionDuration
+    ))).toBe("0s");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:hide-transition")));
     await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /maximum-scale=1, user-scalable=no/);
     expect(await page.locator("body").evaluate((element) => getComputedStyle(element).userSelect)).toBe("none");
     expect(await page.locator("#email").evaluate((element) => getComputedStyle(element).userSelect)).toBe("text");
