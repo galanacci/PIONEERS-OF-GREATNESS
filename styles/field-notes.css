@@ -65,15 +65,30 @@
     width: auto;
     padding: 0;
     background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.field-notes-years::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    width: 5px;
+    height: 5px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    pointer-events: none;
+    transform: translateY(-70%) rotate(45deg);
 }
 
 .field-notes-year-select {
-    padding: 6px 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 6px 16px 6px 4px;
     border: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 0;
     background-color: transparent;
-    color: rgba(255, 255, 255, 0.65);
+    color: inherit;
     font-family: 'Lora', serif;
     font-size: 10px;
     font-weight: 600;
@@ -83,8 +98,11 @@
 
 .field-notes-year-select:hover,
 .field-notes-year-select:focus-visible {
-    border-color: #673CAF;
     outline: 0;
+}
+
+.field-notes-years:hover,
+.field-notes-years:focus-within {
     color: #fff;
 }
 
