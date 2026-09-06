@@ -21,6 +21,26 @@
     transition-delay: 0s;
 }
 
+@media (hover: hover) and (pointer: fine) {
+    .world-room {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.55) transparent;
+    }
+
+    .world-room::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .world-room::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .world-room::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.55);
+        border-radius: 0;
+    }
+}
+
 .world-room-content {
     width: min(82vw, 760px);
     min-height: 100%;

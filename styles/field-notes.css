@@ -3,25 +3,6 @@
     overflow-y: auto;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .field-notes-room {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.55) transparent;
-    }
-
-    .field-notes-room::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .field-notes-room::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .field-notes-room::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.55);
-    }
-}
-
 .field-notes-room .room-return {
     z-index: 2;
 }

@@ -27,6 +27,13 @@ test("presentation controls match the viewing device", async ({ page }, testInfo
     });
     if (testInfo.project.name === "mobile") {
         expect(zoomGestures).toEqual({ gestureAllowed: false, multiTouchAllowed: false, singleTouchAllowed: true });
+    } else {
+        const scrollbar = await page.locator("#founder-room").evaluate((element) => ({
+            color: getComputedStyle(element).scrollbarColor,
+            width: getComputedStyle(element).scrollbarWidth
+        }));
+        expect(scrollbar.width).toBe("thin");
+        expect(scrollbar.color).toContain("rgba(0, 0, 0, 0)");
     }
 });
 
