@@ -6,6 +6,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 
 - Background video autoplays muted; sound control works without an outline.
 - Right-click does not open the browser context menu on desktop.
+- Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
 - Menu opens, does not close from backdrop clicks, and all pointer states are intentional.
 - Field Notes waits until the room opens, defaults to the newest year and switches cleanly between year chapters; carousel arrows change only the current card.

@@ -7,6 +7,15 @@ html, body {
     font-family: 'Lora', serif;
     background-color: black;
     overflow: hidden;
+    touch-action: pan-x pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input,
+textarea {
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 /* Navbar Styles */

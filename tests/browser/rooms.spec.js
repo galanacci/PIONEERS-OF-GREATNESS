@@ -8,11 +8,26 @@ async function openMenu(page) {
 test("presentation controls match the viewing device", async ({ page }, testInfo) => {
     await page.goto("/");
     await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /maximum-scale=1, user-scalable=no/);
+    expect(await page.locator("body").evaluate((element) => getComputedStyle(element).userSelect)).toBe("none");
+    expect(await page.locator("#email").evaluate((element) => getComputedStyle(element).userSelect)).toBe("text");
     const contextMenuAllowed = await page.evaluate(() => document.dispatchEvent(new MouseEvent("contextmenu", {
         bubbles: true,
         cancelable: true
     })));
     expect(contextMenuAllowed).toBe(testInfo.project.name !== "desktop");
+    const zoomGestures = await page.evaluate(() => {
+        const gestureAllowed = document.dispatchEvent(new Event("gesturestart", { bubbles: true, cancelable: true }));
+        const multiTouch = new Event("touchmove", { bubbles: true, cancelable: true });
+        Object.defineProperty(multiTouch, "touches", { value: [{}, {}] });
+        const multiTouchAllowed = document.dispatchEvent(multiTouch);
+        const singleTouch = new Event("touchmove", { bubbles: true, cancelable: true });
+        Object.defineProperty(singleTouch, "touches", { value: [{}] });
+        const singleTouchAllowed = document.dispatchEvent(singleTouch);
+        return { gestureAllowed, multiTouchAllowed, singleTouchAllowed };
+    });
+    if (testInfo.project.name === "mobile") {
+        expect(zoomGestures).toEqual({ gestureAllowed: false, multiTouchAllowed: false, singleTouchAllowed: true });
+    }
 });
 
 test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) => {
