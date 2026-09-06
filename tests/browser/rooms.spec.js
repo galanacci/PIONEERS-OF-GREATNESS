@@ -191,6 +191,20 @@ test("Founder Journey behaves like an eight-slot save history", async ({ page })
     await expect(page.locator(".founder-journey-count")).toHaveText("02 / 08");
     await expect(page.locator("#founder-journey-entry-title")).toHaveText("THE PIVOT");
     await expect(page.locator(".founder-media-placeholder")).toContainText("THE PIVOT");
+    if (page.viewportSize()?.width >= 560) {
+        const alignment = await page.locator(".founder-journey-entry-header").evaluate((header) => {
+            const headerRect = header.getBoundingClientRect();
+            const menuRect = document.querySelector("#founder-room .room-return")?.getBoundingClientRect();
+            return {
+                headerTop: headerRect.top,
+                headerRight: headerRect.right,
+                menuTop: menuRect?.top ?? -Infinity,
+                viewportWidth: window.innerWidth
+            };
+        });
+        expect(Math.abs(alignment.headerTop - alignment.menuTop)).toBeLessThanOrEqual(1);
+        expect(alignment.viewportWidth - alignment.headerRight).toBe(40);
+    }
     expect(await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
 
     await page.keyboard.press("ArrowRight");

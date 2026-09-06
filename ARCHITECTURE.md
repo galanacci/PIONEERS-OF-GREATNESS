@@ -17,6 +17,8 @@ Rooms communicate through `pog:*` browser events. A room controller emits `pog:r
 
 Founder Hub labels, availability, Origin frames and the eight Journey memories live in `data/founder-room.json`. Later Founder stages extend this single content source with principles, notes and the current mission.
 
+Founder chapters that present imagery share one desktop composition rule: navigation anchors the top left, entry metadata anchors the top right, and the visual material owns the centre. Mobile keeps metadata in the normal stacked flow.
+
 ## Content pipelines
 
 - Instagram regular posts generate `data/field-notes.json` and optimized WebP assets.

@@ -551,6 +551,31 @@
     .founder-origin-frame-date {
         margin-top: 7px;
     }
+
+    /* Shared desktop rule for Founder chapters that present visual material. */
+    .founder-journey-entry {
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "media copy"
+            "controls controls";
+    }
+
+    .founder-journey-entry-header {
+        position: fixed;
+        z-index: 2;
+        top: 40px;
+        right: 40px;
+        width: min(42vw, 460px);
+        text-align: right;
+    }
+
+    .founder-journey-entry-header h2 {
+        margin-top: 7px;
+        font-size: clamp(12px, 1.4vw, 16px);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        line-height: 1.35;
+    }
 }
 
 @media (max-width: 560px) {
