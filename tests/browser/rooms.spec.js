@@ -66,12 +66,17 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     expect(Math.abs(returnBox.y - yearBox.y)).toBeLessThanOrEqual(4);
     expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
     expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("0px");
+    await page.locator(".field-notes-year-trigger").hover();
+    expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).borderTopWidth)).toBe("0px");
     await page.locator(".field-notes-year-trigger").click();
     expect(await page.locator(".field-notes-years").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
     await expect(page.locator(".field-notes-year-options")).toBeVisible();
     expect(await page.locator(".field-notes-year-options").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
     expect(await page.locator(".field-notes-year-option.is-selected").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
-    expect(await page.locator(".field-notes-year-option:not(.is-selected)").first().evaluate((element) => getComputedStyle(element).color)).toBe("rgba(255, 255, 255, 0.45)");
+    const unselectedYear = page.locator(".field-notes-year-option:not(.is-selected)").first();
+    expect(await unselectedYear.evaluate((element) => getComputedStyle(element).color)).toBe("rgba(255, 255, 255, 0.45)");
+    await unselectedYear.hover();
+    expect(await unselectedYear.evaluate((element) => getComputedStyle(element).borderTopWidth)).toBe("0px");
     await page.keyboard.press("Escape");
     if (testInfo.project.name === "desktop") {
         await page.setViewportSize({ width: 625, height: 900 });
