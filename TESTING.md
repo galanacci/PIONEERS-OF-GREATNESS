@@ -23,7 +23,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
 - Founder Origin: the shared bedroom, original poem and first Greatness Tee render as three visual-only frames with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, and Escape returns to the Founder Hub.
-- Founder mobile: the Hub and every Origin frame fit within a 375 × 667 viewport without vertical scrolling.
+- Founder viewport: the Hub and every Origin frame scale within desktop and 375 × 667 mobile viewports without scrolling.
 - Rooms: focus starts on MENU, remains trapped inside, and Escape returns to the menu.
 - Field Notes carousels respond to Left/Right when their image area is focused.
 - UNCUT episode buttons respond to Up/Down.

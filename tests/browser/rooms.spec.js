@@ -93,20 +93,16 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/the-beginning-room.webp");
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     await expect(page.locator(".founder-origin-control.is-previous")).toBeDisabled();
-    if (page.viewportSize()?.width < 560) {
-        const frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
-        expect(frameFits).toBe(true);
-    }
+    let frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+    expect(frameFits).toBe(true);
     await page.locator(".founder-origin-control.is-next").click();
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 02 / 03");
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE POEM BEFORE THE BRAND");
     await expect(page.locator(".founder-origin-frame-date")).toHaveText("27 JUNE 2021");
     await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
-    if (page.viewportSize()?.width < 560) {
-        const frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
-        expect(frameFits).toBe(true);
-    }
+    frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+    expect(frameFits).toBe(true);
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
@@ -115,10 +111,8 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-video")).toHaveCount(0);
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     await expect(page.locator(".founder-origin-control.is-next")).toBeDisabled();
-    if (page.viewportSize()?.width < 560) {
-        const frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
-        expect(frameFits).toBe(true);
-    }
+    frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+    expect(frameFits).toBe(true);
     await page.keyboard.press("Escape");
     await expect(page.locator("#founder-hub")).toBeVisible();
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
