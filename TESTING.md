@@ -25,6 +25,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
 - Founder Origin: the shared bedroom, original poem and first Greatness Tee render as three visual-only frames with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, and Escape returns to the Founder Hub.
 - Founder viewport: the Hub and every Origin frame scale within desktop and 375 × 667 mobile viewports without scrolling.
+- Founder Origin desktop: the media begins within the upper 30% of the viewport and receives more than half of the viewport height, avoiding an oversized empty band above it.
 - Rooms: focus starts on MENU, remains trapped inside, and Escape returns to the menu.
 - Field Notes carousels respond to Left/Right when their image area is focused.
 - UNCUT episode buttons respond to Up/Down.

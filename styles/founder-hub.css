@@ -301,6 +301,18 @@
     letter-spacing: 0.14em;
 }
 
+@media (min-width: 561px) {
+    .founder-content {
+        padding-top: clamp(76px, 10vh, 108px);
+    }
+
+    .founder-origin-frame {
+        row-gap: clamp(14px, 2vh, 22px);
+        column-gap: clamp(24px, 5vw, 64px);
+        padding: 8px 0 24px;
+    }
+}
+
 @media (max-width: 560px) {
     .founder-hub {
         height: calc(100dvh - 100px);
