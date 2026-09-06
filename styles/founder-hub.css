@@ -265,13 +265,32 @@
 }
 
 @media (max-width: 560px) {
+    .founder-room {
+        overflow: hidden;
+    }
+
     .founder-hub {
-        min-height: calc(100vh - 100px);
-        padding: 48px 0 36px;
+        height: calc(100dvh - 100px);
+        min-height: 0;
+        padding: clamp(20px, 5vh, 42px) 0 clamp(18px, 4vh, 34px);
+    }
+
+    .founder-hub-header {
+        margin-bottom: clamp(20px, 4vh, 34px);
+    }
+
+    .founder-hub-header h1 {
+        font-size: clamp(42px, 14vw, 62px);
+    }
+
+    .founder-hub-identity {
+        margin-top: 14px;
     }
 
     .founder-hub-item {
-        min-height: 48px;
+        min-height: clamp(40px, 6.8vh, 48px);
+        padding-top: 8px;
+        padding-bottom: 8px;
         padding-left: 34px;
     }
 
@@ -284,44 +303,72 @@
     }
 
     .founder-experience {
-        min-height: calc(100vh - 100px);
+        height: calc(100dvh - 100px);
+        min-height: 0;
     }
 
     .founder-origin-frame {
+        height: 100%;
+        min-height: 0;
         grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
         grid-template-areas:
             "header"
             "media"
             "copy"
             "controls";
-        align-content: start;
-        gap: 26px;
-        padding: 42px 0 34px;
+        gap: clamp(10px, 2vh, 18px);
+        padding: clamp(8px, 2vh, 16px) 0 clamp(14px, 3vh, 24px);
+        overflow: hidden;
     }
 
     .founder-origin-frame-header h2 {
-        font-size: clamp(31px, 10vw, 46px);
+        margin-top: 8px;
+        font-size: clamp(27px, 8.5vw, 40px);
+    }
+
+    .founder-origin-frame-date {
+        margin-top: 7px;
     }
 
     .founder-origin-media {
         width: min(100%, 360px);
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .founder-origin-media img,
     .founder-media-placeholder {
-        max-height: 48vh;
+        width: auto;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .founder-origin-video {
+        height: 100%;
     }
 
     .founder-origin-video video {
-        max-height: 48vh;
+        width: auto;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
     }
 
     .founder-origin-copy p {
-        font-size: 14px;
+        margin-bottom: 0.72em;
+        font-size: clamp(11px, 3.2vw, 14px);
+        line-height: 1.45;
     }
 
     .founder-origin-copy p:first-child {
-        font-size: clamp(20px, 6.5vw, 28px);
+        font-size: clamp(17px, 5.2vw, 24px);
+        line-height: 1.3;
     }
 
     .founder-origin-controls {
@@ -329,7 +376,23 @@
     }
 
     .founder-origin-control {
+        padding: 5px 0;
+        font-size: 8px;
         white-space: normal;
         line-height: 1.5;
+    }
+}
+
+@media (max-width: 560px) and (max-height: 700px) {
+    .founder-hub-status {
+        margin-top: 18px;
+    }
+
+    .founder-origin-copy p {
+        font-size: 11px;
+    }
+
+    .founder-origin-copy p:first-child {
+        font-size: 16px;
     }
 }

@@ -55,6 +55,7 @@ test("Founder mission film leads its statement", async ({ page }) => {
 });
 
 test("Founder opens into the interactive five-chapter hub", async ({ page }) => {
+    if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
         detail: { roomId: "founder-room" }
@@ -62,6 +63,10 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator(".founder-hub-item")).toHaveCount(5);
     await expect(page.locator(".founder-legacy")).toBeHidden();
+    if (page.viewportSize()?.width < 560) {
+        const hubFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+        expect(hubFits).toBe(true);
+    }
     await expect(page.locator(".founder-hub-item").first()).toHaveClass(/is-selected/);
     await page.keyboard.press("ArrowDown");
     await expect(page.locator(".founder-hub-item").nth(1)).toHaveClass(/is-selected/);
@@ -73,6 +78,7 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
 });
 
 test("Founder Origin moves through three finite cinematic frames", async ({ page }) => {
+    if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
         detail: { roomId: "founder-room" }
@@ -84,14 +90,26 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 01 / 03");
     await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/the-beginning-room.webp");
     await expect(page.locator(".founder-origin-control.is-previous")).toBeDisabled();
+    if (page.viewportSize()?.width < 560) {
+        const frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+        expect(frameFits).toBe(true);
+    }
     await page.locator(".founder-origin-control.is-next").click();
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 02 / 03");
     await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
     await expect(page.locator(".founder-origin-copy")).toContainText("The philosophy came before the brand.");
+    if (page.viewportSize()?.width < 560) {
+        const frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+        expect(frameFits).toBe(true);
+    }
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
     await expect(page.locator(".founder-origin-video source")).toHaveAttribute("src", "src/founder/mission-statement.mp4");
     await expect(page.locator(".founder-origin-control.is-next")).toBeDisabled();
+    if (page.viewportSize()?.width < 560) {
+        const frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
+        expect(frameFits).toBe(true);
+    }
     await page.keyboard.press("Escape");
     await expect(page.locator("#founder-hub")).toBeVisible();
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
