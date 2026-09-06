@@ -7,6 +7,10 @@ async function openMenu(page) {
 
 test("presentation controls match the viewing device", async ({ page }, testInfo) => {
     await page.goto("/");
+    await expect(page.locator(".room-transition-label")).toHaveText("LOADING");
+    expect(await page.locator(".room-transition-label").evaluate((element) => (
+        getComputedStyle(element, "::after").animationName
+    ))).toBe("room-loading-dots");
     await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /maximum-scale=1, user-scalable=no/);
     expect(await page.locator("body").evaluate((element) => getComputedStyle(element).userSelect)).toBe("none");
     expect(await page.locator("#email").evaluate((element) => getComputedStyle(element).userSelect)).toBe("text");

@@ -18,7 +18,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 ## Keyboard
 
 - Menu: Up/Down, Enter, Escape and Tab work; locked items stay grey.
-- FOUNDER, DOCUMENTARY and FIELD NOTES show the LOADING... threshold before their destination becomes visible; WAITLIST and EXIT remain immediate.
+- FOUNDER, DOCUMENTARY and FIELD NOTES show the one-second LOADING screen with an animated ellipsis before their destination becomes visible; WAITLIST and EXIT remain immediate.
 - Founder: the poem plays automatically on every visit; each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next. The first visit cannot be skipped, while returning visitors can use SKIP to enter the Founder Hub immediately without a second loading screen.
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
