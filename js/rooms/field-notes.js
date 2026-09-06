@@ -74,23 +74,76 @@ export async function initFieldNotes() {
             const controls = document.createElement("nav");
             controls.className = "field-notes-years";
             controls.setAttribute("aria-label", "Field Notes chapters by year");
-            const select = document.createElement("select");
-            select.className = "field-notes-year-select";
-            select.setAttribute("aria-label", "Select Field Notes year");
+            const trigger = document.createElement("button");
+            trigger.type = "button";
+            trigger.className = "field-notes-year-trigger";
+            trigger.setAttribute("aria-label", "Select Field Notes year");
+            trigger.setAttribute("aria-haspopup", "listbox");
+            trigger.setAttribute("aria-expanded", "false");
+            const options = document.createElement("div");
+            options.className = "field-notes-year-options";
+            options.setAttribute("role", "listbox");
+            options.setAttribute("aria-label", "Field Notes years");
+            options.hidden = true;
             const chapter = document.createElement("div");
             chapter.className = "field-notes-chapter";
             const notesByYear = new Map(yearEntries);
-            yearEntries.forEach(([year]) => {
-                const option = document.createElement("option");
-                option.value = year;
+            let selectedYear = yearEntries[0][0];
+            let optionButtons = [];
+            const setOpen = (open) => {
+                controls.classList.toggle("is-open", open);
+                trigger.setAttribute("aria-expanded", String(open));
+                options.hidden = !open;
+            };
+            const selectYear = (year) => {
+                selectedYear = year;
+                trigger.textContent = year;
+                optionButtons.forEach((button) => {
+                    const selected = button.dataset.year === year;
+                    button.classList.toggle("is-selected", selected);
+                    button.setAttribute("aria-selected", String(selected));
+                });
+                chapter.replaceChildren(...notesByYear.get(year).map(createNote));
+            };
+            optionButtons = yearEntries.map(([year]) => {
+                const option = document.createElement("button");
+                option.type = "button";
+                option.className = "field-notes-year-option";
+                option.dataset.year = year;
+                option.setAttribute("role", "option");
                 option.textContent = year;
-                select.append(option);
+                option.addEventListener("click", () => {
+                    selectYear(year);
+                    setOpen(false);
+                    trigger.focus();
+                });
+                options.append(option);
+                return option;
             });
-            const selectYear = () => chapter.replaceChildren(...notesByYear.get(select.value).map(createNote));
-            select.addEventListener("change", selectYear);
-            controls.append(select);
+            trigger.addEventListener("click", () => {
+                const open = trigger.getAttribute("aria-expanded") !== "true";
+                setOpen(open);
+                if (open) optionButtons.find((button) => button.dataset.year === selectedYear)?.focus();
+            });
+            options.addEventListener("keydown", (event) => {
+                const current = optionButtons.indexOf(document.activeElement);
+                if (["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) {
+                    event.preventDefault();
+                    let next = event.key === "Home" ? 0 : event.key === "End" ? optionButtons.length - 1 : current + (event.key === "ArrowDown" ? 1 : -1);
+                    optionButtons[(next + optionButtons.length) % optionButtons.length].focus();
+                } else if (event.key === "Escape") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setOpen(false);
+                    trigger.focus();
+                }
+            });
+            document.addEventListener("pointerdown", (event) => {
+                if (!controls.contains(event.target)) setOpen(false);
+            });
+            controls.append(trigger, options);
             list.replaceChildren(controls, chapter);
-            selectYear();
+            selectYear(selectedYear);
         } catch (error) {
             initialized = false;
             console.error("Field Notes could not be loaded.", error);

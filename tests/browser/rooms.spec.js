@@ -55,23 +55,28 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     await openMenu(page);
     await page.getByRole("menuitem", { name: "FIELD NOTES" }).click();
     await expect(page.locator("#field-notes-room")).toHaveClass(/is-open/, { timeout: 2500 });
-    await expect(page.locator(".field-notes-year-select")).toBeVisible();
-    await expect(page.locator(".field-notes-year-select")).toHaveValue("2026");
+    await expect(page.locator(".field-notes-year-trigger")).toBeVisible();
+    await expect(page.locator(".field-notes-year-trigger")).toHaveText("2026");
     const returnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
-    const yearBox = await page.locator(".field-notes-year-select").boundingBox();
+    const yearBox = await page.locator(".field-notes-year-trigger").boundingBox();
     expect(returnBox.x + returnBox.width).toBeLessThan(yearBox.x);
     const viewport = page.viewportSize();
     const expectedEdge = testInfo.project.name === "mobile" ? 24 : 40;
     expect(Math.abs(viewport.width - yearBox.x - yearBox.width - expectedEdge)).toBeLessThanOrEqual(1);
     expect(Math.abs(returnBox.y - yearBox.y)).toBeLessThanOrEqual(4);
-    expect(await page.locator(".field-notes-year-select").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
-    expect(await page.locator(".field-notes-year-select").evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("0px");
-    await page.locator(".field-notes-year-select").focus();
+    expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+    expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("0px");
+    await page.locator(".field-notes-year-trigger").click();
     expect(await page.locator(".field-notes-years").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
+    await expect(page.locator(".field-notes-year-options")).toBeVisible();
+    expect(await page.locator(".field-notes-year-options").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+    expect(await page.locator(".field-notes-year-option.is-selected").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
+    expect(await page.locator(".field-notes-year-option:not(.is-selected)").first().evaluate((element) => getComputedStyle(element).color)).toBe("rgba(255, 255, 255, 0.45)");
+    await page.keyboard.press("Escape");
     if (testInfo.project.name === "desktop") {
         await page.setViewportSize({ width: 625, height: 900 });
         const mediumReturnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
-        const mediumYearBox = await page.locator(".field-notes-year-select").boundingBox();
+        const mediumYearBox = await page.locator(".field-notes-year-trigger").boundingBox();
         expect(Math.abs(mediumReturnBox.y - mediumYearBox.y)).toBeLessThanOrEqual(4);
     }
     await expect(page.locator(".field-notes-chapter .field-note").first()).toBeVisible();

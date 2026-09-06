@@ -62,12 +62,9 @@
     transform: translateY(-70%) rotate(45deg);
 }
 
-.field-notes-year-select {
-    appearance: none;
-    -webkit-appearance: none;
+.field-notes-year-trigger {
     padding: 6px 16px 6px 4px;
     border: 0;
-    border-radius: 0;
     background-color: transparent;
     color: inherit;
     font-family: 'Lora', serif;
@@ -77,9 +74,47 @@
     cursor: pointer;
 }
 
-.field-notes-year-select:hover,
-.field-notes-year-select:focus-visible {
+.field-notes-year-trigger:hover,
+.field-notes-year-trigger:focus-visible,
+.field-notes-year-option:focus-visible {
     outline: 0;
+}
+
+.field-notes-year-options {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    min-width: 100%;
+    background: transparent;
+    text-align: right;
+}
+
+.field-notes-year-options[hidden] {
+    display: none;
+}
+
+.field-notes-year-option {
+    display: block;
+    width: 100%;
+    padding: 5px 3px;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: 'Lora', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-align: right;
+    cursor: pointer;
+}
+
+.field-notes-year-option:hover,
+.field-notes-year-option:focus-visible {
+    color: #fff;
+}
+
+.field-notes-year-option.is-selected {
+    color: #673CAF;
 }
 
 .field-notes-years:hover {
@@ -87,7 +122,8 @@
 }
 
 .field-notes-years:focus-within,
-.field-notes-years:active {
+.field-notes-years:active,
+.field-notes-years.is-open {
     color: #673CAF;
 }
 
