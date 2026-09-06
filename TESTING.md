@@ -5,6 +5,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 ## Desktop
 
 - Background video autoplays muted; sound control works without an outline.
+- Right-click does not open the browser context menu on desktop.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
 - Menu opens, does not close from backdrop clicks, and all pointer states are intentional.
 - Field Notes waits until the room opens, defaults to the newest year and switches cleanly between year chapters; carousel arrows change only the current card.
@@ -24,6 +25,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 ## Mobile (320px, 375px, 430px)
 
 - No horizontal scrolling or emoji-rendered controls.
+- Pinch zoom is disabled so the intended composition remains fixed.
 - Landing controls align as one system.
 - Room headings, archives, carousel controls and return buttons remain usable.
 - External links open correctly.

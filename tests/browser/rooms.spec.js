@@ -5,6 +5,16 @@ async function openMenu(page) {
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 }
 
+test("presentation controls match the viewing device", async ({ page }, testInfo) => {
+    await page.goto("/");
+    await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /maximum-scale=1, user-scalable=no/);
+    const contextMenuAllowed = await page.evaluate(() => document.dispatchEvent(new MouseEvent("contextmenu", {
+        bubbles: true,
+        cancelable: true
+    })));
+    expect(contextMenuAllowed).toBe(testInfo.project.name !== "desktop");
+});
+
 test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) => {
     await page.goto("/");
     await openMenu(page);
