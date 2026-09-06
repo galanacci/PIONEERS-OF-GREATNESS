@@ -103,6 +103,7 @@
                 <p id="founder-hub-status" class="founder-hub-status" role="status" aria-live="polite">SELECT A CHAPTER</p>
                 <p class="founder-hub-instructions">UP / DOWN — MOVE&nbsp;&nbsp;&nbsp; ENTER — SELECT</p>
             </section>
+            <section id="founder-experience" class="founder-experience" aria-live="polite" hidden></section>
 
             <div class="founder-legacy" hidden>
 
@@ -114,11 +115,11 @@
             <div class="room-divider" aria-hidden="true"></div>
 
             <section class="founder-mission-film" aria-labelledby="founder-mission-film-title">
-                <div class="founder-mission-player">
+                <div class="founder-mission-player" data-founder-video-player>
                     <video id="founder-mission-video" preload="metadata" playsinline poster="src/founder/mission-statement-poster.webp">
                         <source src="src/founder/mission-statement.mp4" type="video/mp4">
                     </video>
-                    <button type="button" class="founder-mission-play" aria-controls="founder-mission-video">
+                    <button type="button" class="founder-mission-play" data-founder-video-play aria-controls="founder-mission-video">
                         <span class="founder-play-symbol" aria-hidden="true"></span>
                         <span data-founder-play-label>PLAY</span>
                     </button>

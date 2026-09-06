@@ -53,7 +53,8 @@ export function initRoomController() {
         if (!activeRoom) return;
         if (event.key === "Escape") { event.preventDefault(); closeRoom(); return; }
         if (event.key !== "Tab") return;
-        const focusable = [...activeRoom.querySelectorAll("button:not([disabled]), a[href]")];
+        const focusable = [...activeRoom.querySelectorAll("button:not([disabled]), a[href]")]
+            .filter((element) => !element.closest("[hidden]") && element.getClientRects().length);
         if (!focusable.length) return;
         const first = focusable[0]; const last = focusable.at(-1);
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }

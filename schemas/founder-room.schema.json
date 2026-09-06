@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pioneersofgreatness.com/schemas/founder-room.schema.json",
   "type": "object",
-  "required": ["version", "title", "identity", "hub"],
+  "required": ["version", "title", "identity", "hub", "origin"],
   "properties": {
     "version": { "type": "integer", "minimum": 1 },
     "title": { "const": "FOUNDER" },
@@ -19,6 +19,41 @@
           "number": { "type": "string", "pattern": "^[0-9]{2}$" },
           "label": { "type": "string", "minLength": 1 },
           "status": { "enum": ["development", "available"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "origin": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "number", "title", "media", "copy"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "number": { "type": "string", "pattern": "^[0-9]{2}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "date": { "type": "string", "minLength": 1 },
+          "media": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": { "enum": ["image", "video", "placeholder"] },
+              "src": { "type": "string", "minLength": 1 },
+              "poster": { "type": "string", "minLength": 1 },
+              "alt": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "width": { "type": "integer", "minimum": 1 },
+              "height": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          },
+          "copy": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
         },
         "additionalProperties": false
       }

@@ -3,10 +3,56 @@
   "title": "FOUNDER",
   "identity": "GALANACCI",
   "hub": [
-    { "id": "origin", "number": "01", "label": "ORIGIN", "status": "development" },
+    { "id": "origin", "number": "01", "label": "ORIGIN", "status": "available" },
     { "id": "journey", "number": "02", "label": "THE JOURNEY", "status": "development" },
     { "id": "code", "number": "03", "label": "THE CODE", "status": "development" },
     { "id": "notes", "number": "04", "label": "FOUNDER NOTES", "status": "development" },
     { "id": "mission", "number": "05", "label": "CURRENT MISSION", "status": "development" }
+  ],
+  "origin": [
+    {
+      "id": "origin-studio",
+      "number": "01",
+      "title": "WHERE IT STARTED",
+      "date": "24 NOV 2021",
+      "media": {
+        "type": "image",
+        "src": "src/founder/the-beginning-room.webp",
+        "alt": "The London bedroom workspace where PIONEERS OF GREATNESS began",
+        "width": 1500,
+        "height": 2000
+      },
+      "copy": [
+        "THIS IS WHERE PIONEERS OF GREATNESS BEGAN.",
+        "NO TEAM. NO FUNDING. JUST AN IDEA THAT REFUSED TO LEAVE."
+      ]
+    },
+    {
+      "id": "idea-before-brand",
+      "number": "02",
+      "title": "AN IDEA BEFORE A BRAND",
+      "media": {
+        "type": "placeholder",
+        "label": "PLACEHOLDER_IMAGE_EARLY_WORKSPACE_OR_SKETCH"
+      },
+      "copy": [
+        "Before there were products, there was the idea."
+      ]
+    },
+    {
+      "id": "the-founder",
+      "number": "03",
+      "title": "THE FOUNDER",
+      "media": {
+        "type": "video",
+        "src": "src/founder/mission-statement.mp4",
+        "poster": "src/founder/mission-statement-poster.webp"
+      },
+      "copy": [
+        "GALANACCI",
+        "BUILDING PIONEERS OF GREATNESS.",
+        "My mission is to empty myself of my creative potential and inspire others to do the same. PIONEERS OF GREATNESS is the vehicle through which I am doing so."
+      ]
+    }
   ]
 }

@@ -14,7 +14,7 @@ Every interactive room must be registered in `js/room-registry.js` and have a ma
 
 ## Current rooms
 
-- `founder-room`: reached through the versioned GREATNESS POEM introduction. First-time visitors complete the ritual; returning visitors can replay it or enter directly. The room now opens on a five-choice interactive Founder Hub. The former scrolling story remains preserved but hidden until its content has been converted and verified chapter by chapter.
+- `founder-room`: reached through the versioned GREATNESS POEM introduction. First-time visitors complete the ritual; returning visitors can replay it or enter directly. The room opens on a five-choice interactive Founder Hub. ORIGIN is a three-frame, non-looping cinematic sequence containing the dated London bedroom photograph, an explicit early-work placeholder and the Founder mission film. The former scrolling story remains preserved but hidden until its remaining content has been converted and verified chapter by chapter.
 - `documentary-room`: UNCUT screening room, grouped by release year. Its YouTube iframe is removed on exit so hidden playback cannot continue.
 - `field-notes-room`: Instagram-derived journal. Multi-image entries expose pointer and keyboard carousel controls.
 

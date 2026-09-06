@@ -72,6 +72,30 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });
 
+test("Founder Origin moves through three finite cinematic frames", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "founder-room" }
+    })));
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/, { timeout: 2500 });
+    await page.locator('[data-founder-section="origin"]').click();
+    await expect(page.locator("#founder-hub")).toBeHidden();
+    await expect(page.locator("#founder-experience")).toBeVisible();
+    await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 01 / 03");
+    await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/the-beginning-room.webp");
+    await expect(page.locator(".founder-origin-control.is-previous")).toBeDisabled();
+    await page.locator(".founder-origin-control.is-next").click();
+    await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 02 / 03");
+    await expect(page.locator(".founder-media-placeholder")).toBeVisible();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
+    await expect(page.locator(".founder-origin-video source")).toHaveAttribute("src", "src/founder/mission-statement.mp4");
+    await expect(page.locator(".founder-origin-control.is-next")).toBeDisabled();
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#founder-hub")).toBeVisible();
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+});
+
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {
     let requests = 0;
     page.on("request", (request) => {

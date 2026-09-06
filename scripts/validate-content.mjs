@@ -74,6 +74,16 @@ export function validateFounderRoom(payload) {
         assert(typeof item.label === "string" && item.label, `Founder Hub item ${item.id} needs a label.`);
         assert(["development", "available"].includes(item.status), `Invalid Founder Hub status for ${item.id}.`);
     });
+    assert(Array.isArray(payload.origin) && payload.origin.length === 3, "Founder Origin must contain three frames.");
+    payload.origin.forEach((frame, index) => {
+        assert(typeof frame.id === "string" && frame.id, `Founder Origin frame ${index} needs an id.`);
+        assert(/^\d{2}$/.test(frame.number), `Invalid Founder Origin frame number for ${frame.id}.`);
+        assert(typeof frame.title === "string" && frame.title, `Founder Origin frame ${frame.id} needs a title.`);
+        assert(frame.media && ["image", "video", "placeholder"].includes(frame.media.type), `Founder Origin frame ${frame.id} has invalid media.`);
+        assert(Array.isArray(frame.copy) && frame.copy.length > 0, `Founder Origin frame ${frame.id} needs copy.`);
+        if (frame.media.type === "placeholder") assert(typeof frame.media.label === "string" && frame.media.label, `Founder Origin placeholder ${frame.id} needs a label.`);
+        else assert(typeof frame.media.src === "string" && frame.media.src, `Founder Origin frame ${frame.id} needs a media source.`);
+    });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
