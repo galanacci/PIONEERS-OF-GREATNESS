@@ -311,6 +311,30 @@
         column-gap: clamp(24px, 5vw, 64px);
         padding: 8px 0 24px;
     }
+
+    .founder-origin-frame.is-visual-only {
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "media"
+            "controls";
+    }
+
+    .founder-origin-frame-header {
+        position: fixed;
+        z-index: 2;
+        top: 40px;
+        right: 40px;
+        width: min(42vw, 460px);
+        text-align: right;
+    }
+
+    .founder-origin-frame-header h2 {
+        margin-top: 7px;
+    }
+
+    .founder-origin-frame-date {
+        margin-top: 7px;
+    }
 }
 
 @media (max-width: 560px) {

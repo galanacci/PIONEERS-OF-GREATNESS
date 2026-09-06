@@ -145,10 +145,22 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     if (page.viewportSize()?.width >= 560) {
         const composition = await page.locator(".founder-origin-frame").evaluate((frame) => {
             const media = frame.querySelector(".founder-origin-media")?.getBoundingClientRect();
-            return { mediaTop: media?.top ?? Infinity, mediaHeight: media?.height ?? 0, viewportHeight: window.innerHeight };
+            const header = frame.querySelector(".founder-origin-frame-header")?.getBoundingClientRect();
+            const menu = document.querySelector("#founder-room .room-return")?.getBoundingClientRect();
+            return {
+                mediaTop: media?.top ?? Infinity,
+                mediaHeight: media?.height ?? 0,
+                headerTop: header?.top ?? Infinity,
+                headerRight: header?.right ?? 0,
+                menuTop: menu?.top ?? -Infinity,
+                viewportHeight: window.innerHeight,
+                viewportWidth: window.innerWidth
+            };
         });
         expect(composition.mediaTop).toBeLessThan(composition.viewportHeight * 0.3);
         expect(composition.mediaHeight).toBeGreaterThan(composition.viewportHeight * 0.5);
+        expect(Math.abs(composition.headerTop - composition.menuTop)).toBeLessThanOrEqual(1);
+        expect(composition.viewportWidth - composition.headerRight).toBe(40);
     }
     frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
     expect(frameFits).toBe(true);
