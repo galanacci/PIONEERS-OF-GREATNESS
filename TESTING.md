@@ -22,7 +22,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Founder: each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next; the cursor disappears and ENTER appears only after the final pause. The first visit cannot be escaped, and returning visitors can Tab between replay and direct entry.
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
-- Founder Origin: three visual-only frames render in order with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, Escape returns to the Founder Hub, and hidden video stops when leaving the frame.
+- Founder Origin: the shared bedroom, original poem and first Greatness Tee render as three visual-only frames with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, and Escape returns to the Founder Hub.
 - Founder mobile: the Hub and every Origin frame fit within a 375 × 667 viewport without vertical scrolling.
 - Rooms: focus starts on MENU, remains trapped inside, and Escape returns to the menu.
 - Field Notes carousels respond to Left/Right when their image area is focused.

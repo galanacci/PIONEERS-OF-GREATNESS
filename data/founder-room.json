@@ -37,13 +37,15 @@
       }
     },
     {
-      "id": "the-founder",
+      "id": "first-physical-expression",
       "number": "03",
-      "title": "THE FOUNDER",
+      "title": "THE FIRST PHYSICAL EXPRESSION",
       "media": {
-        "type": "video",
-        "src": "src/founder/mission-statement.mp4",
-        "poster": "src/founder/mission-statement-poster.webp"
+        "type": "image",
+        "src": "src/founder/greatness-tee.webp",
+        "alt": "GALANACCI holding the first PIONEERS OF GREATNESS product, the GREATNESS tee",
+        "width": 1200,
+        "height": 1600
       }
     }
   ]

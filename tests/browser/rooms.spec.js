@@ -109,11 +109,9 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     }
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FOUNDER");
-    await expect(page.locator(".founder-origin-video source")).toHaveAttribute("src", "src/founder/mission-statement.mp4");
-    if (page.viewportSize()?.width < 560) {
-        await expect(page.locator(".founder-origin-video video")).toHaveCSS("object-fit", "cover");
-    }
+    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
+    await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/greatness-tee.webp");
+    await expect(page.locator(".founder-origin-video")).toHaveCount(0);
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     await expect(page.locator(".founder-origin-control.is-next")).toBeDisabled();
     if (page.viewportSize()?.width < 560) {
