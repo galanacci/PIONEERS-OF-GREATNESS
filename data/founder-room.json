@@ -13,35 +13,27 @@
     {
       "id": "origin-studio",
       "number": "01",
-      "title": "WHERE IT STARTED",
-      "date": "24 NOV 2021",
+      "title": "THE SHARED BEDROOM, WHERE IT STARTED",
       "media": {
         "type": "image",
         "src": "src/founder/the-beginning-room.webp",
         "alt": "The London bedroom workspace where PIONEERS OF GREATNESS began",
         "width": 1500,
         "height": 2000
-      },
-      "copy": [
-        "THIS IS WHERE PIONEERS OF GREATNESS BEGAN.",
-        "NO TEAM. NO FUNDING. JUST AN IDEA THAT REFUSED TO LEAVE."
-      ]
+      }
     },
     {
       "id": "idea-before-brand",
       "number": "02",
-      "title": "AN IDEA BEFORE A BRAND",
+      "title": "THE POEM BEFORE THE BRAND",
+      "date": "27 JUNE 2021",
       "media": {
         "type": "image",
         "src": "src/founder/greatness-poem-original.webp",
         "alt": "The original handwritten GREATNESS poem by GALANACCI",
         "width": 1600,
         "height": 2118
-      },
-      "copy": [
-        "The philosophy came before the brand.",
-        "GREATNESS was the idea that PIONEERS OF GREATNESS would grow from."
-      ]
+      }
     },
     {
       "id": "the-founder",
@@ -51,12 +43,7 @@
         "type": "video",
         "src": "src/founder/mission-statement.mp4",
         "poster": "src/founder/mission-statement-poster.webp"
-      },
-      "copy": [
-        "GALANACCI",
-        "BUILDING PIONEERS OF GREATNESS.",
-        "My mission is to empty myself of my creative potential and inspire others to do the same. PIONEERS OF GREATNESS is the vehicle through which I am doing so."
-      ]
+      }
     }
   ]
 }

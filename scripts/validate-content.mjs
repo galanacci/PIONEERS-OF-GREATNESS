@@ -80,7 +80,7 @@ export function validateFounderRoom(payload) {
         assert(/^\d{2}$/.test(frame.number), `Invalid Founder Origin frame number for ${frame.id}.`);
         assert(typeof frame.title === "string" && frame.title, `Founder Origin frame ${frame.id} needs a title.`);
         assert(frame.media && ["image", "video", "placeholder"].includes(frame.media.type), `Founder Origin frame ${frame.id} has invalid media.`);
-        assert(Array.isArray(frame.copy) && frame.copy.length > 0, `Founder Origin frame ${frame.id} needs copy.`);
+        assert(frame.copy === undefined || Array.isArray(frame.copy), `Founder Origin frame ${frame.id} copy must be an array when supplied.`);
         if (frame.media.type === "placeholder") assert(typeof frame.media.label === "string" && frame.media.label, `Founder Origin placeholder ${frame.id} needs a label.`);
         else assert(typeof frame.media.src === "string" && frame.media.src, `Founder Origin frame ${frame.id} needs a media source.`);
     });

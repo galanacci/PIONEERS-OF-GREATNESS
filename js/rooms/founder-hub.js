@@ -96,6 +96,7 @@ export function initFounderHub() {
         const frame = content.origin[originFrame];
         const shell = document.createElement("div");
         shell.className = "founder-origin-frame";
+        shell.classList.toggle("is-visual-only", !frame.copy?.length);
         const header = document.createElement("header");
         header.className = "founder-origin-frame-header";
         const count = document.createElement("p");
@@ -114,7 +115,7 @@ export function initFounderHub() {
         const media = createOriginMedia(frame);
         const copy = document.createElement("div");
         copy.className = "founder-origin-copy";
-        frame.copy.forEach((paragraph) => {
+        frame.copy?.forEach((paragraph) => {
             const line = document.createElement("p");
             line.textContent = paragraph;
             copy.append(line);
@@ -139,7 +140,9 @@ export function initFounderHub() {
         next.disabled = originFrame === content.origin.length - 1;
         next.addEventListener("click", () => renderOrigin(originFrame + 1));
         controls.append(previous, back, next);
-        shell.append(header, media, copy, controls);
+        shell.append(header, media);
+        if (frame.copy?.length) shell.append(copy);
+        shell.append(controls);
         experience.replaceChildren(shell);
         experience.setAttribute("aria-labelledby", title.id);
         experience.hidden = false;

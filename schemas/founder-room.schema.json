@@ -29,7 +29,7 @@
       "maxItems": 3,
       "items": {
         "type": "object",
-        "required": ["id", "number", "title", "media", "copy"],
+        "required": ["id", "number", "title", "media"],
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "number": { "type": "string", "pattern": "^[0-9]{2}$" },
@@ -51,7 +51,7 @@
           },
           "copy": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 0,
             "items": { "type": "string", "minLength": 1 }
           }
         },
