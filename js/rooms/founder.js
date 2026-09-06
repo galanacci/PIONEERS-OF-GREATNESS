@@ -22,14 +22,14 @@ function wait(milliseconds) {
 }
 
 // Each passage has its own spoken rhythm. Longer passages move a little faster,
-// while turning points and the final statement are allowed to breathe.
+// and every completed paragraph holds for the same deliberate second.
 const POEM_PACING = [
     { character: 52, space: 30, comma: 170, sentence: 520, question: 900, hold: 1000 },
     { character: 47, space: 27, comma: 240, sentence: 620, question: 620, hold: 1000 },
     { character: 54, space: 32, comma: 260, sentence: 760, question: 760, hold: 1000 },
     { character: 50, space: 30, comma: 220, sentence: 680, question: 680, hold: 1000 },
     { character: 42, space: 24, comma: 190, sentence: 720, question: 720, hold: 1000 },
-    { character: 49, space: 29, comma: 300, sentence: 900, question: 900, hold: 5600 }
+    { character: 49, space: 29, comma: 300, sentence: 900, question: 900, hold: 1000 }
 ];
 
 function pacingFor(index) {
@@ -129,7 +129,6 @@ export function initFounder() {
                 }
             }
             if (token !== sequence) return;
-            await wait(2200);
             const finalParagraph = copy.querySelector(".is-active");
             finalParagraph?.classList.remove("is-active");
             finalParagraph?.classList.add("is-leaving");

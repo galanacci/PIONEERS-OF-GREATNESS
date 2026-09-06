@@ -31,7 +31,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 ## Motion
 
 - Menu and room transitions remain deliberate and consistent.
-- GREATNESS POEM preserves its character-by-character writing, one-second paragraph pauses, fades and blinking writing cursor on desktop and mobile.
+- GREATNESS POEM preserves its character-by-character writing, equal one-second paragraph pauses, fades and blinking writing cursor on desktop and mobile.
 - The final poem paragraph clears before the Greatness Tee image and ENTER appear together.
 
 ## Pipeline integrity

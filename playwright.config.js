@@ -10,7 +10,7 @@ export default defineConfig({
         trace: "retain-on-failure"
     },
     webServer: {
-        command: "python -m http.server 4173 --bind 127.0.0.1",
+        command: "node scripts/test-server.mjs",
         url: "http://127.0.0.1:4173",
         reuseExistingServer: !process.env.CI
     },
