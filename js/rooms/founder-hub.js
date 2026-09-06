@@ -11,6 +11,9 @@ export function initFounderHub() {
     let initialized = false;
     let selected = 0;
     let originFrame = 0;
+    let journeySelected = 0;
+    let journeyEntry = 0;
+    let activeExperience = null;
     let buttons = [];
     let content = null;
 
@@ -35,15 +38,16 @@ export function initFounderHub() {
 
     const showHub = (focus = true) => {
         stopExperienceMedia();
+        activeExperience = null;
         experience.hidden = true;
         experience.replaceChildren();
         hub.hidden = false;
         if (focus) buttons[selected]?.focus();
     };
 
-    const createOriginMedia = (frame) => {
+    const createExperienceMedia = (frame, className = "founder-origin-media") => {
         const media = document.createElement("div");
-        media.className = `founder-origin-media is-${frame.media.type}`;
+        media.className = `${className} is-${frame.media.type}`;
         if (frame.media.type === "image") {
             const image = document.createElement("img");
             image.src = frame.media.src;
@@ -92,6 +96,7 @@ export function initFounderHub() {
 
     const renderOrigin = (index, focus = true) => {
         stopExperienceMedia();
+        activeExperience = "origin";
         originFrame = Math.max(0, Math.min(index, content.origin.length - 1));
         const frame = content.origin[originFrame];
         const shell = document.createElement("div");
@@ -112,7 +117,7 @@ export function initFounderHub() {
             date.textContent = frame.date;
             header.append(date);
         }
-        const media = createOriginMedia(frame);
+        const media = createExperienceMedia(frame);
         const copy = document.createElement("div");
         copy.className = "founder-origin-copy";
         frame.copy?.forEach((paragraph) => {
@@ -158,6 +163,128 @@ export function initFounderHub() {
         renderOrigin(0);
     };
 
+    const selectJourney = (index, focus = false) => {
+        const journeyButtons = [...experience.querySelectorAll(".founder-journey-item")];
+        if (!journeyButtons.length) return;
+        journeySelected = (index + journeyButtons.length) % journeyButtons.length;
+        journeyButtons.forEach((button, buttonIndex) => {
+            const current = buttonIndex === journeySelected;
+            button.classList.toggle("is-selected", current);
+            button.tabIndex = current ? 0 : -1;
+            button.toggleAttribute("aria-current", current);
+        });
+        if (focus) journeyButtons[journeySelected]?.focus();
+    };
+
+    const renderJourneyEntry = (index, focus = true) => {
+        activeExperience = "journey-entry";
+        journeyEntry = Math.max(0, Math.min(index, content.journey.length - 1));
+        const memory = content.journey[journeyEntry];
+        const shell = document.createElement("article");
+        shell.className = "founder-journey-entry";
+        const header = document.createElement("header");
+        header.className = "founder-journey-entry-header";
+        const count = document.createElement("p");
+        count.className = "founder-journey-count";
+        count.textContent = `${memory.number} / ${String(content.journey.length).padStart(2, "0")}`;
+        const title = document.createElement("h2");
+        title.id = "founder-journey-entry-title";
+        title.textContent = memory.title;
+        header.append(count, title);
+        const media = createExperienceMedia(memory, "founder-journey-media");
+        const copy = document.createElement("div");
+        copy.className = "founder-journey-copy";
+        memory.copy.forEach((paragraph) => {
+            const line = document.createElement("p");
+            line.textContent = paragraph;
+            copy.append(line);
+        });
+        const controls = document.createElement("div");
+        controls.className = "founder-journey-controls";
+        const previous = document.createElement("button");
+        previous.type = "button";
+        previous.className = "founder-journey-control is-previous";
+        previous.textContent = "← PREVIOUS";
+        previous.disabled = journeyEntry === 0;
+        previous.addEventListener("click", () => renderJourneyEntry(journeyEntry - 1));
+        const back = document.createElement("button");
+        back.type = "button";
+        back.className = "founder-journey-control founder-journey-return";
+        back.textContent = "RETURN TO JOURNEY";
+        back.addEventListener("click", () => renderJourneyMenu());
+        const next = document.createElement("button");
+        next.type = "button";
+        next.className = "founder-journey-control is-next";
+        next.textContent = "NEXT →";
+        next.disabled = journeyEntry === content.journey.length - 1;
+        next.addEventListener("click", () => renderJourneyEntry(journeyEntry + 1));
+        controls.append(previous, back, next);
+        shell.append(header, media, copy, controls);
+        experience.replaceChildren(shell);
+        experience.setAttribute("aria-labelledby", title.id);
+        experience.hidden = false;
+        if (focus) back.focus();
+    };
+
+    function renderJourneyMenu(focus = true) {
+        activeExperience = "journey-menu";
+        const shell = document.createElement("section");
+        shell.className = "founder-journey-menu";
+        const header = document.createElement("header");
+        header.className = "founder-journey-menu-header";
+        const kicker = document.createElement("p");
+        kicker.className = "founder-journey-kicker";
+        kicker.textContent = "SAVE HISTORY";
+        const title = document.createElement("h2");
+        title.id = "founder-journey-menu-title";
+        title.textContent = "THE JOURNEY";
+        header.append(kicker, title);
+        const journeyList = document.createElement("div");
+        journeyList.className = "founder-journey-list";
+        journeyList.setAttribute("role", "menu");
+        journeyList.setAttribute("aria-label", "Founder Journey memories");
+        content.journey.forEach((memory, index) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "founder-journey-item";
+            button.dataset.journeyEntry = memory.id;
+            button.setAttribute("role", "menuitem");
+            const number = document.createElement("span");
+            number.className = "founder-journey-item-number";
+            number.textContent = memory.number;
+            const label = document.createElement("span");
+            label.className = "founder-journey-item-label";
+            label.textContent = memory.title;
+            button.append(number, label);
+            // A stationary pointer may already sit over the newly rendered list;
+            // require deliberate movement before it changes the initial save slot.
+            button.addEventListener("pointermove", () => selectJourney(index));
+            button.addEventListener("click", () => renderJourneyEntry(index));
+            journeyList.append(button);
+        });
+        const footer = document.createElement("footer");
+        footer.className = "founder-journey-menu-footer";
+        const back = document.createElement("button");
+        back.type = "button";
+        back.className = "founder-journey-menu-return";
+        back.textContent = "← RETURN TO FOUNDER";
+        back.addEventListener("click", () => showHub());
+        const instructions = document.createElement("p");
+        instructions.textContent = "↑ ↓ SELECT   ENTER OPEN   ESC RETURN";
+        footer.append(back, instructions);
+        shell.append(header, journeyList, footer);
+        experience.replaceChildren(shell);
+        experience.setAttribute("aria-labelledby", title.id);
+        experience.hidden = false;
+        selectJourney(journeySelected, focus);
+    }
+
+    const openJourney = () => {
+        hub.hidden = true;
+        journeySelected = 0;
+        renderJourneyMenu();
+    };
+
     const activate = (button) => {
         select(buttons.indexOf(button));
         const item = content.hub[selected];
@@ -165,6 +292,10 @@ export function initFounderHub() {
         window.setTimeout(() => button.classList.remove("is-activated"), 220);
         if (item.status === "available" && item.id === "origin") {
             openOrigin();
+            return;
+        }
+        if (item.status === "available" && item.id === "journey") {
+            openJourney();
             return;
         }
         status.textContent = `${item.label} — CHAPTER IN DEVELOPMENT`;
@@ -196,7 +327,7 @@ export function initFounderHub() {
             const response = await fetch("data/founder-room.json", { cache: "no-cache" });
             if (!response.ok) throw new Error(`Founder Room request failed: ${response.status}`);
             content = await response.json();
-            if (!Array.isArray(content.hub) || content.hub.length !== 5 || !Array.isArray(content.origin)) throw new Error("Founder Room is incomplete.");
+            if (!Array.isArray(content.hub) || content.hub.length !== 5 || !Array.isArray(content.origin) || !Array.isArray(content.journey)) throw new Error("Founder Room is incomplete.");
             buttons = content.hub.map(createItem);
             list.replaceChildren(...buttons);
             select(0);
@@ -219,16 +350,29 @@ export function initFounderHub() {
     });
 
     experience.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowLeft" && originFrame > 0) {
+        if (activeExperience === "origin" && event.key === "ArrowLeft" && originFrame > 0) {
             event.preventDefault();
             renderOrigin(originFrame - 1);
-        } else if (event.key === "ArrowRight" && originFrame < content.origin.length - 1) {
+        } else if (activeExperience === "origin" && event.key === "ArrowRight" && originFrame < content.origin.length - 1) {
             event.preventDefault();
             renderOrigin(originFrame + 1);
+        } else if (activeExperience === "journey-menu" && ["ArrowUp", "ArrowDown"].includes(event.key)) {
+            event.preventDefault();
+            selectJourney(journeySelected + (event.key === "ArrowDown" ? 1 : -1), true);
+        } else if (activeExperience === "journey-menu" && event.key === "Enter") {
+            event.preventDefault();
+            renderJourneyEntry(journeySelected);
+        } else if (activeExperience === "journey-entry" && event.key === "ArrowLeft" && journeyEntry > 0) {
+            event.preventDefault();
+            renderJourneyEntry(journeyEntry - 1);
+        } else if (activeExperience === "journey-entry" && event.key === "ArrowRight" && journeyEntry < content.journey.length - 1) {
+            event.preventDefault();
+            renderJourneyEntry(journeyEntry + 1);
         } else if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();
-            showHub();
+            if (activeExperience === "journey-entry") renderJourneyMenu();
+            else showHub();
         }
     });
 

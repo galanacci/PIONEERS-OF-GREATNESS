@@ -4,7 +4,7 @@
   "identity": "GALANACCI",
   "hub": [
     { "id": "origin", "number": "01", "label": "ORIGIN", "status": "available" },
-    { "id": "journey", "number": "02", "label": "THE JOURNEY", "status": "development" },
+    { "id": "journey", "number": "02", "label": "THE JOURNEY", "status": "available" },
     { "id": "code", "number": "03", "label": "THE CODE", "status": "development" },
     { "id": "notes", "number": "04", "label": "FOUNDER NOTES", "status": "development" },
     { "id": "mission", "number": "05", "label": "CURRENT MISSION", "status": "development" }
@@ -48,6 +48,96 @@
         "width": 1200,
         "height": 1600
       }
+    }
+  ],
+  "journey": [
+    {
+      "id": "architecture",
+      "number": "01",
+      "title": "ARCHITECTURE",
+      "media": { "type": "placeholder", "label": "ARCHITECTURE" },
+      "copy": [
+        "Architecture taught me how to think through space, structure, proportion and ideas.",
+        "But the life I wanted to build existed somewhere else."
+      ]
+    },
+    {
+      "id": "the-pivot",
+      "number": "02",
+      "title": "THE PIVOT",
+      "media": { "type": "placeholder", "label": "THE PIVOT" },
+      "copy": [
+        "I left the conventional architecture path without a guaranteed destination.",
+        "I moved toward fashion, art and independent creative work."
+      ]
+    },
+    {
+      "id": "galanacci",
+      "number": "03",
+      "title": "GALANACCI",
+      "media": { "type": "placeholder", "label": "GALANACCI — EARLY YEARS" },
+      "copy": [
+        "GALANACCI became the space where I learned to build through experimentation.",
+        "FASHION. ILLUSTRATION. OBJECTS. STORYTELLING."
+      ]
+    },
+    {
+      "id": "greatness",
+      "number": "04",
+      "title": "GREATNESS",
+      "media": {
+        "type": "image",
+        "src": "src/founder/greatness-poem-original.webp",
+        "alt": "The original handwritten GREATNESS poem by GALANACCI",
+        "width": 1600,
+        "height": 2118
+      },
+      "copy": [
+        "The philosophy came before the brand.",
+        "GREATNESS became the idea that everything else would grow from."
+      ]
+    },
+    {
+      "id": "pioneers-of-greatness",
+      "number": "05",
+      "title": "PIONEERS OF GREATNESS",
+      "media": { "type": "placeholder", "label": "PIONEERS OF GREATNESS — EARLY WORLD" },
+      "copy": [
+        "The philosophy found its physical language.",
+        "BOXING GAVE IT MEANING. FASHION GAVE IT FORM."
+      ]
+    },
+    {
+      "id": "the-first-piece",
+      "number": "06",
+      "title": "THE FIRST PIECE",
+      "media": {
+        "type": "image",
+        "src": "src/founder/greatness-tee.webp",
+        "alt": "GALANACCI holding the first PIONEERS OF GREATNESS product, the GREATNESS tee",
+        "width": 1200,
+        "height": 1600
+      },
+      "copy": [
+        "PATTERNS. PROTOTYPES. MISTAKES. ADJUSTMENTS.",
+        "The idea became tangible."
+      ]
+    },
+    {
+      "id": "the-first-sale",
+      "number": "07",
+      "title": "THE FIRST SALE",
+      "media": { "type": "placeholder", "label": "THE FIRST SALE" },
+      "copy": [
+        "Someone chose to spend their own money on something that previously existed only in my mind."
+      ]
+    },
+    {
+      "id": "now-2026",
+      "number": "08",
+      "title": "NOW — 2026",
+      "media": { "type": "placeholder", "label": "NOW — 2026" },
+      "copy": ["STILL BUILDING."]
     }
   ]
 }

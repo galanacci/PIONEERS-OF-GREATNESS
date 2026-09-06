@@ -15,7 +15,7 @@
 
 Rooms communicate through `pog:*` browser events. A room controller emits `pog:room-opened`, `pog:room-closing` and `pog:room-closed`; media modules use these lifecycle events to clean up playback.
 
-Founder Hub labels and availability live in `data/founder-room.json`. Later Founder stages extend this single content source with Origin frames, Journey memories, principles, notes and the current mission.
+Founder Hub labels, availability, Origin frames and the eight Journey memories live in `data/founder-room.json`. Later Founder stages extend this single content source with principles, notes and the current mission.
 
 ## Content pipelines
 

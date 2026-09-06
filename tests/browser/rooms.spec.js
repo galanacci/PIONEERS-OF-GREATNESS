@@ -102,7 +102,9 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await page.keyboard.press("ArrowDown");
     await expect(page.locator(".founder-hub-item").nth(1)).toHaveClass(/is-selected/);
     await page.keyboard.press("Enter");
-    await expect(page.locator("#founder-hub-status")).toContainText("THE JOURNEY — CHAPTER IN DEVELOPMENT");
+    await expect(page.locator("#founder-journey-menu-title")).toHaveText("THE JOURNEY");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#founder-hub")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
@@ -167,6 +169,43 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await page.keyboard.press("Escape");
     await expect(page.locator("#founder-hub")).toBeVisible();
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+});
+
+test("Founder Journey behaves like an eight-slot save history", async ({ page }) => {
+    if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "founder-room" }
+    })));
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
+    await page.locator('[data-founder-section="journey"]').click();
+    await expect(page.locator("#founder-journey-menu-title")).toHaveText("THE JOURNEY");
+    await expect(page.locator(".founder-journey-item")).toHaveCount(8);
+    await expect(page.locator(".founder-journey-item").first()).toHaveClass(/is-selected/);
+    expect(await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
+
+    await page.keyboard.press("ArrowDown");
+    await expect(page.locator('.founder-journey-item[data-journey-entry="the-pivot"]')).toHaveClass(/is-selected/);
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".founder-journey-count")).toHaveText("02 / 08");
+    await expect(page.locator("#founder-journey-entry-title")).toHaveText("THE PIVOT");
+    await expect(page.locator(".founder-media-placeholder")).toContainText("THE PIVOT");
+    expect(await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
+
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator(".founder-journey-count")).toHaveText("03 / 08");
+    await expect(page.locator("#founder-journey-entry-title")).toHaveText("GALANACCI");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#founder-journey-menu-title")).toBeVisible();
+    await page.locator('[data-journey-entry="greatness"]').click();
+    await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
+    await page.locator(".founder-journey-return").click();
+    await page.locator('[data-journey-entry="the-first-piece"]').click();
+    await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-tee.webp");
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#founder-hub")).toBeVisible();
 });
 
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {

@@ -84,6 +84,20 @@ export function validateFounderRoom(payload) {
         if (frame.media.type === "placeholder") assert(typeof frame.media.label === "string" && frame.media.label, `Founder Origin placeholder ${frame.id} needs a label.`);
         else assert(typeof frame.media.src === "string" && frame.media.src, `Founder Origin frame ${frame.id} needs a media source.`);
     });
+    assert(Array.isArray(payload.journey) && payload.journey.length === 8, "Founder Journey must contain eight memories.");
+    const journeyIds = new Set();
+    payload.journey.forEach((memory, index) => {
+        assert(typeof memory.id === "string" && memory.id, `Founder Journey memory ${index} needs an id.`);
+        assert(!journeyIds.has(memory.id), `Duplicate Founder Journey id: ${memory.id}`);
+        journeyIds.add(memory.id);
+        assert(/^\d{2}$/.test(memory.number), `Invalid Founder Journey number for ${memory.id}.`);
+        assert(typeof memory.title === "string" && memory.title, `Founder Journey memory ${memory.id} needs a title.`);
+        assert(Array.isArray(memory.copy) && memory.copy.length > 0, `Founder Journey memory ${memory.id} needs copy.`);
+        assert(memory.copy.every((line) => typeof line === "string" && line.trim()), `Founder Journey memory ${memory.id} contains empty copy.`);
+        assert(memory.media && ["image", "placeholder"].includes(memory.media.type), `Founder Journey memory ${memory.id} has invalid media.`);
+        if (memory.media.type === "placeholder") assert(typeof memory.media.label === "string" && memory.media.label, `Founder Journey placeholder ${memory.id} needs a label.`);
+        else assert(typeof memory.media.src === "string" && memory.media.src, `Founder Journey memory ${memory.id} needs an image source.`);
+    });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

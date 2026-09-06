@@ -27,6 +27,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Founder viewport: the Hub and every Origin frame scale within desktop and 375 × 667 mobile viewports without scrolling.
 - Founder Origin desktop: the media begins within the upper 30% of the viewport and receives more than half of the viewport height, avoiding an oversized empty band above it.
 - Founder Origin desktop: frame number, title and date sit at the top right, horizontally balanced against RETURN TO MENU at the top left.
+- Founder Journey: eight save-history entries render from structured data; Up/Down and Enter operate the selector, Left/Right moves between memories, Escape returns one level at a time, and the selector and memory views never scroll.
 - Rooms: focus starts on MENU, remains trapped inside, and Escape returns to the menu.
 - Field Notes carousels respond to Left/Right when their image area is focused.
 - UNCUT episode buttons respond to Up/Down.
