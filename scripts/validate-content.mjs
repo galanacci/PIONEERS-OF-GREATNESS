@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 const FIELD_NOTES_PATH = "data/field-notes.json";
 const DOCUMENTARY_PATH = "data/documentary.json";
 const GREATNESS_POEM_PATH = "data/greatness-poem.json";
+const FOUNDER_ROOM_PATH = "data/founder-room.json";
 
 function assert(condition, message) {
     if (!condition) throw new Error(message);
@@ -58,14 +59,33 @@ export function validateGreatnessPoem(payload) {
     assert(payload.paragraphs.every((paragraph) => typeof paragraph === "string" && paragraph.trim()), "GREATNESS poem paragraphs cannot be empty.");
 }
 
+export function validateFounderRoom(payload) {
+    assert(payload && typeof payload === "object", "Founder Room payload must be an object.");
+    assert(Number.isInteger(payload.version) && payload.version > 0, "Founder Room version must be a positive integer.");
+    assert(payload.title === "FOUNDER", "Founder Room title must be FOUNDER.");
+    assert(typeof payload.identity === "string" && payload.identity.trim(), "Founder identity is required.");
+    assert(Array.isArray(payload.hub) && payload.hub.length === 5, "Founder Hub must contain five sections.");
+    const ids = new Set();
+    payload.hub.forEach((item, index) => {
+        assert(typeof item.id === "string" && item.id, `Founder Hub item ${index} needs an id.`);
+        assert(!ids.has(item.id), `Duplicate Founder Hub id: ${item.id}`);
+        ids.add(item.id);
+        assert(/^\d{2}$/.test(item.number), `Invalid Founder Hub number for ${item.id}.`);
+        assert(typeof item.label === "string" && item.label, `Founder Hub item ${item.id} needs a label.`);
+        assert(["development", "available"].includes(item.status), `Invalid Founder Hub status for ${item.id}.`);
+    });
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [fieldNotes, documentary, greatnessPoem] = await Promise.all([
+    const [fieldNotes, documentary, greatnessPoem, founderRoom] = await Promise.all([
         readJson(FIELD_NOTES_PATH),
         readJson(DOCUMENTARY_PATH),
-        readJson(GREATNESS_POEM_PATH)
+        readJson(GREATNESS_POEM_PATH),
+        readJson(FOUNDER_ROOM_PATH)
     ]);
     await validateFieldNotes(fieldNotes);
     validateDocumentary(documentary);
     validateGreatnessPoem(greatnessPoem);
-    console.log(`Content valid: ${fieldNotes.notes.length} Field Notes, ${documentary.episodes.length} UNCUT episodes and ${greatnessPoem.title} v${greatnessPoem.version}.`);
+    validateFounderRoom(founderRoom);
+    console.log(`Content valid: ${fieldNotes.notes.length} Field Notes, ${documentary.episodes.length} UNCUT episodes, ${greatnessPoem.title} v${greatnessPoem.version} and Founder Hub v${founderRoom.version}.`);
 }

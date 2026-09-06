@@ -5,6 +5,7 @@ import { initRoomController } from "./core/room-controller.js";
 import { initDocumentary } from "./rooms/documentary.js";
 import { initFieldNotes } from "./rooms/field-notes.js";
 import { initFounder } from "./rooms/founder.js";
+import { initFounderHub } from "./rooms/founder-hub.js";
 import { initFounderMission } from "./rooms/founder-mission.js";
 import { initWaitlist } from "./services/waitlist.js";
 
@@ -14,6 +15,7 @@ initMenu();
 initPresentationLock();
 initRoomController();
 initFounder();
+initFounderHub();
 initFounderMission();
 initFieldNotes();
 initDocumentary();

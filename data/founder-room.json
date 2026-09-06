@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "title": "FOUNDER",
+  "identity": "GALANACCI",
+  "hub": [
+    { "id": "origin", "number": "01", "label": "ORIGIN", "status": "development" },
+    { "id": "journey", "number": "02", "label": "THE JOURNEY", "status": "development" },
+    { "id": "code", "number": "03", "label": "THE CODE", "status": "development" },
+    { "id": "notes", "number": "04", "label": "FOUNDER NOTES", "status": "development" },
+    { "id": "mission", "number": "05", "label": "CURRENT MISSION", "status": "development" }
+  ]
+}

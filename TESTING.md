@@ -21,6 +21,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - FOUNDER, DOCUMENTARY and FIELD NOTES show the LOADING... threshold before their destination becomes visible; WAITLIST and EXIT remain immediate.
 - Founder: each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next; the cursor disappears and ENTER appears only after the final pause. The first visit cannot be escaped, and returning visitors can Tab between replay and direct entry.
 - Founder room: the mission film appears before its mission-statement label, title and description.
+- Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
 - Rooms: focus starts on MENU, remains trapped inside, and Escape returns to the menu.
 - Field Notes carousels respond to Left/Right when their image area is focused.
 - UNCUT episode buttons respond to Up/Down.

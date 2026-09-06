@@ -54,6 +54,24 @@ test("Founder mission film leads its statement", async ({ page }) => {
     expect(filmLeads).toBe(true);
 });
 
+test("Founder opens into the interactive five-chapter hub", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "founder-room" }
+    })));
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/, { timeout: 2500 });
+    await expect(page.locator(".founder-hub-item")).toHaveCount(5);
+    await expect(page.locator(".founder-legacy")).toBeHidden();
+    await expect(page.locator(".founder-hub-item").first()).toHaveClass(/is-selected/);
+    await page.keyboard.press("ArrowDown");
+    await expect(page.locator(".founder-hub-item").nth(1)).toHaveClass(/is-selected/);
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#founder-hub-status")).toContainText("THE JOURNEY — CHAPTER IN DEVELOPMENT");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+});
+
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {
     let requests = 0;
     page.on("request", (request) => {
