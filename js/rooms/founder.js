@@ -40,13 +40,14 @@ export function initOpening() {
     const introduction = document.getElementById("founder-introduction");
     const copy = document.getElementById("founder-introduction-copy");
     const poemReveal = document.getElementById("founder-poem-reveal");
+    const poemReplayTrigger = document.getElementById("founder-poem-replay-trigger");
     const actions = document.getElementById("founder-introduction-actions");
     const enter = document.getElementById("founder-introduction-enter");
     const skip = document.getElementById("founder-introduction-skip");
     const replay = introduction?.querySelector("[data-opening-replay]");
     const enterMenu = introduction?.querySelector("[data-opening-enter]");
     const transition = document.getElementById("room-transition");
-    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
+    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !poemReplayTrigger || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -54,8 +55,7 @@ export function initOpening() {
     let sequence = 0;
     let poem = null;
     let poemPromise = null;
-    let exitMode = "menu";
-    let returnFocus = null;
+    let replaying = false;
     let backgroundState = new Map();
 
     function renderEntryState() {
@@ -110,14 +110,8 @@ export function initOpening() {
     function enterSite() {
         rememberCompletion();
         renderEntryState();
+        replaying = false;
         closeIntroduction();
-        if (exitMode === "origin") {
-            const target = returnFocus;
-            exitMode = "menu";
-            returnFocus = null;
-            target?.focus();
-            return;
-        }
         window.dispatchEvent(new CustomEvent("pog:opening-complete"));
     }
 
@@ -199,8 +193,7 @@ export function initOpening() {
     }
 
     async function enterOpeningPath() {
-        exitMode = "menu";
-        returnFocus = null;
+        replaying = false;
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
         if (hasCompletedIntroduction()) {
             showFinalReveal();
@@ -214,19 +207,27 @@ export function initOpening() {
         window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
-    function replayFromOrigin(event) {
-        exitMode = "origin";
-        returnFocus = event.detail?.trigger || null;
+    function replayPoem() {
+        replaying = true;
         playIntroduction({ allowSkip: true });
+    }
+
+    function skipPoem() {
+        if (replaying) {
+            replaying = false;
+            showFinalReveal();
+            return;
+        }
+        enterSite();
     }
 
     renderEntryState();
     window.addEventListener("pog:start-requested", enterOpeningPath);
-    window.addEventListener("pog:poem-replay-requested", replayFromOrigin);
-    replay.addEventListener("click", () => playIntroduction({ allowSkip: true }));
+    poemReplayTrigger.addEventListener("click", replayPoem);
+    replay.addEventListener("click", replayPoem);
     enterMenu.addEventListener("click", enterSite);
     enter.addEventListener("click", enterSite);
-    skip.addEventListener("click", enterSite);
+    skip.addEventListener("click", skipPoem);
     introduction.addEventListener("keydown", (event) => {
         if (event.key === "Escape") event.preventDefault();
         if (event.key === "Enter" && !enter.hidden) { event.preventDefault(); enterSite(); }

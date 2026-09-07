@@ -167,6 +167,17 @@ test("the poem plays once before CONTINUE opens its completed image state", asyn
     await expect(page.locator("#founder-introduction-skip")).toBeHidden();
     await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
+    const revealPosition = await page.locator("#founder-poem-reveal img").evaluate((image) => {
+        const bounds = image.getBoundingClientRect();
+        return { centre: bounds.top + bounds.height / 2, viewport: window.innerHeight / 2 };
+    });
+    expect(Math.abs(revealPosition.centre - revealPosition.viewport)).toBeLessThan(2);
+    await page.getByRole("button", { name: "Replay the animated GREATNESS POEM" }).click();
+    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
+    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#founder-poem-reveal")).toBeVisible();
+    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
@@ -229,15 +240,7 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
     expect(frameFits).toBe(true);
-    await page.getByRole("button", { name: "Replay the animated GREATNESS POEM" }).click();
-    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/);
-    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
-    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
-    await page.locator("#founder-introduction-skip").click();
-    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE POEM BEFORE THE BRAND");
-    await expect(page.getByRole("button", { name: "Replay the animated GREATNESS POEM" })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Replay the animated GREATNESS POEM" })).toHaveCount(0);
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");

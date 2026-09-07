@@ -54,12 +54,32 @@ body.founder-introduction-active {
 
 .founder-poem-reveal {
     position: fixed;
-    inset: 8vh 10vw 18vh;
+    inset: 0;
     z-index: 1;
     display: grid;
     place-items: center;
+    box-sizing: border-box;
     margin: 0;
+    padding: clamp(72px, 10vh, 110px) 10vw;
     animation: founder-paragraph-enter 1100ms ease both;
+}
+
+.founder-poem-replay-trigger,
+.founder-poem-replay-trigger:hover,
+.founder-poem-replay-trigger:focus-visible {
+    display: inline-flex;
+    max-width: min(68vw, 720px);
+    max-height: 68vh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+}
+
+.founder-poem-replay-trigger:focus-visible img {
+    box-shadow: 0 0 0 1px var(--color-accent-light);
 }
 
 .founder-poem-reveal img {
@@ -79,29 +99,6 @@ body.founder-introduction-active {
     left: 50%;
     transform: translateX(-50%);
     animation: founder-enter-reveal 1100ms ease both;
-}
-
-.founder-origin-poem-trigger,
-.founder-origin-poem-trigger:hover,
-.founder-origin-poem-trigger:focus-visible {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: inherit;
-}
-
-.founder-origin-poem-trigger:focus-visible {
-    box-shadow: 0 0 0 1px var(--color-accent-light);
-}
-
-.founder-origin-poem-trigger img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
 }
 
 .founder-introduction-skip {
@@ -590,7 +587,10 @@ body.founder-introduction-active {
         margin-top: 54px;
     }
 
-    .founder-poem-reveal { inset: 24px 18px 78px; }
+    .founder-poem-reveal {
+        inset: 0;
+        padding: 70px 18px;
+    }
 
     .founder-poem-reveal img {
         max-width: 100%;

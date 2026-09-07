@@ -118,22 +118,6 @@ export function initFounderHub() {
             header.append(date);
         }
         const media = createExperienceMedia(frame);
-        if (frame.id === "idea-before-brand") {
-            const image = media.querySelector("img");
-            if (image) {
-                const poemTrigger = document.createElement("button");
-                poemTrigger.type = "button";
-                poemTrigger.className = "founder-origin-poem-trigger";
-                poemTrigger.setAttribute("aria-label", "Replay the animated GREATNESS POEM");
-                poemTrigger.addEventListener("click", () => {
-                    window.dispatchEvent(new CustomEvent("pog:poem-replay-requested", {
-                        detail: { trigger: poemTrigger }
-                    }));
-                });
-                poemTrigger.append(image);
-                media.append(poemTrigger);
-            }
-        }
         const copy = document.createElement("div");
         copy.className = "founder-origin-copy";
         frame.copy?.forEach((paragraph) => {
