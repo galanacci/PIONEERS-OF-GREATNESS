@@ -91,6 +91,10 @@ export function initMenu() {
     window.addEventListener("pog:opening-complete", () => open(false));
     window.addEventListener("pog:return-to-menu", () => open(false));
     window.addEventListener("pog:waitlist-complete", () => hideWaitlist());
+    overlay.addEventListener("click", (event) => {
+        if (!waitlistOpen || event.target.closest("#email-form, .audio-toggle, .menu-item")) return;
+        hideWaitlist();
+    });
     panel.addEventListener("click", (event) => { const item = event.target.closest(".menu-item"); if (item) activate(item); });
     panel.addEventListener("pointerover", (event) => {
         if (event.pointerType && event.pointerType !== "mouse" && event.pointerType !== "pen") return;

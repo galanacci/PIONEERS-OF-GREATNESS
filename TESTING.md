@@ -14,7 +14,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - CONTINUE shows the completed poem's centred Greatness Tee image and ENTER state after loading instead of replaying the animation. Pressing that image is the hidden replay path: it runs the full animation with SKIP, which returns to the same image-and-ENTER state.
 - Right-click does not open the browser context menu on desktop.
 - Presented text cannot be selected; the email field remains editable.
-- Waitlist placeholder moves on the landing page. JOIN WAITLIST opens the email capture inside the menu overlay; feedback remains white, a successful or duplicate submission restores the selector, and ambience continues without stopping or restarting.
+- Waitlist placeholder moves on the landing page. JOIN WAITLIST opens the email capture inside the menu overlay; pressing outside the form or Escape restores the selector, feedback remains white, a successful or duplicate submission returns to the selector, and ambience continues without stopping or restarting.
 - Menu opens, does not close from backdrop clicks, and all pointer states are intentional.
 - Field Notes waits until the room opens, defaults to the newest year and switches cleanly through the top-right year selector; carousel arrows change only the current card.
 - Field Notes custom year selector aligns with RETURN TO MENU at wide, intermediate and mobile widths; its closed and open backgrounds remain transparent, the selected year is purple and other years are grey.

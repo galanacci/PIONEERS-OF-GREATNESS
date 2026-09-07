@@ -68,6 +68,11 @@ test("JOIN WAITLIST opens inside the menu and returns after signup", async ({ pa
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-waitlist-open/);
     await expect(page.locator("#email")).toBeFocused();
     await expect(page.locator("#email")).toHaveAttribute("placeholder", "ENTER EMAIL HERE...");
+    await page.locator("#menu-overlay").click({ position: { x: 8, y: 8 } });
+    await expect(page.locator("#menu-overlay")).not.toHaveClass(/is-waitlist-open/);
+    await expect(page.getByRole("menuitem", { name: "JOIN WAITLIST" })).toBeFocused();
+    await page.getByRole("menuitem", { name: "JOIN WAITLIST" }).click();
+    await expect(page.locator("#email")).toBeFocused();
     await page.locator("#email").fill("founder@example.com");
     await page.locator('#email-form button[type="submit"]').click();
     await expect(page.locator("#status")).toHaveText("Something went wrong.");
