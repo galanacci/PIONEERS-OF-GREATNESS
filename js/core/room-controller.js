@@ -77,6 +77,7 @@ export function initRoomController() {
     window.addEventListener("pog:open-room", (event) => openRoom(event.detail?.roomId, {
         skipTransition: event.detail?.skipTransition === true
     }));
+    window.addEventListener("pog:close-room", closeRoom);
     window.addEventListener("pog:room-ready", (event) => {
         if (event.detail?.roomId === transitionEntry?.roomId) transitionEntry.complete();
     });

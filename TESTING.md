@@ -31,6 +31,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
 - Founder navigation follows one-level-back hierarchy: the dominant top-left control reads RETURN TO MENU on the Hub, RETURN TO FOUNDER in a chapter selector or Origin, and RETURN TO JOURNEY inside a Journey memory. It never skips an intermediate level.
+- Founder Origin and Journey viewers also provide a bottom-centre RETURN TO MENU shortcut for visitors who want to leave the Founder section immediately.
 - Founder Origin: the shared bedroom, original poem and first Greatness Tee render as three visual-only frames with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, and Escape returns to the Founder Hub.
 - Founder viewport: the Hub and every Origin frame scale within desktop and 375 × 667 mobile viewports without scrolling.
 - Founder Origin desktop: the media begins within the upper 30% of the viewport and receives more than half of the viewport height, avoiding an oversized empty band above it.

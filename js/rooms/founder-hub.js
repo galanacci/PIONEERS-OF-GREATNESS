@@ -150,8 +150,8 @@ export function initFounderHub() {
         const back = document.createElement("button");
         back.type = "button";
         back.className = "founder-origin-control founder-origin-return";
-        back.textContent = "RETURN TO FOUNDER";
-        back.addEventListener("click", () => showHub());
+        back.textContent = "RETURN TO MENU";
+        back.addEventListener("click", () => window.dispatchEvent(new CustomEvent("pog:close-room")));
         const next = document.createElement("button");
         next.type = "button";
         next.className = "founder-origin-control is-next";
@@ -225,8 +225,8 @@ export function initFounderHub() {
         const back = document.createElement("button");
         back.type = "button";
         back.className = "founder-journey-control founder-journey-return";
-        back.textContent = "RETURN TO JOURNEY";
-        back.addEventListener("click", () => renderJourneyMenu());
+        back.textContent = "RETURN TO MENU";
+        back.addEventListener("click", () => window.dispatchEvent(new CustomEvent("pog:close-room")));
         const next = document.createElement("button");
         next.type = "button";
         next.className = "founder-journey-control is-next";

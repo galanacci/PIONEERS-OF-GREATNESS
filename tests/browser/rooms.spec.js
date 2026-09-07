@@ -97,7 +97,7 @@ test("game-like feedback extends to room controls without duplicating the main m
     const origin = page.locator('[data-founder-section="origin"]');
     await origin.dispatchEvent("pointerover", { pointerType: "mouse" });
     await origin.click();
-    await page.locator(".founder-origin-return").click();
+    await page.locator("#founder-room .room-return").click();
     const journey = page.locator('[data-founder-section="journey"]');
     await journey.dispatchEvent("pointerdown", { pointerType: "touch" });
     await page.keyboard.press("ArrowDown");
@@ -304,9 +304,10 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     }
     frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
     expect(frameFits).toBe(true);
-    await page.keyboard.press("Escape");
-    await expect(page.locator("#founder-hub")).toBeVisible();
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator(".founder-origin-return")).toHaveText("RETURN TO MENU");
+    await page.locator(".founder-origin-return").click();
+    await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });
 
 test("Founder Journey behaves like an eight-slot save history", async ({ page }) => {
@@ -354,14 +355,13 @@ test("Founder Journey behaves like an eight-slot save history", async ({ page })
     await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO FOUNDER");
     await page.locator('[data-journey-entry="greatness"]').click();
     await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
-    await page.locator(".founder-journey-return").click();
+    await expect(page.locator(".founder-journey-return")).toHaveText("RETURN TO MENU");
+    await page.locator("#founder-room .room-return").click();
     await page.locator('[data-journey-entry="the-first-piece"]').click();
     await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-tee.webp");
-    await page.locator("#founder-room .room-return").click();
-    await expect(page.locator("#founder-journey-menu-title")).toBeVisible();
-    await page.locator("#founder-room .room-return").click();
-    await expect(page.locator("#founder-hub")).toBeVisible();
-    await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO MENU");
+    await page.locator(".founder-journey-return").click();
+    await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });
 
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {
