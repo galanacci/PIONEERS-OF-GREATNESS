@@ -158,7 +158,9 @@ test("the poem is unskippable once and skippable on return without another loadi
 
     await page.reload();
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
-    await page.getByRole("button", { name: "Begin experience" }).click();
+    await page.reload();
+    await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
+    await page.getByRole("button", { name: "Continue experience" }).click();
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();

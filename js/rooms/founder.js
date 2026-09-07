@@ -35,6 +35,8 @@ function pacingFor(index) {
 }
 
 export function initOpening() {
+    const entryButton = document.querySelector(".menu-toggle");
+    const entryLabel = entryButton?.querySelector(".menu-toggle-label");
     const introduction = document.getElementById("founder-introduction");
     const copy = document.getElementById("founder-introduction-copy");
     const poemReveal = document.getElementById("founder-poem-reveal");
@@ -44,7 +46,7 @@ export function initOpening() {
     const replay = introduction?.querySelector("[data-opening-replay]");
     const enterMenu = introduction?.querySelector("[data-opening-enter]");
     const transition = document.getElementById("room-transition");
-    if (!introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
+    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -52,6 +54,12 @@ export function initOpening() {
     let sequence = 0;
     let poem = null;
     let poemPromise = null;
+
+    function renderEntryState() {
+        const returning = hasCompletedIntroduction();
+        entryLabel.textContent = returning ? "CONTINUE" : "BEGIN";
+        entryButton.setAttribute("aria-label", returning ? "Continue experience" : "Begin experience");
+    }
 
     async function loadPoem() {
         if (poem) return poem;
@@ -94,6 +102,7 @@ export function initOpening() {
 
     function enterSite() {
         rememberCompletion();
+        renderEntryState();
         closeIntroduction();
         window.dispatchEvent(new CustomEvent("pog:opening-complete"));
     }
@@ -171,6 +180,7 @@ export function initOpening() {
         window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
+    renderEntryState();
     window.addEventListener("pog:start-requested", enterOpeningPath);
     replay.addEventListener("click", () => playIntroduction({ allowSkip: true }));
     enterMenu.addEventListener("click", enterSite);
