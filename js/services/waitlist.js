@@ -20,6 +20,14 @@ export function initWaitlist() {
     window.addEventListener("pog:waitlist-requested", () => {
         form.classList.add("is-direct-entry");
         placeholder.hidden = true;
+        status.textContent = "";
+        status.style.removeProperty("color");
+    });
+    window.addEventListener("pog:waitlist-dismissed", () => {
+        status.textContent = "";
+        status.style.removeProperty("color");
+        form.classList.remove("is-direct-entry");
+        placeholder.hidden = email.value !== "";
     });
     email.addEventListener("input", () => { placeholder.hidden = form.classList.contains("is-direct-entry") || email.value !== ""; });
     email.addEventListener("blur", () => {
@@ -37,19 +45,21 @@ export function initWaitlist() {
             body.append("email", value);
             const response = await fetch(SCRIPT_URL, { method: "POST", body });
             const data = await response.json();
-            const states = { success: ["Welcome to the movement.", "#7dff7d"], duplicate: ["Already signed up.", "#ffbf47"] };
-            const [message, color] = states[data.status] || ["Something went wrong.", "#ff6b6b"];
+            const states = { success: "Welcome to the movement.", duplicate: "Already signed up." };
+            const message = states[data.status] || "Something went wrong.";
             status.textContent = message;
-            status.style.color = color;
-            if (data.status === "success") {
+            status.style.removeProperty("color");
+            if (data.status === "success" || data.status === "duplicate") {
                 email.value = "";
                 form.classList.remove("is-direct-entry");
                 placeholder.hidden = false;
+                status.textContent = "";
+                window.dispatchEvent(new CustomEvent("pog:waitlist-complete", { detail: { status: data.status } }));
             }
         } catch (error) {
             console.error("Waitlist request failed.", error);
             status.textContent = "Unable to connect.";
-            status.style.color = "#ff6b6b";
+            status.style.removeProperty("color");
         }
     });
 }

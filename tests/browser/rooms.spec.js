@@ -47,12 +47,37 @@ test("presentation controls match the viewing device", async ({ page }, testInfo
     }
 });
 
-test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) => {
+test("JOIN WAITLIST opens inside the menu and returns after signup", async ({ page }) => {
+    let attempts = 0;
+    await page.route("https://script.google.com/**", async (route) => {
+        attempts += 1;
+        await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({ status: attempts === 1 ? "error" : "success" })
+        });
+    });
     await page.goto("/");
+    await page.evaluate(() => {
+        window.__ambienceStops = 0;
+        window.addEventListener("pog:ambience-stop", () => { window.__ambienceStops += 1; });
+    });
     await openMenu(page);
     await page.getByRole("menuitem", { name: "JOIN WAITLIST" }).click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-waitlist-open/);
     await expect(page.locator("#email")).toBeFocused();
     await expect(page.locator("#email")).toHaveAttribute("placeholder", "ENTER EMAIL HERE...");
+    await page.locator("#email").fill("founder@example.com");
+    await page.locator('#email-form button[type="submit"]').click();
+    await expect(page.locator("#status")).toHaveText("Something went wrong.");
+    await expect(page.locator("#status")).toHaveCSS("color", "rgb(255, 255, 255)");
+    await page.locator('#email-form button[type="submit"]').click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).not.toHaveClass(/is-waitlist-open/);
+    await expect(page.locator(".menu-list")).toBeVisible();
+    await expect(page.locator("#status")).toBeEmpty();
+    expect(await page.evaluate(() => window.__ambienceStops)).toBe(0);
 });
 
 test("menu emits game-like feedback for pointer, touch, keyboard and locked choices", async ({ page }) => {
