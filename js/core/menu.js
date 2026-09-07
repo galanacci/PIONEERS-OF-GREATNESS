@@ -61,7 +61,6 @@ export function initMenu() {
     };
     select(selected);
     toggle.addEventListener("click", () => {
-        sound("confirm");
         if (!overlay.classList.contains("is-open")) {
             window.dispatchEvent(new CustomEvent("pog:start-requested"));
         }

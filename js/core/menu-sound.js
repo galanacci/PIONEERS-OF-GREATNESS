@@ -18,11 +18,12 @@ export function initMenuSound() {
     let context;
     let keyboardNavigation = false;
     let hoveredControl = null;
+    let soundSequence = 0;
 
     const interactiveFrom = (target) => target instanceof Element
         ? target.closest("button, a[href], [role='button'], [role='option'], [role='menuitem']")
         : null;
-    const isMainMenuControl = (control) => control?.matches(".menu-item, .menu-toggle");
+    const isMainMenuControl = (control) => control?.matches(".menu-item");
     const isLocked = (control) => control?.matches("[aria-disabled='true'], [disabled]")
         || control?.dataset.status === "development";
     const emit = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
@@ -45,8 +46,10 @@ export function initMenuSound() {
     window.addEventListener("pog:menu-sound", async (event) => {
         const shape = SOUND_SHAPES[event.detail?.name];
         if (!shape) return;
+        const request = ++soundSequence;
         context ||= new AudioContext();
         if (context.state === "suspended") await context.resume();
+        if (request !== soundSequence || context.state !== "running") return;
         shape.forEach(playTone);
     });
 

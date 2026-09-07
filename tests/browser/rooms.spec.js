@@ -63,7 +63,12 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
         window.__menuSoundLog = [];
         window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
     });
-    await page.getByRole("button", { name: "Continue experience" }).click();
+    const continueButton = page.getByRole("button", { name: "Continue experience" });
+    await continueButton.dispatchEvent("pointerover", { pointerType: "mouse" });
+    await continueButton.click();
+    const entrySounds = await page.evaluate(() => window.__menuSoundLog.slice());
+    expect(entrySounds.filter((sound) => sound === "select")).toHaveLength(1);
+    expect(entrySounds.filter((sound) => sound === "confirm")).toHaveLength(1);
     await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await page.locator("#founder-introduction-enter").click();
