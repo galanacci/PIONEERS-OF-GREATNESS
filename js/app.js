@@ -1,5 +1,6 @@
 import { initAudio } from "./core/audio.js";
 import { initMenu } from "./core/menu.js";
+import { initMenuSound } from "./core/menu-sound.js";
 import { initPresentationLock } from "./core/presentation-lock.js";
 import { initRoomController } from "./core/room-controller.js";
 import { initDocumentary } from "./rooms/documentary.js";
@@ -11,6 +12,7 @@ import { initWaitlist } from "./services/waitlist.js";
 
 initWaitlist();
 initAudio();
+initMenuSound();
 initMenu();
 initPresentationLock();
 initRoomController();

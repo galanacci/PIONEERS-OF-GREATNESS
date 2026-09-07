@@ -55,6 +55,24 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
     await expect(page.locator("#email")).toHaveAttribute("placeholder", "ENTER EMAIL HERE...");
 });
 
+test("menu emits game-like feedback for pointer, touch, keyboard and locked choices", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => {
+        window.__menuSoundLog = [];
+        window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
+    });
+    await openMenu(page);
+    await page.getByRole("menuitem", { name: "FOUNDER" }).dispatchEvent("pointerover", { pointerType: "mouse" });
+    await page.getByRole("menuitem", { name: "FIELD NOTES" }).dispatchEvent("pointerdown", { pointerType: "touch" });
+    await page.getByRole("menuitem", { name: "COLLECTIONS" }).dispatchEvent("click");
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await page.keyboard.press("ArrowUp");
+    const soundLog = await page.evaluate(() => window.__menuSoundLog);
+    expect(soundLog).toContain("confirm");
+    expect(soundLog).toContain("select");
+    expect(soundLog).toContain("locked");
+});
+
 test("menu starts randomized ambience while the background video remains silent", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => { Math.random = () => 0.5; });

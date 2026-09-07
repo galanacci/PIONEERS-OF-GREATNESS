@@ -10,8 +10,11 @@ export function initMenu() {
     const regions = document.querySelectorAll("nav, #container, .container, .copyright");
     if (!toggle || !overlay || !panel || !list || !items.length) return;
     let selected = Math.max(0, items.findIndex((item) => item.classList.contains("is-selected")));
-    const select = (index) => {
-        selected = (index + items.length) % items.length;
+    const sound = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
+    const select = (index, withSound = false) => {
+        const next = (index + items.length) % items.length;
+        if (withSound && next !== selected) sound("select");
+        selected = next;
         items.forEach((item, i) => {
             const active = i === selected;
             item.classList.toggle("is-selected", active);
@@ -36,7 +39,11 @@ export function initMenu() {
     };
     const activate = (item) => {
         select(items.indexOf(item));
-        if (item.getAttribute("aria-disabled") === "true") return;
+        if (item.getAttribute("aria-disabled") === "true") {
+            sound("locked");
+            return;
+        }
+        sound("confirm");
         item.classList.add("is-activated");
         if (item.dataset.menuAction === "waitlist") {
             close(false);
@@ -53,10 +60,24 @@ export function initMenu() {
         } else if (item.dataset.menuAction === "exit") close();
     };
     select(selected);
-    toggle.addEventListener("click", () => overlay.classList.contains("is-open") ? close() : open(true));
+    toggle.addEventListener("click", () => {
+        sound("confirm");
+        overlay.classList.contains("is-open") ? close() : open(true);
+    });
     window.addEventListener("pog:return-to-menu", () => open(false));
     panel.addEventListener("click", (event) => { const item = event.target.closest(".menu-item"); if (item) activate(item); });
-    panel.addEventListener("pointerover", (event) => { list.classList.remove("is-keyboard-nav"); const item = event.target.closest(".menu-item"); if (item) select(items.indexOf(item)); });
+    panel.addEventListener("pointerover", (event) => {
+        if (event.pointerType && event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+        list.classList.remove("is-keyboard-nav");
+        const item = event.target.closest(".menu-item");
+        if (item) select(items.indexOf(item), true);
+    });
+    panel.addEventListener("pointerdown", (event) => {
+        if (event.pointerType !== "touch") return;
+        list.classList.remove("is-keyboard-nav");
+        const item = event.target.closest(".menu-item");
+        if (item) select(items.indexOf(item), true);
+    });
     document.addEventListener("keydown", (event) => {
         if (!overlay.classList.contains("is-open")) return;
         if (["ArrowUp", "ArrowDown"].includes(event.key)) list.classList.add("is-keyboard-nav");
@@ -65,7 +86,7 @@ export function initMenu() {
             if (document.activeElement === audio) { list.classList.add("is-keyboard-nav"); items[selected].focus(); }
             else { list.classList.remove("is-keyboard-nav"); audio?.focus(); }
         } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-            event.preventDefault(); select(selected + (event.key === "ArrowDown" ? 1 : -1)); items[selected].focus();
+            event.preventDefault(); select(selected + (event.key === "ArrowDown" ? 1 : -1), true); items[selected].focus();
         } else if (event.key === "Enter") { event.preventDefault(); activate(items[selected]); }
         else if (event.key === "Escape") { event.preventDefault(); close(); }
     });
