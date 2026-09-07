@@ -5,6 +5,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 ## Desktop
 
 - Background video autoplays permanently muted. Pressing BEGIN starts the low-volume Muhammad Ali training ambience from a random point; SOUND OFF mutes it while playback continues, SOUND ON restores that advancing playback, and the ambience continues into rooms without an outline on its control.
+- Switching to another tab, window or mobile app pauses the ambience at its current position; returning to the site resumes from that position and preserves the visitor's SOUND ON/OFF choice.
 - Menu feedback uses a light selection tick for mouse hover, keyboard movement and touch selection; activation has a firmer confirmation tone, while locked rooms have a distinct blocked tone.
 - The landing control reads BEGIN. It opens the loading veil, then the GREATNESS POEM; first-time visitors see the full unskippable ritual, returning visitors can skip directly to the menu, and FOUNDER now opens its room without replaying the poem.
 - Right-click does not open the browser context menu on desktop.

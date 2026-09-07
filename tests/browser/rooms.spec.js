@@ -126,6 +126,14 @@ test("menu starts randomized ambience while the background video remains silent"
     expect(restoredState.muted).toBe(false);
     expect(restoredState.paused).toBe(false);
     expect(restoredState.currentTime).toBeGreaterThanOrEqual(mutedState.currentTime);
+    await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+    const suspendedTime = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(true);
+    await page.waitForTimeout(150);
+    expect(await page.locator("#site-ambience").evaluate((audio) => audio.currentTime)).toBeCloseTo(suspendedTime, 1);
+    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
+    expect(await page.locator("#site-ambience").evaluate((audio) => audio.currentTime)).toBeGreaterThanOrEqual(suspendedTime);
     await page.getByRole("menuitem", { name: "FOUNDER" }).click();
     expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
 });

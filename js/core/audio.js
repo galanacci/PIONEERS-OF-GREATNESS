@@ -6,6 +6,7 @@ export function initAudio() {
     if (!video || !ambience || !button || !label) return;
     const ambienceVolume = 0.12;
     let visitorMuted = false;
+    let suspendedByPage = false;
 
     const render = () => {
         const enabled = !ambience.paused && !ambience.muted;
@@ -20,6 +21,7 @@ export function initAudio() {
     };
 
     const playFromRandomPoint = async () => {
+        suspendedByPage = false;
         ambience.muted = visitorMuted;
         let startTime = randomStartTime();
         const seekToStart = () => {
@@ -41,8 +43,29 @@ export function initAudio() {
     };
 
     const stop = () => {
+        suspendedByPage = false;
         ambience.pause();
         ambience.currentTime = 0;
+        render();
+    };
+
+    const suspendForPage = () => {
+        if (ambience.paused) return;
+        suspendedByPage = true;
+        ambience.pause();
+        render();
+    };
+
+    const resumeForPage = async () => {
+        if (!suspendedByPage || document.hidden || !document.hasFocus()) return;
+        suspendedByPage = false;
+        ambience.muted = visitorMuted;
+        try {
+            await ambience.play();
+        } catch (error) {
+            suspendedByPage = true;
+            console.error("Training ambience could not resume.", error);
+        }
         render();
     };
 
@@ -74,4 +97,11 @@ export function initAudio() {
     });
     window.addEventListener("pog:start-requested", playFromRandomPoint);
     window.addEventListener("pog:ambience-stop", stop);
+    window.addEventListener("blur", suspendForPage);
+    window.addEventListener("focus", resumeForPage);
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) suspendForPage();
+        else resumeForPage();
+    });
+    window.addEventListener("pagehide", suspendForPage);
 }
