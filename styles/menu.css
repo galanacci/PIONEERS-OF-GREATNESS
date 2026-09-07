@@ -42,6 +42,7 @@
 }
 
 .menu-overlay.is-waitlist-open .menu-list {
+    display: none;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
