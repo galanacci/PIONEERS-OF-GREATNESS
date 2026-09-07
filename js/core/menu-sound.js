@@ -16,7 +16,8 @@ export function initMenuSound() {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     let context;
-    const effectsGain = 1.18;
+    const mobileAudioMix = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    const effectsGain = mobileAudioMix ? 3 : 1.18;
     let keyboardNavigation = false;
     let hoveredControl = null;
     let soundSequence = 0;
@@ -42,7 +43,8 @@ export function initMenuSound() {
     };
 
     const unlockAudio = () => {
-        context ||= new AudioContext();
+        context ||= window.__pogAudioContext || new AudioContext();
+        window.__pogAudioContext = context;
         if (context.state === "running") {
             warmAudioPath();
             return Promise.resolve();

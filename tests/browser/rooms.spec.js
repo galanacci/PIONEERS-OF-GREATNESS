@@ -217,16 +217,20 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     await page.getByRole("button", { name: "Begin experience" }).click();
     const beforeEnter = await page.locator("#site-ambience").evaluate((audio) => ({
         paused: audio.paused,
-        level: Number(audio.dataset.outputLevel)
+        level: Number(audio.dataset.outputLevel),
+        target: Number(audio.dataset.targetLevel)
     }));
-    expect(beforeEnter).toEqual({ paused: true, level: 0 });
+    expect(beforeEnter.paused).toBe(true);
+    expect(beforeEnter.level).toBe(0);
+    expect(beforeEnter.target).toBe(page.viewportSize()?.width < 560 ? 0.05 : 0.09);
+    const targetLevel = beforeEnter.target;
     expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
     await expect(page.locator("#founder-introduction-enter")).toBeVisible({ timeout: 10000 });
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
-    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(0.085);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(targetLevel - 0.005);
     const audioState = await page.locator("#site-ambience").evaluate((audio) => ({
         currentTime: audio.currentTime,
         duration: audio.duration,
@@ -234,9 +238,11 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
         outputMode: audio.dataset.outputMode
     }));
     expect(audioState.currentTime).toBeGreaterThan(audioState.duration * 0.45);
-    expect(audioState.level).toBeCloseTo(0.09);
+    expect(audioState.level).toBeCloseTo(targetLevel);
     expect(audioState.outputMode).toBe("webaudio");
-    expect(await page.evaluate(() => window.__ambienceVolumes.some((volume) => volume > 0.005 && volume < 0.085))).toBe(true);
+    expect(await page.evaluate((target) => window.__ambienceVolumes.some((volume) => (
+        volume > 0.005 && volume < target - 0.005
+    )), targetLevel)).toBe(true);
     await expect(page.locator(".audio-toggle")).toHaveAttribute("aria-pressed", "true");
     const timeBeforeMute = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
     await page.locator(".audio-toggle").click();
@@ -253,7 +259,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     expect(mutedState.level).toBe(0);
     expect(await page.locator(".background-video").evaluate((video) => video.muted)).toBe(true);
     await page.locator(".audio-toggle").click();
-    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(0.085);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(targetLevel - 0.005);
     const restoredState = await page.locator("#site-ambience").evaluate((audio) => ({
         muted: audio.muted,
         paused: audio.paused,
@@ -270,7 +276,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     expect(await page.locator("#site-ambience").evaluate((audio) => audio.currentTime)).toBeCloseTo(suspendedTime, 1);
     await page.evaluate(() => window.dispatchEvent(new Event("focus")));
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
-    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(0.085);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(targetLevel - 0.005);
     expect(await page.locator("#site-ambience").evaluate((audio) => audio.currentTime)).toBeGreaterThanOrEqual(suspendedTime);
     await page.getByRole("menuitem", { name: "FOUNDER" }).click();
     expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
@@ -287,7 +293,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), {
         timeout: 3000
-    }).toBeGreaterThan(0.085);
+    }).toBeGreaterThan(targetLevel - 0.005);
     await expect(page.locator("#site-ambience")).toHaveAttribute("data-output-mode", "webaudio");
     const timeBeforeDocumentary = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
     await page.getByRole("menuitem", { name: "DOCUMENTARY" }).click();
@@ -308,7 +314,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => ({
         level: Number(audio.dataset.outputLevel),
         muted: audio.muted
-    })), { timeout: 3000 }).toEqual({ level: 0.09, muted: false });
+    })), { timeout: 3000 }).toEqual({ level: targetLevel, muted: false });
 });
 
 test("Founder mission film leads its statement", async ({ page }) => {

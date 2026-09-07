@@ -5,7 +5,8 @@ export function initAudio() {
     const label = button?.querySelector(".audio-label");
     if (!video || !ambience || !button || !label) return;
 
-    const ambienceVolume = 0.09;
+    const mobileAudioMix = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    const ambienceVolume = mobileAudioMix ? 0.05 : 0.09;
     const entryFadeDuration = 1200;
     const stateFadeDuration = 800;
     let visitorMuted = false;
@@ -38,7 +39,8 @@ export function initAudio() {
         if (!OutputAudioContext || outputGraphFailed) return false;
         if (!outputContext) {
             try {
-                outputContext = new OutputAudioContext();
+                outputContext = window.__pogAudioContext || new OutputAudioContext();
+                window.__pogAudioContext = outputContext;
                 outputSource = outputContext.createMediaElementSource(ambience);
                 outputGain = outputContext.createGain();
                 outputGain.gain.value = outputLevel;
@@ -197,6 +199,7 @@ export function initAudio() {
     video.defaultMuted = true;
     video.muted = true;
     ambience.dataset.outputMode = "element";
+    ambience.dataset.targetLevel = String(ambienceVolume);
     setOutputLevel(0);
     render();
 
