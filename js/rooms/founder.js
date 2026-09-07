@@ -240,13 +240,12 @@ export function initOpening() {
         playIntroduction({ allowSkip: true, openingDelay: 0 });
     }
 
-    async function skipPoem() {
+    function skipPoem() {
         if (replayDestination === "origin") {
             sequence += 1;
             skip.hidden = true;
             copy.setAttribute("aria-busy", "false");
             copy.classList.add("is-dismissing");
-            await wait(700);
             returnToOrigin();
             return;
         }

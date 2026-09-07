@@ -46,7 +46,7 @@ body.founder-introduction-active {
     display: flex;
     align-items: flex-start;
     opacity: 1;
-    transition: opacity 700ms ease;
+    transition: opacity 600ms ease;
 }
 
 .founder-introduction-copy.is-dismissing {

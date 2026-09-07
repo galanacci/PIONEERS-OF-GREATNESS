@@ -11,7 +11,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - BEGIN/CONTINUE plays the standard selection sound on mouse hover or mobile touch and exactly one confirmation sound when pressed.
 - The landing control reads BEGIN. It opens the loading veil, then the GREATNESS POEM; first-time visitors see the full unskippable ritual, returning visitors can skip directly to the menu, and FOUNDER now opens its room without replaying the poem.
 - After the visitor completes the poem once, the landing control persists as CONTINUE on future visits to that device.
-- After the first poem and Greatness Tee image-and-ENTER initiation, CONTINUE opens the menu directly. Pressing `THE FIRST PHYSICAL EXPRESSION` image in Origin starts the sole replay easter egg immediately. SKIP fades the poem copy out completely before the black ritual layer dissolves back to that same frame.
+- After the first poem and Greatness Tee image-and-ENTER initiation, CONTINUE opens the menu directly. Pressing `THE FIRST PHYSICAL EXPRESSION` image in Origin starts the sole replay easter egg immediately. SKIP mirrors its entrance by fading the poem copy and black ritual layer out together, returning to that same frame.
 - Right-click does not open the browser context menu on desktop.
 - Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves on the landing page. JOIN WAITLIST opens the email capture inside the menu overlay; pressing outside the form or Escape restores the selector, feedback remains white, a successful or duplicate submission returns to the selector, and ambience continues without stopping or restarting.
