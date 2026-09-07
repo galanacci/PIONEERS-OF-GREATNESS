@@ -120,6 +120,25 @@
     filter: saturate(0.82) contrast(1.04);
 }
 
+.founder-origin-poem-trigger,
+.founder-origin-poem-trigger:hover,
+.founder-origin-poem-trigger:focus-visible {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+}
+
+.founder-origin-poem-trigger:focus-visible img {
+    box-shadow: 0 0 0 1px var(--color-accent-light);
+}
+
 .founder-media-placeholder {
     box-sizing: border-box;
     display: grid;

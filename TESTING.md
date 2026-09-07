@@ -4,14 +4,14 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 
 ## Desktop
 
-- Background video autoplays permanently muted. BEGIN/CONTINUE remains silent through the poem and final image; pressing ENTER starts the Muhammad Ali training ambience from a random point and fades it to a restrained 9% volume. SOUND OFF fades to mute while playback continues, SOUND ON fades the advancing playback back in, and ambience continues into rooms without an outline on its control.
+- Background video autoplays permanently muted. On the first visit, BEGIN remains silent through the poem and final image; pressing ENTER starts the Muhammad Ali training ambience from a random point and fades it to a restrained 9% volume. On later visits, CONTINUE primes that ambience silently behind the loading veil and fades it in with the menu. SOUND OFF fades to mute while playback continues, SOUND ON fades the advancing playback back in, and ambience continues into rooms without an outline on its control.
 - EXIT fades the ambience to silence before stopping it. Switching to another tab, window or mobile app fades it out before pausing at its current position; returning resumes from that position and fades back to the visitor's chosen SOUND ON/OFF state.
 - Menu feedback uses a light selection tick for mouse hover, keyboard movement and touch selection; activation has a firmer confirmation tone, while locked rooms have a distinct blocked tone.
 - The same sonic language applies to relevant controls throughout the opening ritual, Founder, Documentary, Field Notes, waitlist and external links without double-playing on the main menu.
 - BEGIN/CONTINUE plays the standard selection sound on mouse hover or mobile touch and exactly one confirmation sound when pressed.
 - The landing control reads BEGIN. It opens the loading veil, then the GREATNESS POEM; first-time visitors see the full unskippable ritual, returning visitors can skip directly to the menu, and FOUNDER now opens its room without replaying the poem.
 - After the visitor completes the poem once, the landing control persists as CONTINUE on future visits to that device.
-- CONTINUE shows the completed poem's centred Greatness Tee image and ENTER state after loading instead of replaying the animation. Pressing that image is the hidden replay path: it runs the full animation with SKIP, which returns to the same image-and-ENTER state.
+- After the first poem and Greatness Tee image-and-ENTER initiation, CONTINUE opens the menu directly. Pressing `THE FIRST PHYSICAL EXPRESSION` image in Origin is the sole replay easter egg; replay and SKIP both return to that same frame.
 - Right-click does not open the browser context menu on desktop.
 - Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves on the landing page. JOIN WAITLIST opens the email capture inside the menu overlay; pressing outside the form or Escape restores the selector, feedback remains white, a successful or duplicate submission returns to the selector, and ambience continues without stopping or restarting.

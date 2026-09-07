@@ -40,14 +40,13 @@ export function initOpening() {
     const introduction = document.getElementById("founder-introduction");
     const copy = document.getElementById("founder-introduction-copy");
     const poemReveal = document.getElementById("founder-poem-reveal");
-    const poemReplayTrigger = document.getElementById("founder-poem-replay-trigger");
     const actions = document.getElementById("founder-introduction-actions");
     const enter = document.getElementById("founder-introduction-enter");
     const skip = document.getElementById("founder-introduction-skip");
     const replay = introduction?.querySelector("[data-opening-replay]");
     const enterMenu = introduction?.querySelector("[data-opening-enter]");
     const transition = document.getElementById("room-transition");
-    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !poemReplayTrigger || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
+    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -56,6 +55,8 @@ export function initOpening() {
     let poem = null;
     let poemPromise = null;
     let replaying = false;
+    let replayDestination = "reveal";
+    let returnFocus = null;
     let backgroundState = new Map();
 
     function renderEntryState() {
@@ -128,6 +129,15 @@ export function initOpening() {
         enter.focus();
     }
 
+    function returnToOrigin() {
+        const target = returnFocus;
+        replaying = false;
+        replayDestination = "reveal";
+        returnFocus = null;
+        closeIntroduction();
+        target?.focus();
+    }
+
     async function typeParagraph(paragraph, token, pacing) {
         const element = document.createElement("p");
         element.className = "is-active";
@@ -175,13 +185,8 @@ export function initOpening() {
             finalParagraph?.classList.remove("is-active");
             finalParagraph?.classList.add("is-leaving");
             await wait(700);
-            copy.replaceChildren();
-            copy.hidden = true;
-            poemReveal.hidden = false;
-            copy.setAttribute("aria-busy", "false");
-            skip.hidden = true;
-            enter.hidden = false;
-            enter.focus();
+            if (replayDestination === "origin") returnToOrigin();
+            else showFinalReveal();
         } catch (error) {
             console.error("THE BEGINNING could not be loaded.", error);
             const state = document.createElement("p");
@@ -195,10 +200,14 @@ export function initOpening() {
 
     async function enterOpeningPath() {
         replaying = false;
+        replayDestination = "reveal";
+        returnFocus = null;
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
         if (hasCompletedIntroduction()) {
-            showFinalReveal();
+            window.dispatchEvent(new CustomEvent("pog:ambience-prime"));
+            window.dispatchEvent(new CustomEvent("pog:opening-complete"));
             await wait(1000);
+            window.dispatchEvent(new CustomEvent("pog:ambience-reveal"));
             window.dispatchEvent(new CustomEvent("pog:hide-transition"));
             return;
         }
@@ -210,10 +219,22 @@ export function initOpening() {
 
     function replayPoem() {
         replaying = true;
+        replayDestination = "reveal";
+        playIntroduction({ allowSkip: true });
+    }
+
+    function replayFromOrigin(event) {
+        replaying = true;
+        replayDestination = "origin";
+        returnFocus = event.detail?.trigger || null;
         playIntroduction({ allowSkip: true });
     }
 
     function skipPoem() {
+        if (replayDestination === "origin") {
+            returnToOrigin();
+            return;
+        }
         if (replaying) {
             replaying = false;
             showFinalReveal();
@@ -224,7 +245,7 @@ export function initOpening() {
 
     renderEntryState();
     window.addEventListener("pog:start-requested", enterOpeningPath);
-    poemReplayTrigger.addEventListener("click", replayPoem);
+    window.addEventListener("pog:poem-replay-requested", replayFromOrigin);
     replay.addEventListener("click", replayPoem);
     enterMenu.addEventListener("click", enterSite);
     enter.addEventListener("click", enterSite);

@@ -12,6 +12,7 @@ export function initAudio() {
     let suspendedByPage = false;
     let hasStarted = false;
     let playbackSequence = 0;
+    let fadeWhenReady = false;
     let fadeSequence = 0;
     let fadeInterval = null;
     let fadeFallback = null;
@@ -68,9 +69,10 @@ export function initAudio() {
         return Math.random() * (ambience.duration - 1);
     };
 
-    const startWithFade = async () => {
+    const beginPlayback = async (fadeIn) => {
         cancelFade();
         const token = ++playbackSequence;
+        fadeWhenReady = fadeIn;
         hasStarted = true;
         suspendedByPage = false;
         ambience.volume = 0;
@@ -86,7 +88,7 @@ export function initAudio() {
             await ambience.play();
             if (token !== playbackSequence || !hasStarted) return;
             seekToStart();
-            if (!visitorMuted) fadeTo(ambienceVolume, entryFadeDuration);
+            if (!visitorMuted && fadeWhenReady) fadeTo(ambienceVolume, entryFadeDuration);
         } catch (error) {
             hasStarted = false;
             console.error("Training ambience could not begin.", error);
@@ -97,6 +99,7 @@ export function initAudio() {
     const stopWithFade = () => {
         if (!hasStarted) return;
         playbackSequence += 1;
+        fadeWhenReady = false;
         hasStarted = false;
         suspendedByPage = false;
         ambience.muted = false;
@@ -167,7 +170,15 @@ export function initAudio() {
     video.addEventListener("volumechange", () => {
         if (!video.muted) video.muted = true;
     });
-    window.addEventListener("pog:ambience-start", startWithFade);
+    window.addEventListener("pog:ambience-prime", () => beginPlayback(false));
+    window.addEventListener("pog:ambience-reveal", () => {
+        fadeWhenReady = true;
+        if (hasStarted && !suspendedByPage && !ambience.paused && !visitorMuted) {
+            ambience.muted = false;
+            fadeTo(ambienceVolume, entryFadeDuration);
+        }
+    });
+    window.addEventListener("pog:ambience-start", () => beginPlayback(true));
     window.addEventListener("pog:ambience-stop", stopWithFade);
     window.addEventListener("blur", suspendForPage);
     window.addEventListener("focus", resumeForPage);

@@ -104,9 +104,7 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
     const entrySounds = await page.evaluate(() => window.__menuSoundLog.slice());
     expect(entrySounds.filter((sound) => sound === "select")).toHaveLength(1);
     expect(entrySounds.filter((sound) => sound === "confirm")).toHaveLength(1);
-    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await page.getByRole("menuitem", { name: "FOUNDER" }).dispatchEvent("pointerover", { pointerType: "mouse" });
     await page.getByRole("menuitem", { name: "FIELD NOTES" }).dispatchEvent("pointerdown", { pointerType: "touch" });
@@ -146,9 +144,12 @@ test("game-like feedback extends to room controls without duplicating the main m
 });
 
 test("ENTER fades in randomized ambience and page or menu exits fade it out", async ({ page }) => {
+    await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ paragraphs: ["A."] })
+    }));
     await page.goto("/");
-    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
-    await page.reload();
     await page.evaluate(() => {
         Math.random = () => 0.5;
         window.__ambienceVolumes = [];
@@ -156,14 +157,14 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
             window.__ambienceVolumes.push(event.currentTarget.volume);
         });
     });
-    await page.getByRole("button", { name: "Continue experience" }).click();
+    await page.getByRole("button", { name: "Begin experience" }).click();
     const beforeEnter = await page.locator("#site-ambience").evaluate((audio) => ({
         paused: audio.paused,
         volume: audio.volume
     }));
     expect(beforeEnter).toEqual({ paused: true, volume: 0 });
     expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
-    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
+    await expect(page.locator("#founder-introduction-enter")).toBeVisible({ timeout: 10000 });
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
@@ -233,8 +234,13 @@ test("Founder mission film leads its statement", async ({ page }) => {
     expect(filmLeads).toBe(true);
 });
 
-test("the poem plays once before CONTINUE opens its completed image state", async ({ page }) => {
+test("the poem gates the first visit and replays from the first physical expression", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 320, height: 568 });
+    await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ paragraphs: ["A."] })
+    }));
     await page.goto("/");
     await expect(page.locator(".menu-toggle")).toHaveText("BEGIN");
     await page.getByRole("button", { name: "Begin experience" }).click();
@@ -242,9 +248,11 @@ test("the poem plays once before CONTINUE opens its completed image state", asyn
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeHidden();
-
-    await page.reload();
-    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
+    await expect(page.locator("#founder-introduction-enter")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("#founder-poem-reveal")).toBeVisible();
+    await expect(page.locator('#founder-introduction [aria-label="Replay the animated GREATNESS POEM"]')).toHaveCount(0);
+    await page.locator("#founder-introduction-enter").click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await page.reload();
     await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
     const landingType = await page.evaluate(() => {
@@ -281,30 +289,26 @@ test("the poem plays once before CONTINUE opens its completed image state", asyn
         expect(buttonBounds.rightBorder).toBe("1px");
     }
     await page.getByRole("button", { name: "Continue experience" }).click();
-    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
-    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "false");
-    await expect(page.locator("#founder-poem-reveal")).toBeVisible();
-    await expect(page.locator("#founder-introduction-skip")).toBeHidden();
-    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
+    await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    const revealPosition = await page.locator("#founder-poem-reveal img").evaluate((image) => {
-        const bounds = image.getBoundingClientRect();
-        return { centre: bounds.top + bounds.height / 2, viewport: window.innerHeight / 2 };
-    });
-    expect(Math.abs(revealPosition.centre - revealPosition.viewport)).toBeLessThan(2);
-    await page.getByRole("button", { name: "Replay the animated GREATNESS POEM" }).click();
+    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#founder-poem-reveal")).toBeHidden();
+    await page.getByRole("menuitem", { name: "FOUNDER" }).click();
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await page.locator('[data-founder-section="origin"]').click();
+    await page.locator(".founder-origin-control.is-next").click();
+    await page.locator(".founder-origin-control.is-next").click();
+    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
+    const replayTrigger = page.getByRole("button", { name: "Replay the animated GREATNESS POEM" });
+    await replayTrigger.click();
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();
     await page.locator("#founder-introduction-skip").click();
-    await expect(page.locator("#founder-poem-reveal")).toBeVisible();
-    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
-    await page.locator("#founder-introduction-enter").click();
-    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
-    await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
-    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/);
-    await page.getByRole("menuitem", { name: "FOUNDER" }).click();
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
     await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
+    await expect(replayTrigger).toBeFocused();
 });
 
 test("Founder opens into the interactive five-chapter hub", async ({ page }) => {

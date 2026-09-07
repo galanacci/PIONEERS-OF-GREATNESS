@@ -13,7 +13,7 @@
 - `js/services/` owns the waitlist integration.
 - `js/room-registry.js` is the central list of available rooms.
 
-BEGIN emits `pog:start-requested`; first-time visitors receive the full poem, while the persisted CONTINUE state opens its completed image-and-ENTER reveal. The Greatness Tee image in that reveal is the poem replay easter egg, with SKIP returning to the completed reveal. The ritual completes with `pog:opening-complete`, which reveals the menu. Rooms communicate through separate `pog:*` browser events. A room controller emits `pog:room-opened`, `pog:room-closing` and `pog:room-closed`; media modules use these lifecycle events to clean up playback.
+BEGIN emits `pog:start-requested`; first-time visitors receive the full unskippable poem followed by the Greatness Tee image-and-ENTER reveal. Once completed, the persisted CONTINUE state opens the menu directly behind the loading veil. The Origin frame `THE FIRST PHYSICAL EXPRESSION` becomes the only poem replay easter egg and returns visitors to that frame after completion or SKIP. Rooms communicate through separate `pog:*` browser events. A room controller emits `pog:room-opened`, `pog:room-closing` and `pog:room-closed`; media modules use these lifecycle events to clean up playback.
 
 Founder Hub labels, availability, Origin frames and the eight Journey memories live in `data/founder-room.json`. Later Founder stages extend this single content source with principles, notes and the current mission.
 

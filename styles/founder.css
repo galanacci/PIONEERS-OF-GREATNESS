@@ -64,24 +64,6 @@ body.founder-introduction-active {
     animation: founder-paragraph-enter 1100ms ease both;
 }
 
-.founder-poem-replay-trigger,
-.founder-poem-replay-trigger:hover,
-.founder-poem-replay-trigger:focus-visible {
-    display: inline-flex;
-    max-width: min(68vw, 720px);
-    max-height: 68vh;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: inherit;
-}
-
-.founder-poem-replay-trigger:focus-visible img {
-    box-shadow: 0 0 0 1px var(--color-accent-light);
-}
-
 .founder-poem-reveal img {
     display: block;
     width: auto;
