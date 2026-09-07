@@ -20,6 +20,8 @@ export function initMenuSound() {
     let keyboardNavigation = false;
     let hoveredControl = null;
     let soundSequence = 0;
+    let unlockPromise = null;
+    let audioWarmed = false;
 
     const interactiveFrom = (target) => target instanceof Element
         ? target.closest("button, a[href], [role='button'], [role='option'], [role='menuitem']")
@@ -28,6 +30,28 @@ export function initMenuSound() {
     const isLocked = (control) => control?.matches("[aria-disabled='true'], [disabled]")
         || control?.dataset.status === "development";
     const emit = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
+
+    const warmAudioPath = () => {
+        if (audioWarmed || !context || context.state !== "running") return;
+        audioWarmed = true;
+        const buffer = context.createBuffer(1, 1, context.sampleRate);
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+        source.start(0);
+    };
+
+    const unlockAudio = () => {
+        context ||= new AudioContext();
+        if (context.state === "running") {
+            warmAudioPath();
+            return Promise.resolve();
+        }
+        unlockPromise ||= context.resume()
+            .then(() => warmAudioPath())
+            .finally(() => { unlockPromise = null; });
+        return unlockPromise;
+    };
 
     const playTone = ({ frequency, endFrequency, duration, gain, type, delay = 0 }) => {
         const start = context.currentTime + delay;
@@ -48,8 +72,7 @@ export function initMenuSound() {
         const shape = SOUND_SHAPES[event.detail?.name];
         if (!shape) return;
         const request = ++soundSequence;
-        context ||= new AudioContext();
-        if (context.state === "suspended") await context.resume();
+        await unlockAudio();
         if (request !== soundSequence || context.state !== "running") return;
         shape.forEach(playTone);
     });
@@ -61,10 +84,17 @@ export function initMenuSound() {
     }, true);
 
     document.addEventListener("pointerdown", (event) => {
+        // Mobile browsers only authorize Web Audio from a direct physical gesture.
+        // Unlock before delegated menu and room handlers emit their feedback tone.
+        unlockAudio().catch(() => {});
         keyboardNavigation = false;
         const control = interactiveFrom(event.target);
         if (event.pointerType === "touch" && control && !isMainMenuControl(control)) emit("select");
     }, true);
+
+    document.addEventListener("touchstart", () => {
+        unlockAudio().catch(() => {});
+    }, { capture: true, passive: true });
 
     document.addEventListener("pointerover", (event) => {
         if (event.pointerType && event.pointerType !== "mouse" && event.pointerType !== "pen") return;

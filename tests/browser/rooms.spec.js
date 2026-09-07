@@ -117,6 +117,63 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
     expect(soundLog).toContain("locked");
 });
 
+test("a direct mobile touch unlocks and warms the SFX engine", async ({ page }) => {
+    await page.addInitScript(() => {
+        window.__sfxAudit = { contexts: 0, resumes: 0, warmStarts: 0, toneStarts: 0 };
+        const parameter = {
+            setValueAtTime() {},
+            exponentialRampToValueAtTime() {}
+        };
+        window.AudioContext = class {
+            constructor() {
+                window.__sfxAudit.contexts += 1;
+                this.state = "suspended";
+                this.currentTime = 0;
+                this.sampleRate = 44100;
+                this.destination = {};
+            }
+
+            resume() {
+                window.__sfxAudit.resumes += 1;
+                this.state = "running";
+                return Promise.resolve();
+            }
+
+            createBuffer() { return {}; }
+            createBufferSource() {
+                return {
+                    buffer: null,
+                    connect: (target) => target,
+                    start: () => { window.__sfxAudit.warmStarts += 1; }
+                };
+            }
+
+            createOscillator() {
+                return {
+                    frequency: parameter,
+                    connect: (target) => target,
+                    start: () => { window.__sfxAudit.toneStarts += 1; },
+                    stop() {}
+                };
+            }
+
+            createGain() {
+                return { gain: parameter, connect: (target) => target };
+            }
+        };
+    });
+    await page.goto("/");
+    await page.getByRole("button", { name: "Begin experience" }).dispatchEvent("pointerdown", {
+        pointerType: "touch"
+    });
+    await expect.poll(() => page.evaluate(() => window.__sfxAudit)).toMatchObject({
+        contexts: 1,
+        resumes: 1,
+        warmStarts: 1
+    });
+    await expect.poll(() => page.evaluate(() => window.__sfxAudit.toneStarts)).toBeGreaterThan(0);
+});
+
 test("game-like feedback extends to room controls without duplicating the main menu", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => {
