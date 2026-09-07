@@ -16,6 +16,51 @@ export function initAudio() {
     let fadeSequence = 0;
     let fadeInterval = null;
     let fadeFallback = null;
+    const OutputAudioContext = window.AudioContext || window.webkitAudioContext;
+    let outputContext = null;
+    let outputSource = null;
+    let outputGain = null;
+    let outputLevel = 0;
+    let outputGraphFailed = false;
+
+    const setOutputLevel = (level) => {
+        outputLevel = Math.max(0, Math.min(1, level));
+        ambience.dataset.outputLevel = outputLevel.toFixed(4);
+        if (outputGain) outputGain.gain.value = outputLevel;
+        else ambience.volume = outputLevel;
+        window.dispatchEvent(new CustomEvent("pog:ambience-level", {
+            detail: { level: outputLevel }
+        }));
+    };
+
+    const ensureOutputGraph = async () => {
+        if (!OutputAudioContext || outputGraphFailed) return false;
+        if (!outputContext) {
+            try {
+                outputContext = new OutputAudioContext();
+                outputSource = outputContext.createMediaElementSource(ambience);
+                outputGain = outputContext.createGain();
+                outputGain.gain.value = outputLevel;
+                outputSource.connect(outputGain).connect(outputContext.destination);
+                ambience.volume = 1;
+                ambience.dataset.outputMode = "webaudio";
+            } catch (error) {
+                outputGraphFailed = true;
+                outputGain = null;
+                ambience.dataset.outputMode = "element";
+                ambience.volume = outputLevel;
+                console.warn("Web Audio ambience gain unavailable; using element volume.", error);
+                return false;
+            }
+        }
+        try {
+            if (outputContext.state !== "running") await outputContext.resume();
+            return outputContext.state === "running";
+        } catch (error) {
+            console.warn("Web Audio ambience gain could not resume yet.", error);
+            return false;
+        }
+    };
 
     const render = () => {
         const enabled = hasStarted && !visitorMuted;
@@ -35,7 +80,7 @@ export function initAudio() {
     const fadeTo = (target, duration, onComplete) => {
         cancelFade();
         const token = fadeSequence;
-        const initial = ambience.volume;
+        const initial = outputLevel;
         const startedAt = performance.now();
         let complete = false;
         const finish = () => {
@@ -45,7 +90,7 @@ export function initAudio() {
             if (fadeFallback !== null) window.clearTimeout(fadeFallback);
             fadeInterval = null;
             fadeFallback = null;
-            ambience.volume = target;
+            setOutputLevel(target);
             onComplete?.();
         };
         if (duration <= 0 || Math.abs(target - initial) < 0.001) {
@@ -56,7 +101,7 @@ export function initAudio() {
             if (token !== fadeSequence) return;
             const progress = Math.min(1, (performance.now() - startedAt) / duration);
             const eased = 1 - ((1 - progress) ** 2);
-            ambience.volume = initial + ((target - initial) * eased);
+            setOutputLevel(initial + ((target - initial) * eased));
             if (progress >= 1) finish();
         };
         fadeInterval = window.setInterval(step, 32);
@@ -75,7 +120,9 @@ export function initAudio() {
         fadeWhenReady = fadeIn;
         hasStarted = true;
         suspendedByPage = false;
-        ambience.volume = 0;
+        await ensureOutputGraph();
+        if (token !== playbackSequence || !hasStarted) return;
+        setOutputLevel(0);
         ambience.muted = visitorMuted;
         let startTime = randomStartTime();
         const seekToStart = () => {
@@ -129,7 +176,8 @@ export function initAudio() {
         const token = playbackSequence;
         suspendedByPage = false;
         cancelFade();
-        if (ambience.paused) ambience.volume = 0;
+        await ensureOutputGraph();
+        if (ambience.paused) setOutputLevel(0);
         ambience.muted = visitorMuted;
         try {
             await ambience.play();
@@ -147,7 +195,8 @@ export function initAudio() {
 
     video.defaultMuted = true;
     video.muted = true;
-    ambience.volume = 0;
+    ambience.dataset.outputMode = "element";
+    setOutputLevel(0);
     render();
 
     button.addEventListener("click", () => {
