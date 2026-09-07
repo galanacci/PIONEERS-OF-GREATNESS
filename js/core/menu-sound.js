@@ -16,6 +16,16 @@ export function initMenuSound() {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     let context;
+    let keyboardNavigation = false;
+    let hoveredControl = null;
+
+    const interactiveFrom = (target) => target instanceof Element
+        ? target.closest("button, a[href], [role='button'], [role='option'], [role='menuitem']")
+        : null;
+    const isMainMenuControl = (control) => control?.matches(".menu-item, .menu-toggle");
+    const isLocked = (control) => control?.matches("[aria-disabled='true'], [disabled]")
+        || control?.dataset.status === "development";
+    const emit = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
 
     const playTone = ({ frequency, endFrequency, duration, gain, type, delay = 0 }) => {
         const start = context.currentTime + delay;
@@ -38,5 +48,42 @@ export function initMenuSound() {
         context ||= new AudioContext();
         if (context.state === "suspended") await context.resume();
         shape.forEach(playTone);
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (["Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+            keyboardNavigation = true;
+        }
+    }, true);
+
+    document.addEventListener("pointerdown", (event) => {
+        keyboardNavigation = false;
+        const control = interactiveFrom(event.target);
+        if (event.pointerType === "touch" && control && !isMainMenuControl(control)) emit("select");
+    }, true);
+
+    document.addEventListener("pointerover", (event) => {
+        if (event.pointerType && event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+        const control = interactiveFrom(event.target);
+        if (!control || isMainMenuControl(control) || control === hoveredControl) return;
+        hoveredControl = control;
+        emit("select");
+    }, true);
+
+    document.addEventListener("pointerout", (event) => {
+        const remainsInside = event.relatedTarget instanceof Node && hoveredControl?.contains(event.relatedTarget);
+        if (hoveredControl && !remainsInside) hoveredControl = null;
+    }, true);
+
+    document.addEventListener("focusin", (event) => {
+        if (!keyboardNavigation) return;
+        const control = interactiveFrom(event.target);
+        if (control && !isMainMenuControl(control)) emit("select");
+    }, true);
+
+    document.addEventListener("click", (event) => {
+        const control = interactiveFrom(event.target);
+        if (!control || isMainMenuControl(control)) return;
+        emit(isLocked(control) ? "locked" : "confirm");
     });
 }

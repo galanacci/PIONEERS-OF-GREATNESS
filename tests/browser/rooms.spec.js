@@ -79,6 +79,32 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
     expect(soundLog).toContain("locked");
 });
 
+test("game-like feedback extends to room controls without duplicating the main menu", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => {
+        window.__siteSoundLog = [];
+        window.addEventListener("pog:menu-sound", (event) => window.__siteSoundLog.push(event.detail.name));
+        window.dispatchEvent(new CustomEvent("pog:open-room", {
+            detail: { roomId: "founder-room", skipTransition: true }
+        }));
+    });
+    await expect(page.locator(".founder-hub-item")).toHaveCount(5);
+    const origin = page.locator('[data-founder-section="origin"]');
+    await origin.dispatchEvent("pointerover", { pointerType: "mouse" });
+    await origin.click();
+    await page.getByRole("button", { name: "RETURN TO FOUNDER" }).click();
+    const journey = page.locator('[data-founder-section="journey"]');
+    await journey.dispatchEvent("pointerdown", { pointerType: "touch" });
+    await page.keyboard.press("ArrowDown");
+    const unavailable = page.locator('[data-founder-section="code"]');
+    await expect(unavailable).toHaveAttribute("aria-disabled", "true");
+    await unavailable.dispatchEvent("click");
+    const sounds = await page.evaluate(() => window.__siteSoundLog);
+    expect(sounds).toContain("select");
+    expect(sounds).toContain("confirm");
+    expect(sounds).toContain("locked");
+});
+
 test("menu starts randomized ambience while the background video remains silent", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));

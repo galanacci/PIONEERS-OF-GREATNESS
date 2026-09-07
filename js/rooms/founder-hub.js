@@ -307,6 +307,8 @@ export function initFounderHub() {
         button.className = "founder-hub-item";
         button.setAttribute("role", "menuitem");
         button.dataset.founderSection = item.id;
+        button.dataset.status = item.status;
+        if (item.status !== "available") button.setAttribute("aria-disabled", "true");
         const number = document.createElement("span");
         number.className = "founder-hub-item-number";
         number.textContent = item.number;
