@@ -179,6 +179,7 @@ test("Founder mission film leads its statement", async ({ page }) => {
 });
 
 test("the poem plays once before CONTINUE opens its completed image state", async ({ page }) => {
+    if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 320, height: 568 });
     await page.goto("/");
     await expect(page.locator(".menu-toggle")).toHaveText("BEGIN");
     await page.getByRole("button", { name: "Begin experience" }).click();
@@ -191,6 +192,14 @@ test("the poem plays once before CONTINUE opens its completed image state", asyn
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
     await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
+    if (page.viewportSize()?.width < 560) {
+        const buttonBounds = await page.locator(".menu-toggle").evaluate((button) => {
+            const bounds = button.getBoundingClientRect();
+            return { left: bounds.left, right: bounds.right, viewportWidth: window.innerWidth };
+        });
+        expect(buttonBounds.left).toBeGreaterThanOrEqual(0);
+        expect(buttonBounds.right).toBeLessThanOrEqual(buttonBounds.viewportWidth);
+    }
     await page.getByRole("button", { name: "Continue experience" }).click();
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "false");

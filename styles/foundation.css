@@ -229,6 +229,19 @@ button:hover {
 }
 
 @media (max-width: 480px) {
+    #email-form {
+        box-sizing: border-box;
+        padding-inline: 16px;
+    }
+    #email-form .input-container {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 220px;
+    }
+    #email-form input[type="email"] {
+        width: 100%;
+        min-width: 0;
+    }
     .button-text {
         display: none;
     }
