@@ -19,7 +19,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Field Notes waits until the room opens, defaults to the newest year and switches cleanly through the top-right year selector; carousel arrows change only the current card.
 - Field Notes custom year selector aligns with RETURN TO MENU at wide, intermediate and mobile widths; its closed and open backgrounds remain transparent, the selected year is purple and other years are grey.
 - Every desktop room scrollbar shows a slim indicator with no visible track.
-- UNCUT waits until the room opens, chapters are ordered newest first, and episode numbering remains correct.
+- UNCUT waits until the room opens, defaults to the newest year, and its top-right year selector replaces the archive with only that year's correctly numbered episodes.
 - Leaving UNCUT by MENU or Escape stops playback.
 
 ## Keyboard

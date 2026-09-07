@@ -9,6 +9,103 @@
     padding-bottom: clamp(64px, 10vh, 120px);
 }
 
+.documentary-years {
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    left: auto;
+    z-index: 2;
+    display: block;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.documentary-years::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    width: 5px;
+    height: 5px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    pointer-events: none;
+    transform: translateY(-70%) rotate(45deg);
+}
+
+.documentary-year-trigger {
+    padding: 6px 16px 6px 4px;
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+    font-family: 'Lora', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    cursor: pointer;
+}
+
+.documentary-year-trigger:hover,
+.documentary-year-trigger:focus-visible,
+.documentary-year-trigger:active,
+.documentary-year-option:hover,
+.documentary-year-option:active,
+.documentary-year-option:focus-visible {
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+}
+
+.documentary-year-options {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    min-width: 100%;
+    background: transparent;
+    text-align: right;
+}
+
+.documentary-year-options[hidden] {
+    display: none;
+}
+
+.documentary-year-option {
+    display: block;
+    width: 100%;
+    padding: 5px 3px;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: 'Lora', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-align: right;
+    cursor: pointer;
+}
+
+.documentary-year-option:hover,
+.documentary-year-option:focus-visible {
+    color: #fff;
+}
+
+.documentary-year-option.is-selected {
+    color: #673CAF;
+}
+
+.documentary-years:hover {
+    color: #fff;
+}
+
+.documentary-years:focus-within,
+.documentary-years:active,
+.documentary-years.is-open {
+    color: #673CAF;
+}
+
 .documentary-header {
     margin-top: clamp(70px, 12vh, 120px);
 }
@@ -152,5 +249,12 @@
 
     .documentary-episode-status {
         text-align: right;
+    }
+}
+
+@media (max-width: 480px) {
+    .documentary-years {
+        top: 24px;
+        right: 24px;
     }
 }
