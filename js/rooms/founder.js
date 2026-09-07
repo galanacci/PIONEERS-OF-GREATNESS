@@ -90,6 +90,7 @@ export function initOpening() {
 
     function openIntroduction() {
         sequence += 1;
+        copy.classList.remove("is-dismissing");
         if (!introduction.classList.contains("is-open")) {
             backgroundState = new Map([...background].map((element) => [element, element.inert]));
         }
@@ -136,6 +137,12 @@ export function initOpening() {
         returnFocus = null;
         closeIntroduction();
         target?.focus();
+        window.setTimeout(() => {
+            if (!introduction.classList.contains("is-open")) {
+                copy.classList.remove("is-dismissing");
+                copy.replaceChildren();
+            }
+        }, 650);
     }
 
     async function typeParagraph(paragraph, token, pacing) {
@@ -155,7 +162,10 @@ export function initOpening() {
         return element;
     }
 
-    async function playIntroduction({ allowSkip = hasCompletedIntroduction() } = {}) {
+    async function playIntroduction({
+        allowSkip = hasCompletedIntroduction(),
+        openingDelay = 1200
+    } = {}) {
         openIntroduction();
         const token = sequence;
         copy.hidden = false;
@@ -167,7 +177,7 @@ export function initOpening() {
         skip.hidden = !allowSkip;
         try {
             const content = await loadPoem();
-            await wait(1200);
+            if (openingDelay > 0) await wait(openingDelay);
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
                 const pacing = pacingFor(index);
@@ -227,11 +237,16 @@ export function initOpening() {
         replaying = true;
         replayDestination = "origin";
         returnFocus = event.detail?.trigger || null;
-        playIntroduction({ allowSkip: true });
+        playIntroduction({ allowSkip: true, openingDelay: 0 });
     }
 
-    function skipPoem() {
+    async function skipPoem() {
         if (replayDestination === "origin") {
+            sequence += 1;
+            skip.hidden = true;
+            copy.setAttribute("aria-busy", "false");
+            copy.classList.add("is-dismissing");
+            await wait(700);
             returnToOrigin();
             return;
         }

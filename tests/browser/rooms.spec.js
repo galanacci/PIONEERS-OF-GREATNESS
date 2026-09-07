@@ -304,7 +304,13 @@ test("the poem gates the first visit and replays from the first physical express
     await replayTrigger.click();
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await expect(page.locator("#founder-introduction-copy")).toContainText("A", { timeout: 500 });
     await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#founder-introduction-copy")).toHaveClass(/is-dismissing/);
+    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/);
+    expect(await page.locator("#founder-introduction-copy").evaluate((element) => (
+        Number.parseFloat(getComputedStyle(element).transitionDuration)
+    ))).toBeCloseTo(0.7, 1);
     await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
