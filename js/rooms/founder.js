@@ -112,6 +112,7 @@ export function initOpening() {
         renderEntryState();
         replaying = false;
         closeIntroduction();
+        window.dispatchEvent(new CustomEvent("pog:ambience-start"));
         window.dispatchEvent(new CustomEvent("pog:opening-complete"));
     }
 

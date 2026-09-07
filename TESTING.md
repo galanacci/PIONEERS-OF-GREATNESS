@@ -4,8 +4,8 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 
 ## Desktop
 
-- Background video autoplays permanently muted. Pressing BEGIN starts the Muhammad Ali training ambience at a restrained 9% volume from a random point; SOUND OFF mutes it while playback continues, SOUND ON restores that advancing playback, and the ambience continues into rooms without an outline on its control.
-- Switching to another tab, window or mobile app pauses the ambience at its current position; returning to the site resumes from that position and preserves the visitor's SOUND ON/OFF choice.
+- Background video autoplays permanently muted. BEGIN/CONTINUE remains silent through the poem and final image; pressing ENTER starts the Muhammad Ali training ambience from a random point and fades it to a restrained 9% volume. SOUND OFF fades to mute while playback continues, SOUND ON fades the advancing playback back in, and ambience continues into rooms without an outline on its control.
+- EXIT fades the ambience to silence before stopping it. Switching to another tab, window or mobile app fades it out before pausing at its current position; returning resumes from that position and fades back to the visitor's chosen SOUND ON/OFF state.
 - Menu feedback uses a light selection tick for mouse hover, keyboard movement and touch selection; activation has a firmer confirmation tone, while locked rooms have a distinct blocked tone.
 - The same sonic language applies to relevant controls throughout the opening ritual, Founder, Documentary, Field Notes, waitlist and external links without double-playing on the main menu.
 - BEGIN/CONTINUE plays the standard selection sound on mouse hover or mobile touch and exactly one confirmation sound when pressed.

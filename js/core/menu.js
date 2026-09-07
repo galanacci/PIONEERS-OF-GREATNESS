@@ -28,12 +28,12 @@ export function initMenu() {
             item.toggleAttribute("aria-current", active);
         });
     };
-    const open = (randomizeAmbience = false) => {
+    const open = () => {
         overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false");
         toggle.setAttribute("aria-expanded", "true");
         regions.forEach((region) => { region.inert = true; });
         list.classList.remove("is-keyboard-nav"); select(selected); items[selected].focus();
-        window.dispatchEvent(new CustomEvent("pog:menu-opened", { detail: { randomizeAmbience } }));
+        window.dispatchEvent(new CustomEvent("pog:menu-opened"));
     };
     const hideWaitlist = (focusMenu = true) => {
         if (!waitlistOpen) return;
@@ -88,8 +88,8 @@ export function initMenu() {
             window.dispatchEvent(new CustomEvent("pog:start-requested"));
         }
     });
-    window.addEventListener("pog:opening-complete", () => open(false));
-    window.addEventListener("pog:return-to-menu", () => open(false));
+    window.addEventListener("pog:opening-complete", open);
+    window.addEventListener("pog:return-to-menu", open);
     window.addEventListener("pog:waitlist-complete", () => hideWaitlist());
     overlay.addEventListener("click", (event) => {
         if (!waitlistOpen || event.target.closest("#email-form, .audio-toggle, .menu-item")) return;
