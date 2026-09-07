@@ -192,6 +192,24 @@ test("the poem plays once before CONTINUE opens its completed image state", asyn
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
     await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
+    const landingType = await page.evaluate(() => {
+        const styles = (selector) => {
+            const computed = getComputedStyle(document.querySelector(selector));
+            return {
+                fontFamily: computed.fontFamily,
+                fontSize: computed.fontSize,
+                fontWeight: computed.fontWeight,
+                letterSpacing: computed.letterSpacing
+            };
+        };
+        return {
+            entry: styles(".menu-toggle"),
+            prompt: styles("#animated-placeholder"),
+            email: styles('#email-form input[type="email"]')
+        };
+    });
+    expect(landingType.prompt).toEqual(landingType.entry);
+    expect(landingType.email).toEqual(landingType.entry);
     if (page.viewportSize()?.width < 560) {
         const buttonBounds = await page.locator(".menu-toggle").evaluate((button) => {
             const bounds = button.getBoundingClientRect();
