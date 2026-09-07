@@ -84,7 +84,7 @@ export function initRoomController() {
     window.addEventListener("pog:hide-transition", hideTransition);
     rooms.forEach((room) => {
         room.querySelectorAll("[data-room-close]").forEach((button) => button.addEventListener("click", () => {
-            if (button.dataset.roomClose === "founder") return;
+            if (button.dataset.roomClose === "founder" || button.dataset.roomClose === "journey") return;
             closeRoom();
         }));
     });

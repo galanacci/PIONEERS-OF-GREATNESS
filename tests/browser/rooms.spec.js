@@ -328,6 +328,7 @@ test("Founder Journey behaves like an eight-slot save history", async ({ page })
     await page.keyboard.press("Enter");
     await expect(page.locator(".founder-journey-count")).toHaveText("02 / 08");
     await expect(page.locator("#founder-journey-entry-title")).toHaveText("THE PIVOT");
+    await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO JOURNEY");
     await expect(page.locator(".founder-media-placeholder")).toContainText("THE PIVOT");
     if (page.viewportSize()?.width >= 560) {
         const alignment = await page.locator(".founder-journey-entry-header").evaluate((header) => {
@@ -348,16 +349,19 @@ test("Founder Journey behaves like an eight-slot save history", async ({ page })
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-journey-count")).toHaveText("03 / 08");
     await expect(page.locator("#founder-journey-entry-title")).toHaveText("GALANACCI");
-    await page.keyboard.press("Escape");
+    await page.locator("#founder-room .room-return").click();
     await expect(page.locator("#founder-journey-menu-title")).toBeVisible();
+    await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO FOUNDER");
     await page.locator('[data-journey-entry="greatness"]').click();
     await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
     await page.locator(".founder-journey-return").click();
     await page.locator('[data-journey-entry="the-first-piece"]').click();
     await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-tee.webp");
-    await page.keyboard.press("Escape");
-    await page.keyboard.press("Escape");
+    await page.locator("#founder-room .room-return").click();
+    await expect(page.locator("#founder-journey-menu-title")).toBeVisible();
+    await page.locator("#founder-room .room-return").click();
     await expect(page.locator("#founder-hub")).toBeVisible();
+    await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO MENU");
 });
 
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {

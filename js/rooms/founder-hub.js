@@ -19,10 +19,14 @@ export function initFounderHub() {
     let content = null;
 
     const updateTopReturn = () => {
-        const insideChapter = activeExperience !== null;
-        topReturn.dataset.roomClose = insideChapter ? "founder" : "";
-        topReturn.textContent = insideChapter ? "← RETURN TO FOUNDER" : "← RETURN TO MENU";
-        topReturn.setAttribute("aria-label", insideChapter ? "Return to Founder" : "Return to menu");
+        const destination = activeExperience === "journey-entry"
+            ? { state: "journey", label: "← RETURN TO JOURNEY", accessible: "Return to Journey" }
+            : activeExperience !== null
+                ? { state: "founder", label: "← RETURN TO FOUNDER", accessible: "Return to Founder" }
+                : { state: "", label: "← RETURN TO MENU", accessible: "Return to menu" };
+        topReturn.dataset.roomClose = destination.state;
+        topReturn.textContent = destination.label;
+        topReturn.setAttribute("aria-label", destination.accessible);
     };
 
     const select = (index, focus = false) => {
@@ -364,7 +368,8 @@ export function initFounderHub() {
     });
 
     topReturn.addEventListener("click", () => {
-        if (topReturn.dataset.roomClose === "founder") showHub();
+        if (topReturn.dataset.roomClose === "journey") renderJourneyMenu();
+        else if (topReturn.dataset.roomClose === "founder") showHub();
     });
 
     experience.addEventListener("keydown", (event) => {
