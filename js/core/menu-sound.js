@@ -16,6 +16,7 @@ export function initMenuSound() {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     let context;
+    const effectsGain = 1.18;
     let keyboardNavigation = false;
     let hoveredControl = null;
     let soundSequence = 0;
@@ -36,7 +37,7 @@ export function initMenuSound() {
         oscillator.frequency.setValueAtTime(frequency, start);
         oscillator.frequency.exponentialRampToValueAtTime(endFrequency, start + duration);
         envelope.gain.setValueAtTime(0.0001, start);
-        envelope.gain.exponentialRampToValueAtTime(gain, start + 0.008);
+        envelope.gain.exponentialRampToValueAtTime(gain * effectsGain, start + 0.008);
         envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
         oscillator.connect(envelope).connect(context.destination);
         oscillator.start(start);

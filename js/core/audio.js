@@ -4,7 +4,7 @@ export function initAudio() {
     const button = document.querySelector(".audio-toggle");
     const label = button?.querySelector(".audio-label");
     if (!video || !ambience || !button || !label) return;
-    const ambienceVolume = 0.12;
+    const ambienceVolume = 0.09;
     let visitorMuted = false;
     let suspendedByPage = false;
 

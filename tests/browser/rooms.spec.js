@@ -127,7 +127,7 @@ test("menu starts randomized ambience while the background video remains silent"
     }));
     expect(audioState.paused).toBe(false);
     expect(audioState.currentTime).toBeGreaterThan(audioState.duration * 0.45);
-    expect(audioState.volume).toBeCloseTo(0.12);
+    expect(audioState.volume).toBeCloseTo(0.09);
     await expect(page.locator(".audio-toggle")).toHaveAttribute("aria-pressed", "true");
     expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
     await expect(page.locator("#founder-introduction-enter")).toBeVisible();
