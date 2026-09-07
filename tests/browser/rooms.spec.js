@@ -55,6 +55,38 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
     await expect(page.locator("#email")).toHaveAttribute("placeholder", "ENTER EMAIL HERE...");
 });
 
+test("menu starts randomized ambience while the background video remains silent", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForFunction(() => Number.isFinite(document.getElementById("site-ambience")?.duration));
+    await page.evaluate(() => { Math.random = () => 0.5; });
+    await openMenu(page);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => (
+        audio.currentTime > audio.duration * 0.45
+    ))).toBe(true);
+    const audioState = await page.locator("#site-ambience").evaluate((audio) => ({
+        paused: audio.paused,
+        currentTime: audio.currentTime,
+        duration: audio.duration,
+        volume: audio.volume
+    }));
+    expect(audioState.paused).toBe(false);
+    expect(audioState.currentTime).toBeGreaterThan(audioState.duration * 0.45);
+    expect(audioState.volume).toBeCloseTo(0.12);
+    await expect(page.locator(".audio-toggle")).toHaveAttribute("aria-pressed", "true");
+    expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
+
+    await page.keyboard.press("Escape");
+    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused && audio.currentTime === 0)).toBe(true);
+    await openMenu(page);
+    await page.locator(".audio-toggle").click();
+    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(true);
+    expect(await page.locator(".background-video").evaluate((video) => video.muted)).toBe(true);
+    await page.locator(".audio-toggle").click();
+    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
+    await page.getByRole("menuitem", { name: "FOUNDER" }).click();
+    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
+});
+
 test("Founder mission film leads its statement", async ({ page }) => {
     await page.goto("/");
     const filmLeads = await page.locator(".founder-mission-film").evaluate((section) => (

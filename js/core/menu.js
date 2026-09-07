@@ -20,16 +20,18 @@ export function initMenu() {
             item.toggleAttribute("aria-current", active);
         });
     };
-    const open = () => {
+    const open = (randomizeAmbience = false) => {
         overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false");
         toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", "Close menu");
         regions.forEach((region) => { region.inert = true; });
         list.classList.remove("is-keyboard-nav"); select(selected); items[selected].focus();
+        window.dispatchEvent(new CustomEvent("pog:menu-opened", { detail: { randomizeAmbience } }));
     };
-    const close = (focusToggle = true) => {
+    const close = (focusToggle = true, keepAmbience = false) => {
         overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden", "true");
         toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", "Open menu");
         regions.forEach((region) => { region.inert = false; });
+        if (!keepAmbience) window.dispatchEvent(new CustomEvent("pog:ambience-stop"));
         if (focusToggle) toggle.focus();
     };
     const activate = (item) => {
@@ -42,17 +44,17 @@ export function initMenu() {
             document.getElementById("email")?.focus();
         }
         else if (item.dataset.menuAction === "founder") {
-            close(false);
+            close(false, true);
             window.dispatchEvent(new CustomEvent("pog:founder-requested"));
         }
         else if (item.dataset.menuAction === "room" && isKnownRoom(item.dataset.roomTarget)) {
-            close(false);
+            close(false, true);
             window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: item.dataset.roomTarget } }));
         } else if (item.dataset.menuAction === "exit") close();
     };
     select(selected);
-    toggle.addEventListener("click", () => overlay.classList.contains("is-open") ? close() : open());
-    window.addEventListener("pog:return-to-menu", open);
+    toggle.addEventListener("click", () => overlay.classList.contains("is-open") ? close() : open(true));
+    window.addEventListener("pog:return-to-menu", () => open(false));
     panel.addEventListener("click", (event) => { const item = event.target.closest(".menu-item"); if (item) activate(item); });
     panel.addEventListener("pointerover", (event) => { list.classList.remove("is-keyboard-nav"); const item = event.target.closest(".menu-item"); if (item) select(items.indexOf(item)); });
     document.addEventListener("keydown", (event) => {

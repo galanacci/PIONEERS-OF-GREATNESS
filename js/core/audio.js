@@ -1,20 +1,71 @@
 export function initAudio() {
     const video = document.querySelector(".background-video");
+    const ambience = document.getElementById("site-ambience");
     const button = document.querySelector(".audio-toggle");
     const label = button?.querySelector(".audio-label");
-    if (!video || !button || !label) return;
+    if (!video || !ambience || !button || !label) return;
+    const ambienceVolume = 0.12;
+    let visitorMuted = false;
+
     const render = () => {
-        const enabled = !video.muted;
+        const enabled = !ambience.paused;
         button.setAttribute("aria-pressed", String(enabled));
-        button.setAttribute("aria-label", enabled ? "Mute background audio" : "Turn background audio on");
+        button.setAttribute("aria-label", enabled ? "Turn training ambience off" : "Turn training ambience on");
         label.textContent = enabled ? "SOUND ON" : "SOUND OFF";
     };
-    video.muted = true;
-    render();
-    button.addEventListener("click", async () => {
-        video.muted = !video.muted;
-        if (video.paused) await video.play().catch((error) => console.error("Background video could not resume.", error));
+
+    const randomStartTime = () => {
+        if (!Number.isFinite(ambience.duration) || ambience.duration <= 1) return null;
+        return Math.random() * (ambience.duration - 1);
+    };
+
+    const playFromRandomPoint = async () => {
+        if (visitorMuted) return;
+        const startTime = randomStartTime();
+        if (startTime === null) {
+            ambience.addEventListener("loadedmetadata", playFromRandomPoint, { once: true });
+            return;
+        }
+        ambience.currentTime = startTime;
+        const playback = ambience.play();
+        // Chromium can reset an audio element to zero as playback begins, so
+        // reapply the chosen offset both immediately and once play settles.
+        ambience.currentTime = startTime;
+        await playback.catch((error) => console.error("Training ambience could not begin.", error));
+        ambience.currentTime = startTime;
         render();
+    };
+
+    const stop = () => {
+        ambience.pause();
+        ambience.currentTime = 0;
+        render();
+    };
+
+    video.defaultMuted = true;
+    video.muted = true;
+    ambience.volume = ambienceVolume;
+    render();
+
+    button.addEventListener("click", async () => {
+        if (!ambience.paused) {
+            visitorMuted = true;
+            ambience.pause();
+            render();
+            return;
+        }
+        visitorMuted = false;
+        await playFromRandomPoint();
     });
-    video.addEventListener("volumechange", render);
+
+    // The visual background must never become the site's sound source.
+    video.addEventListener("volumechange", () => {
+        if (!video.muted) video.muted = true;
+    });
+    ambience.addEventListener("play", render);
+    ambience.addEventListener("pause", render);
+    window.addEventListener("pog:menu-opened", (event) => {
+        if (event.detail?.randomizeAmbience) playFromRandomPoint();
+    });
+    window.addEventListener("pog:ambience-stop", stop);
 }
