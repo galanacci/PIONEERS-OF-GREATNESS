@@ -4,7 +4,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 
 ## Desktop
 
-- Background video autoplays permanently muted. Opening the menu starts the low-volume Muhammad Ali training ambience from a random point; SOUND ON/OFF controls only that MP3, and the ambience continues into rooms without an outline on its control.
+- Background video autoplays permanently muted. Opening the menu starts the low-volume Muhammad Ali training ambience from a random point; SOUND OFF mutes it while playback continues, SOUND ON restores that advancing playback, and the ambience continues into rooms without an outline on its control.
 - Right-click does not open the browser context menu on desktop.
 - Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.

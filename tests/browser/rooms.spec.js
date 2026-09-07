@@ -57,7 +57,6 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
 
 test("menu starts randomized ambience while the background video remains silent", async ({ page }) => {
     await page.goto("/");
-    await page.waitForFunction(() => Number.isFinite(document.getElementById("site-ambience")?.duration));
     await page.evaluate(() => { Math.random = () => 0.5; });
     await openMenu(page);
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => (
@@ -78,11 +77,29 @@ test("menu starts randomized ambience while the background video remains silent"
     await page.keyboard.press("Escape");
     expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused && audio.currentTime === 0)).toBe(true);
     await openMenu(page);
+    const timeBeforeMute = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
     await page.locator(".audio-toggle").click();
-    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(true);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.currentTime), {
+        timeout: 3000
+    }).toBeGreaterThan(timeBeforeMute);
+    const mutedState = await page.locator("#site-ambience").evaluate((audio) => ({
+        muted: audio.muted,
+        paused: audio.paused,
+        currentTime: audio.currentTime
+    }));
+    expect(mutedState.muted).toBe(true);
+    expect(mutedState.paused).toBe(false);
+    expect(mutedState.currentTime).toBeGreaterThan(timeBeforeMute);
     expect(await page.locator(".background-video").evaluate((video) => video.muted)).toBe(true);
     await page.locator(".audio-toggle").click();
-    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
+    const restoredState = await page.locator("#site-ambience").evaluate((audio) => ({
+        muted: audio.muted,
+        paused: audio.paused,
+        currentTime: audio.currentTime
+    }));
+    expect(restoredState.muted).toBe(false);
+    expect(restoredState.paused).toBe(false);
+    expect(restoredState.currentTime).toBeGreaterThanOrEqual(mutedState.currentTime);
     await page.getByRole("menuitem", { name: "FOUNDER" }).click();
     expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
 });

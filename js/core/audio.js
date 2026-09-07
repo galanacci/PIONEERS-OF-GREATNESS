@@ -8,7 +8,7 @@ export function initAudio() {
     let visitorMuted = false;
 
     const render = () => {
-        const enabled = !ambience.paused;
+        const enabled = !ambience.paused && !ambience.muted;
         button.setAttribute("aria-pressed", String(enabled));
         button.setAttribute("aria-label", enabled ? "Turn training ambience off" : "Turn training ambience on");
         label.textContent = enabled ? "SOUND ON" : "SOUND OFF";
@@ -20,19 +20,23 @@ export function initAudio() {
     };
 
     const playFromRandomPoint = async () => {
-        if (visitorMuted) return;
-        const startTime = randomStartTime();
+        ambience.muted = visitorMuted;
+        let startTime = randomStartTime();
+        const seekToStart = () => {
+            if (startTime === null) startTime = randomStartTime();
+            if (startTime !== null) ambience.currentTime = startTime;
+        };
         if (startTime === null) {
-            ambience.addEventListener("loadedmetadata", playFromRandomPoint, { once: true });
-            return;
+            ambience.addEventListener("loadedmetadata", seekToStart, { once: true });
+        } else {
+            seekToStart();
         }
-        ambience.currentTime = startTime;
         const playback = ambience.play();
         // Chromium can reset an audio element to zero as playback begins, so
         // reapply the chosen offset both immediately and once play settles.
-        ambience.currentTime = startTime;
+        seekToStart();
         await playback.catch((error) => console.error("Training ambience could not begin.", error));
-        ambience.currentTime = startTime;
+        seekToStart();
         render();
     };
 
@@ -48,14 +52,15 @@ export function initAudio() {
     render();
 
     button.addEventListener("click", async () => {
-        if (!ambience.paused) {
-            visitorMuted = true;
-            ambience.pause();
+        if (ambience.paused) {
+            visitorMuted = false;
+            ambience.muted = false;
+            await playFromRandomPoint();
+        } else {
+            visitorMuted = !ambience.muted;
+            ambience.muted = visitorMuted;
             render();
-            return;
         }
-        visitorMuted = false;
-        await playFromRandomPoint();
     });
 
     // The visual background must never become the site's sound source.
