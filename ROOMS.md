@@ -14,7 +14,7 @@ Every interactive room must be registered in `js/room-registry.js` and have a ma
 
 ## Current rooms
 
-- `founder-room`: reached directly from the main menu after the site-wide BEGIN and GREATNESS POEM threshold. The five-choice Founder Hub currently opens two finished chapters: ORIGIN is a three-frame, non-looping visual sequence containing the dated London bedroom, original poem and first Greatness Tee; THE JOURNEY is an eight-memory save history with a selector and finite entry navigation. The former scrolling story remains preserved but hidden until its remaining content has been converted and verified chapter by chapter.
+- `founder-room`: reached directly from the main menu after the site-wide BEGIN threshold. The full GREATNESS POEM animation is a one-time initiation; CONTINUE returns to its completed image state. The five-choice Founder Hub currently opens two finished chapters: ORIGIN is a three-frame, non-looping visual sequence containing the dated London bedroom, original poem and first Greatness Tee. Its handwritten poem frame is an accessible easter egg that replays the animation with SKIP before restoring the same frame. THE JOURNEY is an eight-memory save history with a selector and finite entry navigation. The former scrolling story remains preserved but hidden until its remaining content has been converted and verified chapter by chapter.
 - `documentary-room`: UNCUT screening room, grouped by release year. Its YouTube iframe is removed on exit so hidden playback cannot continue.
 - `field-notes-room`: Instagram-derived journal. Multi-image entries expose pointer and keyboard carousel controls.
 

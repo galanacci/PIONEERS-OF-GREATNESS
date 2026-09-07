@@ -81,6 +81,29 @@ body.founder-introduction-active {
     animation: founder-enter-reveal 1100ms ease both;
 }
 
+.founder-origin-poem-trigger,
+.founder-origin-poem-trigger:hover,
+.founder-origin-poem-trigger:focus-visible {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+}
+
+.founder-origin-poem-trigger:focus-visible {
+    box-shadow: 0 0 0 1px var(--color-accent-light);
+}
+
+.founder-origin-poem-trigger img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 .founder-introduction-skip {
     position: fixed;
     z-index: 2;

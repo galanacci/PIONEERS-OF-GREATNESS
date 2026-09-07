@@ -54,6 +54,9 @@ export function initOpening() {
     let sequence = 0;
     let poem = null;
     let poemPromise = null;
+    let exitMode = "menu";
+    let returnFocus = null;
+    let backgroundState = new Map();
 
     function renderEntryState() {
         const returning = hasCompletedIntroduction();
@@ -86,6 +89,9 @@ export function initOpening() {
 
     function openIntroduction() {
         sequence += 1;
+        if (!introduction.classList.contains("is-open")) {
+            backgroundState = new Map([...background].map((element) => [element, element.inert]));
+        }
         document.body.classList.add("founder-introduction-active");
         introduction.classList.add("is-open");
         introduction.setAttribute("aria-hidden", "false");
@@ -97,14 +103,34 @@ export function initOpening() {
         introduction.classList.remove("is-open");
         introduction.setAttribute("aria-hidden", "true");
         document.body.classList.remove("founder-introduction-active");
-        background.forEach((element) => { element.inert = false; });
+        background.forEach((element) => { element.inert = backgroundState.get(element) ?? false; });
+        backgroundState.clear();
     }
 
     function enterSite() {
         rememberCompletion();
         renderEntryState();
         closeIntroduction();
+        if (exitMode === "origin") {
+            const target = returnFocus;
+            exitMode = "menu";
+            returnFocus = null;
+            target?.focus();
+            return;
+        }
         window.dispatchEvent(new CustomEvent("pog:opening-complete"));
+    }
+
+    function showFinalReveal() {
+        openIntroduction();
+        copy.hidden = true;
+        copy.replaceChildren();
+        poemReveal.hidden = false;
+        copy.setAttribute("aria-busy", "false");
+        actions.hidden = true;
+        skip.hidden = true;
+        enter.hidden = false;
+        enter.focus();
     }
 
     async function typeParagraph(paragraph, token, pacing) {
@@ -173,15 +199,30 @@ export function initOpening() {
     }
 
     async function enterOpeningPath() {
+        exitMode = "menu";
+        returnFocus = null;
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
+        if (hasCompletedIntroduction()) {
+            showFinalReveal();
+            await wait(1000);
+            window.dispatchEvent(new CustomEvent("pog:hide-transition"));
+            return;
+        }
         const poemReady = loadPoem().catch(() => null);
-        playIntroduction({ allowSkip: hasCompletedIntroduction() });
+        playIntroduction({ allowSkip: false });
         await Promise.all([wait(1000), poemReady]);
         window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
+    function replayFromOrigin(event) {
+        exitMode = "origin";
+        returnFocus = event.detail?.trigger || null;
+        playIntroduction({ allowSkip: true });
+    }
+
     renderEntryState();
     window.addEventListener("pog:start-requested", enterOpeningPath);
+    window.addEventListener("pog:poem-replay-requested", replayFromOrigin);
     replay.addEventListener("click", () => playIntroduction({ allowSkip: true }));
     enterMenu.addEventListener("click", enterSite);
     enter.addEventListener("click", enterSite);

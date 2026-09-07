@@ -57,15 +57,16 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
 
 test("menu emits game-like feedback for pointer, touch, keyboard and locked choices", async ({ page }) => {
     await page.goto("/");
+    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
+    await page.reload();
     await page.evaluate(() => {
-        localStorage.setItem("pog:founder-introduction:v2", "complete");
         window.__menuSoundLog = [];
         window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
     });
-    await page.getByRole("button", { name: "Begin experience" }).click();
-    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await page.getByRole("button", { name: "Continue experience" }).click();
+    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    await page.locator("#founder-introduction-skip").click();
+    await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await page.getByRole("menuitem", { name: "FOUNDER" }).dispatchEvent("pointerover", { pointerType: "mouse" });
     await page.getByRole("menuitem", { name: "FIELD NOTES" }).dispatchEvent("pointerdown", { pointerType: "touch" });
@@ -80,11 +81,10 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
 
 test("menu starts randomized ambience while the background video remains silent", async ({ page }) => {
     await page.goto("/");
-    await page.evaluate(() => {
-        localStorage.setItem("pog:founder-introduction:v2", "complete");
-        Math.random = () => 0.5;
-    });
-    await page.getByRole("button", { name: "Begin experience" }).click();
+    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
+    await page.reload();
+    await page.evaluate(() => { Math.random = () => 0.5; });
+    await page.getByRole("button", { name: "Continue experience" }).click();
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => (
         audio.currentTime > audio.duration * 0.45
     ))).toBe(true);
@@ -99,9 +99,9 @@ test("menu starts randomized ambience while the background video remains silent"
     expect(audioState.volume).toBeCloseTo(0.12);
     await expect(page.locator(".audio-toggle")).toHaveAttribute("aria-pressed", "true");
     expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
-    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    await page.locator("#founder-introduction-skip").click();
+    await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     const timeBeforeMute = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
     await page.locator(".audio-toggle").click();
@@ -147,7 +147,7 @@ test("Founder mission film leads its statement", async ({ page }) => {
     expect(filmLeads).toBe(true);
 });
 
-test("the poem is unskippable once and skippable on return without another loading screen", async ({ page }) => {
+test("the poem plays once before CONTINUE opens its completed image state", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(".menu-toggle")).toHaveText("BEGIN");
     await page.getByRole("button", { name: "Begin experience" }).click();
@@ -162,10 +162,12 @@ test("the poem is unskippable once and skippable on return without another loadi
     await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
     await page.getByRole("button", { name: "Continue experience" }).click();
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
-    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
-    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "false");
+    await expect(page.locator("#founder-poem-reveal")).toBeVisible();
+    await expect(page.locator("#founder-introduction-skip")).toBeHidden();
+    await expect(page.locator("#founder-introduction-enter")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    await page.locator("#founder-introduction-skip").click();
+    await page.locator("#founder-introduction-enter").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/);
@@ -227,6 +229,15 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
     frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
     expect(frameFits).toBe(true);
+    await page.getByRole("button", { name: "Replay the animated GREATNESS POEM" }).click();
+    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
+    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE POEM BEFORE THE BRAND");
+    await expect(page.getByRole("button", { name: "Replay the animated GREATNESS POEM" })).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
     await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");

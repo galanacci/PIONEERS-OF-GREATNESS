@@ -8,7 +8,8 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Switching to another tab, window or mobile app pauses the ambience at its current position; returning to the site resumes from that position and preserves the visitor's SOUND ON/OFF choice.
 - Menu feedback uses a light selection tick for mouse hover, keyboard movement and touch selection; activation has a firmer confirmation tone, while locked rooms have a distinct blocked tone.
 - The landing control reads BEGIN. It opens the loading veil, then the GREATNESS POEM; first-time visitors see the full unskippable ritual, returning visitors can skip directly to the menu, and FOUNDER now opens its room without replaying the poem.
-- After the visitor completes the poem once, the landing control persists as CONTINUE on future visits to that device while retaining the returning-visitor poem and SKIP behavior.
+- After the visitor completes the poem once, the landing control persists as CONTINUE on future visits to that device.
+- CONTINUE shows the completed poem's Greatness Tee image and ENTER state after loading instead of replaying the animation. Pressing THE POEM BEFORE THE BRAND image in Founder Origin is the hidden replay path: it runs the full animation with SKIP and returns to that Origin frame.
 - Right-click does not open the browser context menu on desktop.
 - Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
