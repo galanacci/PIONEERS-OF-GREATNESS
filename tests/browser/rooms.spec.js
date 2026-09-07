@@ -62,7 +62,7 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
         window.__menuSoundLog = [];
         window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
     });
-    await page.getByRole("button", { name: "Start experience" }).click();
+    await page.getByRole("button", { name: "Begin experience" }).click();
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await page.locator("#founder-introduction-skip").click();
@@ -84,7 +84,7 @@ test("menu starts randomized ambience while the background video remains silent"
         localStorage.setItem("pog:founder-introduction:v2", "complete");
         Math.random = () => 0.5;
     });
-    await page.getByRole("button", { name: "Start experience" }).click();
+    await page.getByRole("button", { name: "Begin experience" }).click();
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => (
         audio.currentTime > audio.duration * 0.45
     ))).toBe(true);
@@ -141,8 +141,8 @@ test("Founder mission film leads its statement", async ({ page }) => {
 
 test("the poem is unskippable once and skippable on return without another loading screen", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator(".menu-toggle")).toHaveText("START");
-    await page.getByRole("button", { name: "Start experience" }).click();
+    await expect(page.locator(".menu-toggle")).toHaveText("BEGIN");
+    await page.getByRole("button", { name: "Begin experience" }).click();
     await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
@@ -150,7 +150,7 @@ test("the poem is unskippable once and skippable on return without another loadi
 
     await page.reload();
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
-    await page.getByRole("button", { name: "Start experience" }).click();
+    await page.getByRole("button", { name: "Begin experience" }).click();
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();
