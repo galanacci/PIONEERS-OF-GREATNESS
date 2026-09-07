@@ -289,6 +289,26 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
         timeout: 3000
     }).toBeGreaterThan(0.085);
     await expect(page.locator("#site-ambience")).toHaveAttribute("data-output-mode", "webaudio");
+    const timeBeforeDocumentary = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
+    await page.getByRole("menuitem", { name: "DOCUMENTARY" }).click();
+    await expect(page.locator("#documentary-room")).toHaveClass(/is-open/);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => ({
+        level: Number(audio.dataset.outputLevel),
+        muted: audio.muted
+    })), { timeout: 3000 }).toEqual({ level: 0, muted: true });
+    const documentaryAudio = await page.locator("#site-ambience").evaluate((audio) => ({
+        currentTime: audio.currentTime,
+        paused: audio.paused
+    }));
+    expect(documentaryAudio.paused).toBe(false);
+    expect(documentaryAudio.currentTime).toBeGreaterThan(timeBeforeDocumentary);
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
+    await page.locator("#documentary-room [data-room-close]").first().click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => ({
+        level: Number(audio.dataset.outputLevel),
+        muted: audio.muted
+    })), { timeout: 3000 }).toEqual({ level: 0.09, muted: false });
 });
 
 test("Founder mission film leads its statement", async ({ page }) => {

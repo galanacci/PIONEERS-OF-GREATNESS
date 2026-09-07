@@ -10,6 +10,7 @@ export function initAudio() {
     const stateFadeDuration = 800;
     let visitorMuted = false;
     let suspendedByPage = false;
+    let documentaryDucked = false;
     let hasStarted = false;
     let playbackSequence = 0;
     let fadeWhenReady = false;
@@ -182,7 +183,7 @@ export function initAudio() {
         try {
             await ambience.play();
             if (token !== playbackSequence || !hasStarted || suspendedByPage) return;
-            if (!visitorMuted) {
+            if (!visitorMuted && !documentaryDucked) {
                 ambience.muted = false;
                 fadeTo(ambienceVolume, stateFadeDuration);
             }
@@ -215,6 +216,30 @@ export function initAudio() {
         }
     });
 
+    const duckForDocumentary = () => {
+        documentaryDucked = true;
+        if (!hasStarted) return;
+        if (visitorMuted) {
+            setOutputLevel(0);
+            ambience.muted = true;
+            return;
+        }
+        ambience.muted = false;
+        fadeTo(0, stateFadeDuration, () => {
+            if (documentaryDucked) ambience.muted = true;
+        });
+    };
+
+    const restoreAfterDocumentary = () => {
+        documentaryDucked = false;
+        if (!hasStarted || suspendedByPage) return;
+        ambience.muted = visitorMuted;
+        if (!visitorMuted && !ambience.paused) {
+            ambience.muted = false;
+            fadeTo(ambienceVolume, stateFadeDuration);
+        }
+    };
+
     // The visual background must never become the site's sound source.
     video.addEventListener("volumechange", () => {
         if (!video.muted) video.muted = true;
@@ -229,6 +254,12 @@ export function initAudio() {
     });
     window.addEventListener("pog:ambience-start", () => beginPlayback(true));
     window.addEventListener("pog:ambience-stop", stopWithFade);
+    window.addEventListener("pog:room-opened", (event) => {
+        if (event.detail?.roomId === "documentary-room") duckForDocumentary();
+    });
+    window.addEventListener("pog:room-closed", (event) => {
+        if (event.detail?.roomId === "documentary-room") restoreAfterDocumentary();
+    });
     window.addEventListener("blur", suspendForPage);
     window.addEventListener("focus", resumeForPage);
     document.addEventListener("visibilitychange", () => {
