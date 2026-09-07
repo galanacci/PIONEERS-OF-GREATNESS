@@ -30,6 +30,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Opening ritual: the poem plays automatically after BEGIN; each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next. The first visit cannot be skipped, while returning visitors can use SKIP to enter the main menu immediately without a second loading screen.
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
+- Founder navigation is contextual: the dominant top-left control reads RETURN TO MENU on the Hub and changes to RETURN TO FOUNDER inside every chapter, where it returns to the Hub without closing the room.
 - Founder Origin: the shared bedroom, original poem and first Greatness Tee render as three visual-only frames with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, and Escape returns to the Founder Hub.
 - Founder viewport: the Hub and every Origin frame scale within desktop and 375 × 667 mobile viewports without scrolling.
 - Founder Origin desktop: the media begins within the upper 30% of the viewport and receives more than half of the viewport height, avoiding an oversized empty band above it.

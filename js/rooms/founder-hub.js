@@ -6,7 +6,8 @@ export function initFounderHub() {
     const list = document.getElementById("founder-hub-list");
     const status = document.getElementById("founder-hub-status");
     const experience = document.getElementById("founder-experience");
-    if (!room || !hub || !list || !status || !experience) return;
+    const topReturn = room?.querySelector(".room-return[data-room-close]");
+    if (!room || !hub || !list || !status || !experience || !topReturn) return;
 
     let initialized = false;
     let selected = 0;
@@ -16,6 +17,13 @@ export function initFounderHub() {
     let activeExperience = null;
     let buttons = [];
     let content = null;
+
+    const updateTopReturn = () => {
+        const insideChapter = activeExperience !== null;
+        topReturn.dataset.roomClose = insideChapter ? "founder" : "";
+        topReturn.textContent = insideChapter ? "← RETURN TO FOUNDER" : "← RETURN TO MENU";
+        topReturn.setAttribute("aria-label", insideChapter ? "Return to Founder" : "Return to menu");
+    };
 
     const select = (index, focus = false) => {
         if (!buttons.length) return;
@@ -39,6 +47,7 @@ export function initFounderHub() {
     const showHub = (focus = true) => {
         stopExperienceMedia();
         activeExperience = null;
+        updateTopReturn();
         experience.hidden = true;
         experience.replaceChildren();
         hub.hidden = false;
@@ -97,6 +106,7 @@ export function initFounderHub() {
     const renderOrigin = (index, focus = true) => {
         stopExperienceMedia();
         activeExperience = "origin";
+        updateTopReturn();
         originFrame = Math.max(0, Math.min(index, content.origin.length - 1));
         const frame = content.origin[originFrame];
         const shell = document.createElement("div");
@@ -178,6 +188,7 @@ export function initFounderHub() {
 
     const renderJourneyEntry = (index, focus = true) => {
         activeExperience = "journey-entry";
+        updateTopReturn();
         journeyEntry = Math.max(0, Math.min(index, content.journey.length - 1));
         const memory = content.journey[journeyEntry];
         const shell = document.createElement("article");
@@ -228,6 +239,7 @@ export function initFounderHub() {
 
     function renderJourneyMenu(focus = true) {
         activeExperience = "journey-menu";
+        updateTopReturn();
         const shell = document.createElement("section");
         shell.className = "founder-journey-menu";
         const header = document.createElement("header");
@@ -349,6 +361,10 @@ export function initFounderHub() {
             event.preventDefault();
             activate(document.activeElement);
         }
+    });
+
+    topReturn.addEventListener("click", () => {
+        if (topReturn.dataset.roomClose === "founder") showHub();
     });
 
     experience.addEventListener("keydown", (event) => {

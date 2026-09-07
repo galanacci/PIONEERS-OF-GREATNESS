@@ -97,7 +97,7 @@ test("game-like feedback extends to room controls without duplicating the main m
     const origin = page.locator('[data-founder-section="origin"]');
     await origin.dispatchEvent("pointerover", { pointerType: "mouse" });
     await origin.click();
-    await page.getByRole("button", { name: "RETURN TO FOUNDER" }).click();
+    await page.locator(".founder-origin-return").click();
     const journey = page.locator('[data-founder-section="journey"]');
     await journey.dispatchEvent("pointerdown", { pointerType: "touch" });
     await page.keyboard.press("ArrowDown");
@@ -238,8 +238,10 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await expect(page.locator(".founder-hub-item").nth(1)).toHaveClass(/is-selected/);
     await page.keyboard.press("Enter");
     await expect(page.locator("#founder-journey-menu-title")).toHaveText("THE JOURNEY");
-    await page.keyboard.press("Escape");
+    await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO FOUNDER");
+    await page.locator("#founder-room .room-return").click();
     await expect(page.locator("#founder-hub")).toBeVisible();
+    await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO MENU");
     await page.keyboard.press("Escape");
     await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
