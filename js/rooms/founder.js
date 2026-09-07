@@ -174,10 +174,13 @@ export function initOpening() {
         copy.setAttribute("aria-busy", "true");
         actions.hidden = true;
         enter.hidden = true;
-        skip.hidden = !allowSkip;
+        skip.hidden = true;
         try {
-            const content = await loadPoem();
-            if (openingDelay > 0) await wait(openingDelay);
+            const [content] = await Promise.all([
+                loadPoem(),
+                openingDelay > 0 ? wait(openingDelay) : Promise.resolve()
+            ]);
+            skip.hidden = !allowSkip;
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
                 const pacing = pacingFor(index);
@@ -237,15 +240,16 @@ export function initOpening() {
         replaying = true;
         replayDestination = "origin";
         returnFocus = event.detail?.trigger || null;
-        playIntroduction({ allowSkip: true, openingDelay: 0 });
+        playIntroduction({ allowSkip: true, openingDelay: 600 });
     }
 
-    function skipPoem() {
+    async function skipPoem() {
         if (replayDestination === "origin") {
             sequence += 1;
             skip.hidden = true;
             copy.setAttribute("aria-busy", "false");
             copy.classList.add("is-dismissing");
+            await wait(600);
             returnToOrigin();
             return;
         }
