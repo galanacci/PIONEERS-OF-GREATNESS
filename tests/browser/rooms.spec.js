@@ -248,10 +248,17 @@ test("the poem plays once before CONTINUE opens its completed image state", asyn
     if (page.viewportSize()?.width < 560) {
         const buttonBounds = await page.locator(".menu-toggle").evaluate((button) => {
             const bounds = button.getBoundingClientRect();
-            return { left: bounds.left, right: bounds.right, viewportWidth: window.innerWidth };
+            const styles = getComputedStyle(button);
+            return {
+                left: bounds.left,
+                right: bounds.right,
+                viewportWidth: window.innerWidth,
+                rightBorder: styles.borderRightWidth
+            };
         });
         expect(buttonBounds.left).toBeGreaterThanOrEqual(0);
         expect(buttonBounds.right).toBeLessThanOrEqual(buttonBounds.viewportWidth);
+        expect(buttonBounds.rightBorder).toBe("1px");
     }
     await page.getByRole("button", { name: "Continue experience" }).click();
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });

@@ -201,6 +201,11 @@ button:hover {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.18em;
+    border-width: 1px;
+}
+
+.menu-toggle:hover {
+    border-width: 1px;
 }
 
 .menu-toggle-label {
