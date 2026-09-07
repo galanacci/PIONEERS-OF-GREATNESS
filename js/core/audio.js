@@ -72,5 +72,6 @@ export function initAudio() {
     window.addEventListener("pog:menu-opened", (event) => {
         if (event.detail?.randomizeAmbience) playFromRandomPoint();
     });
+    window.addEventListener("pog:start-requested", playFromRandomPoint);
     window.addEventListener("pog:ambience-stop", stop);
 }

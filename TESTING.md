@@ -4,8 +4,9 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 
 ## Desktop
 
-- Background video autoplays permanently muted. Opening the menu starts the low-volume Muhammad Ali training ambience from a random point; SOUND OFF mutes it while playback continues, SOUND ON restores that advancing playback, and the ambience continues into rooms without an outline on its control.
+- Background video autoplays permanently muted. Pressing START begins the low-volume Muhammad Ali training ambience from a random point; SOUND OFF mutes it while playback continues, SOUND ON restores that advancing playback, and the ambience continues into rooms without an outline on its control.
 - Menu feedback uses a light selection tick for mouse hover, keyboard movement and touch selection; activation has a firmer confirmation tone, while locked rooms have a distinct blocked tone.
+- The landing control reads START. It opens the loading veil, then the GREATNESS POEM; first-time visitors see the full unskippable ritual, returning visitors can skip directly to the menu, and FOUNDER now opens its room without replaying the poem.
 - Right-click does not open the browser context menu on desktop.
 - Presented text cannot be selected; the email field remains editable.
 - Waitlist placeholder moves, hides on focus and returns after a successful submission.
@@ -21,7 +22,7 @@ Run `npm test` first. It validates every generated archive and exercises the cri
 - Menu: Up/Down, Enter, Escape and Tab work; locked items stay grey.
 - FOUNDER, DOCUMENTARY and FIELD NOTES build behind the LOADING veil; it stays visible for at least one second and fades only after the destination reports its first visible state ready. WAITLIST and EXIT remain immediate.
 - The LOADING veil appears instantly when a destination is selected, preventing a one-frame glimpse of the landing page on mobile; only its exit fades.
-- Founder: the poem plays automatically on every visit; each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next. The first visit cannot be skipped, while returning visitors can use SKIP to enter the Founder Hub immediately without a second loading screen.
+- Opening ritual: the poem plays automatically after START; each paragraph types in isolation with a visible writing cursor, remains visible for its reading pause, and clears before the next. The first visit cannot be skipped, while returning visitors can use SKIP to enter the main menu immediately without a second loading screen.
 - Founder room: the mission film appears before its mission-statement label, title and description.
 - Founder Hub: five chapter choices render from structured data; Up/Down changes selection, Enter gives a development response, and Escape returns to the main menu.
 - Founder Origin: the shared bedroom, original poem and first Greatness Tee render as three visual-only frames with no descriptive copy; Previous/Next stop at the ends, Left/Right moves between frames, and Escape returns to the Founder Hub.

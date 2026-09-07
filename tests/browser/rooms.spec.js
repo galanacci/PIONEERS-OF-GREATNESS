@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 async function openMenu(page) {
-    await page.locator(".menu-toggle").click();
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:opening-complete")));
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 }
 
@@ -58,10 +58,15 @@ test("menu opens and JOIN WAITLIST focuses the email field", async ({ page }) =>
 test("menu emits game-like feedback for pointer, touch, keyboard and locked choices", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => {
+        localStorage.setItem("pog:founder-introduction:v2", "complete");
         window.__menuSoundLog = [];
         window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
     });
-    await openMenu(page);
+    await page.getByRole("button", { name: "Start experience" }).click();
+    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
+    await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await page.getByRole("menuitem", { name: "FOUNDER" }).dispatchEvent("pointerover", { pointerType: "mouse" });
     await page.getByRole("menuitem", { name: "FIELD NOTES" }).dispatchEvent("pointerdown", { pointerType: "touch" });
     await page.getByRole("menuitem", { name: "COLLECTIONS" }).dispatchEvent("click");
@@ -75,8 +80,11 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
 
 test("menu starts randomized ambience while the background video remains silent", async ({ page }) => {
     await page.goto("/");
-    await page.evaluate(() => { Math.random = () => 0.5; });
-    await openMenu(page);
+    await page.evaluate(() => {
+        localStorage.setItem("pog:founder-introduction:v2", "complete");
+        Math.random = () => 0.5;
+    });
+    await page.getByRole("button", { name: "Start experience" }).click();
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => (
         audio.currentTime > audio.duration * 0.45
     ))).toBe(true);
@@ -91,10 +99,10 @@ test("menu starts randomized ambience while the background video remains silent"
     expect(audioState.volume).toBeCloseTo(0.12);
     await expect(page.locator(".audio-toggle")).toHaveAttribute("aria-pressed", "true");
     expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
-
-    await page.keyboard.press("Escape");
-    expect(await page.locator("#site-ambience").evaluate((audio) => audio.paused && audio.currentTime === 0)).toBe(true);
-    await openMenu(page);
+    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
+    await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     const timeBeforeMute = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
     await page.locator(".audio-toggle").click();
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.currentTime), {
@@ -133,21 +141,27 @@ test("Founder mission film leads its statement", async ({ page }) => {
 
 test("the poem is unskippable once and skippable on return without another loading screen", async ({ page }) => {
     await page.goto("/");
-    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:founder-requested")));
+    await expect(page.locator(".menu-toggle")).toHaveText("START");
+    await page.getByRole("button", { name: "Start experience" }).click();
+    await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeHidden();
 
     await page.reload();
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
-    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:founder-requested")));
+    await page.getByRole("button", { name: "Start experience" }).click();
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeVisible();
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await page.locator("#founder-introduction-skip").click();
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/);
+    await page.getByRole("menuitem", { name: "FOUNDER" }).click();
+    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
 });
 
 test("Founder opens into the interactive five-chapter hub", async ({ page }) => {

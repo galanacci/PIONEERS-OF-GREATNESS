@@ -25,14 +25,14 @@ export function initMenu() {
     };
     const open = (randomizeAmbience = false) => {
         overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false");
-        toggle.setAttribute("aria-expanded", "true"); toggle.setAttribute("aria-label", "Close menu");
+        toggle.setAttribute("aria-expanded", "true");
         regions.forEach((region) => { region.inert = true; });
         list.classList.remove("is-keyboard-nav"); select(selected); items[selected].focus();
         window.dispatchEvent(new CustomEvent("pog:menu-opened", { detail: { randomizeAmbience } }));
     };
     const close = (focusToggle = true, keepAmbience = false) => {
         overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden", "true");
-        toggle.setAttribute("aria-expanded", "false"); toggle.setAttribute("aria-label", "Open menu");
+        toggle.setAttribute("aria-expanded", "false");
         regions.forEach((region) => { region.inert = false; });
         if (!keepAmbience) window.dispatchEvent(new CustomEvent("pog:ambience-stop"));
         if (focusToggle) toggle.focus();
@@ -52,7 +52,7 @@ export function initMenu() {
         }
         else if (item.dataset.menuAction === "founder") {
             close(false, true);
-            window.dispatchEvent(new CustomEvent("pog:founder-requested"));
+            window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: "founder-room" } }));
         }
         else if (item.dataset.menuAction === "room" && isKnownRoom(item.dataset.roomTarget)) {
             close(false, true);
@@ -62,8 +62,11 @@ export function initMenu() {
     select(selected);
     toggle.addEventListener("click", () => {
         sound("confirm");
-        overlay.classList.contains("is-open") ? close() : open(true);
+        if (!overlay.classList.contains("is-open")) {
+            window.dispatchEvent(new CustomEvent("pog:start-requested"));
+        }
     });
+    window.addEventListener("pog:opening-complete", () => open(false));
     window.addEventListener("pog:return-to-menu", () => open(false));
     panel.addEventListener("click", (event) => { const item = event.target.closest(".menu-item"); if (item) activate(item); });
     panel.addEventListener("pointerover", (event) => {

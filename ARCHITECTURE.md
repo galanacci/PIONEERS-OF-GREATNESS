@@ -9,11 +9,11 @@
 - `js/app.js` starts independent modules.
 - `js/core/` owns navigation, audio and room lifecycle.
 - `js/rooms/` owns room-specific rendering.
-- `js/rooms/founder.js` owns the preserved GREATNESS POEM cinematic; `js/rooms/founder-hub.js` owns the interactive Founder story state.
+- `js/rooms/founder.js` currently owns the preserved GREATNESS POEM opening ritual triggered by START; `js/rooms/founder-hub.js` separately owns the interactive Founder story state.
 - `js/services/` owns the waitlist integration.
 - `js/room-registry.js` is the central list of available rooms.
 
-Rooms communicate through `pog:*` browser events. A room controller emits `pog:room-opened`, `pog:room-closing` and `pog:room-closed`; media modules use these lifecycle events to clean up playback.
+START emits `pog:start-requested`; the opening ritual completes with `pog:opening-complete`, which reveals the menu. Rooms communicate through separate `pog:*` browser events. A room controller emits `pog:room-opened`, `pog:room-closing` and `pog:room-closed`; media modules use these lifecycle events to clean up playback.
 
 Founder Hub labels, availability, Origin frames and the eight Journey memories live in `data/founder-room.json`. Later Founder stages extend this single content source with principles, notes and the current mission.
 
