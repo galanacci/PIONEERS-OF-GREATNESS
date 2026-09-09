@@ -199,6 +199,12 @@
     .menu-audio { top: 20px; right: 20px; gap: 8px; }
     .audio-track { font-size: 9px; }
 }
+.menu-version {
+    position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%;
+    transform: translateX(-50%); margin: 0;
+    color: rgba(255,255,255,.4); font-family: 'Lora',serif;
+    font-size: 9px; letter-spacing: .14em; pointer-events: none;
+}
 
 @media (prefers-reduced-motion: reduce) {
     .menu-overlay {

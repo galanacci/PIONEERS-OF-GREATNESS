@@ -109,6 +109,42 @@
     .page-template :is(.founder-origin-controls,.founder-journey-controls,.page-controls) { gap: 8px; }
 }
 .page-template [hidden] { display: none !important; }
+.archive-bottom-menu {
+    position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); left: 50%;
+    transform: translateX(-50%); z-index: 20;
+    min-height: 44px; padding: 12px 18px; border: 0; background: #000;
+    color: #aaa; font-family: var(--font-brand); font-size: 10px;
+    letter-spacing: .1em; cursor: pointer;
+}
+.world-room :is(.archive-bottom-menu,.journey-menu-return,.founder-origin-return,.founder-journey-return,.page-controls-center > button) {
+    background: #000 !important; border: 0 !important; outline: none !important;
+    box-shadow: none !important;
+}
+.world-room :is(.archive-bottom-menu,.journey-menu-return,.founder-origin-return,.founder-journey-return,.page-controls-center > button):is(:hover,:focus,:focus-visible,:active,[aria-expanded="true"]) {
+    color: #a981e8;
+}
+#documentary-room .archive-bottom-menu,
+#field-notes-room .archive-bottom-menu {
+    border: 1px solid rgba(255,255,255,.25) !important;
+    box-sizing: border-box;
+}
+.page-quick-menu {
+    position: fixed; z-index: 10000; inset: auto; margin: 0; border: 1px solid rgba(255,255,255,.25); width: 240px; max-width: calc(100vw - 24px);
+    box-sizing: border-box; padding: 10px; background: #000;
+    display: flex; flex-direction: column; max-height: 65vh; overflow-y: auto;
+}
+.page-quick-menu button {
+    min-height: 40px; padding: 10px; border: 0; background: transparent;
+    color: #aaa; text-align: left; font-family: var(--font-brand);
+    font-size: 11px; letter-spacing: .1em;
+}
+.page-quick-menu button:is(:hover,:focus-visible) { color: #a981e8; }
+.page-quick-menu button[aria-disabled="true"] { position: relative; padding-right: 48px; color: rgba(255,255,255,.4); cursor: default; }
+.page-quick-menu button[aria-disabled="true"]::after {
+    content: ''; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    width: 10px; height: 12px;
+    background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 12'%3E%3Cpath d='M2.25 5V3.25a2.75 2.75 0 0 1 5.5 0V5M1 5h8v6H1z' fill='none' stroke='%23fff' stroke-opacity='.4' stroke-width='1.25' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
 
 /* Archives retain their original scrolling layout; only the page heading moves. */
 .world-room-content.archive-heading-right { padding-top: 40px; }

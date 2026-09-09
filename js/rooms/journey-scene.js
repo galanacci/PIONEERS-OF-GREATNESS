@@ -184,7 +184,19 @@ class JourneyScene {
             if(!item.group.visible)return;
             item.label.getWorldPosition(this.anchor).project(this.camera);
             const onScreen=Math.abs(this.anchor.x)<1.05&&Math.abs(this.anchor.y)<1.05&&Math.abs(this.anchor.z)<1;
-            this.hooks.onLabel(i,onScreen?{x:(this.anchor.x*.5+.5)*this.width,y:(-.5*this.anchor.y+.5)*this.height}:null);
+            // DOM labels sit above the canvas, so explicitly respect the selected mesh's depth.
+            // Test the visible number centre (the label is positioned below its anchor).
+            let occluded=false;
+            if(onScreen){
+                this.pointer.set(this.anchor.x,this.anchor.y-14/this.height);
+                this.raycaster.setFromCamera(this.pointer,this.camera);
+                const hit=this.raycaster.intersectObject(this.models[selected].orientation,true)[0];
+                if(hit){
+                    const labelDepth=this.anchor.z;
+                    occluded=hit.point.clone().project(this.camera).z<labelDepth;
+                }
+            }
+            this.hooks.onLabel(i,onScreen&&!occluded?{x:(this.anchor.x*.5+.5)*this.width,y:(-.5*this.anchor.y+.5)*this.height}:null);
         });
         if(!this.ready&&this.models.every(item=>item.loaded)){
             this.ready=true;this.hooks.onReady?.();

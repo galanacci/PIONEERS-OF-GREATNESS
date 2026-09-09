@@ -199,7 +199,10 @@ export function initFounderHub() {
         experience.querySelectorAll("[data-founder-video-player]").forEach((player) => {
             window.dispatchEvent(new CustomEvent("pog:founder-video-ready", { detail: { player } }));
         });
-        if (focus) back.focus();
+        if (focus) {
+            title.tabIndex = -1;
+            title.focus({ preventScroll: true });
+        }
     };
 
     const openOrigin = () => {

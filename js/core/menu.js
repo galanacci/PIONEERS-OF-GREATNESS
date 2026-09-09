@@ -15,6 +15,7 @@ export function initMenu() {
     if (!toggle || !overlay || !panel || !list || !waitlist || !form || !status || !waitlistHome || !items.length) return;
     let selected = Math.max(0, items.findIndex((item) => item.classList.contains("is-selected")));
     let waitlistOpen = false;
+    let pageWaitlist = null;
     const sound = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
     const select = (index, withSound = false) => {
         const next = (index + items.length) % items.length;
@@ -43,6 +44,14 @@ export function initMenu() {
         waitlist.hidden = true;
         list.inert = false;
         window.dispatchEvent(new CustomEvent("pog:waitlist-dismissed"));
+        if(pageWaitlist){
+            const saved=pageWaitlist;pageWaitlist=null;
+            overlay.classList.remove('is-open');overlay.setAttribute('aria-hidden','true');
+            overlay.style.removeProperty('z-index');overlay.inert=saved.overlayInert;
+            saved.room.inert=saved.roomInert;
+            saved.focus?.focus({preventScroll:true});
+            return;
+        }
         if (focusMenu) items[selected].focus();
     };
     const showWaitlist = () => {
@@ -83,6 +92,14 @@ export function initMenu() {
         } else if (item.dataset.menuAction === "exit") close();
     };
     select(selected);
+    window.addEventListener('pog:page-waitlist',event=>{
+        const room=document.querySelector('.world-room.is-open');
+        if(!room||pageWaitlist)return;
+        pageWaitlist={room,roomInert:room.inert,overlayInert:overlay.inert,focus:event.detail?.returnFocus};
+        room.inert=true;overlay.inert=false;
+        overlay.style.zIndex='2100';overlay.classList.add('is-open');overlay.setAttribute('aria-hidden','false');
+        showWaitlist();
+    });
     toggle.addEventListener("click", () => {
         if (!overlay.classList.contains("is-open")) {
             window.dispatchEvent(new CustomEvent("pog:start-requested"));

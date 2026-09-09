@@ -9,6 +9,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     const mobile=matchMedia('(max-width:700px)');
     const buttons=[],timers=[];let scene=null,disposed=false,opening=false,swipe=null,suppressClick=false,hovered=null;
     const isReduced=()=>false;
+    let soundHover=null, hoverExitTimer;
     const sound=name=>window.dispatchEvent(new CustomEvent('pog:menu-sound',{detail:{name}}));
     shell.classList.add('has-motion');
     const reveal=()=>{if(disposed)return;space.style.visibility='';space.inert=false;space.setAttribute('aria-busy','false');};
@@ -60,11 +61,18 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
         const label=event.target.closest('.journey-object');
         const hit=label?buttons.indexOf(label):scene.pick(event.clientX,event.clientY);
         // Model and number share one artefact identity, including their hover sound.
-        if(hit!==null&&hit!==hovered)sound('select');
+        clearTimeout(hoverExitTimer);
+        if(hit!==null){
+            if(hit!==soundHover)sound('select');
+            soundHover=hit;
+        }else{
+            // Bridge the small empty gap between a model and its number.
+            hoverExitTimer=setTimeout(()=>{soundHover=null;},350);
+        }
         hovered=hit;space.style.cursor=hit===null?'default':'pointer';
         buttons.forEach((b,i)=>b.classList.toggle('is-hovered',i===hit));
     });
-    space.addEventListener('pointerleave',()=>{hovered=null;buttons.forEach(b=>b.classList.remove('is-hovered'));});
+    space.addEventListener('pointerleave',()=>{clearTimeout(hoverExitTimer);soundHover=null;hovered=null;buttons.forEach(b=>b.classList.remove('is-hovered'));});
     space.addEventListener('pointerdown',e=>{swipe={x:e.clientX,y:e.clientY,id:e.pointerId};});
     space.addEventListener('pointerup',e=>{
         if(!swipe)return;const dx=e.clientX-swipe.x,dy=e.clientY-swipe.y;swipe=null;
@@ -91,6 +99,6 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
         shell.journeyScene=scene;space.classList.add('is-scene');
     }).catch(fallback);
     shell.focusSelected=()=>buttons[selected].focus({preventScroll:true});
-    shell.dispose=()=>{disposed=true;timers.forEach(clearTimeout);scene?.detach();};
+    shell.dispose=()=>{disposed=true;clearTimeout(hoverExitTimer);timers.forEach(clearTimeout);scene?.detach();};
     return shell;
 }

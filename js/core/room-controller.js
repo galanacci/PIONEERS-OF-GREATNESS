@@ -90,7 +90,7 @@ export function initRoomController() {
         }));
     });
     document.addEventListener("keydown", (event) => {
-        if (!activeRoom) return;
+        if (!activeRoom || activeRoom.inert || event.defaultPrevented) return;
         if (event.key === "Escape") { event.preventDefault(); closeRoom(); return; }
         if (event.key !== "Tab") return;
         const focusable = [...activeRoom.querySelectorAll("button:not([disabled]), a[href]")]
