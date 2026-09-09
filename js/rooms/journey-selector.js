@@ -2,7 +2,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     const shell=document.createElement('section');shell.className='journey-collection';
     shell.innerHTML=`<h2 id="founder-journey-menu-title" class="journey-section-label">THE JOURNEY</h2>
       <header class="founder-journey-entry-header journey-selector-header" aria-live="polite" aria-atomic="true"><p class="founder-journey-count journey-selection-count"></p><h2 class="journey-selection-title"></h2><p class="journey-selection-status"></p></header>
-      <div class="journey-space is-static" role="group" aria-label="Journey artefacts"></div>
+      <div class="journey-space" role="group" aria-label="Journey artefacts" aria-busy="true" inert style="visibility:hidden"></div>
       <p class="journey-scene-message" role="status">OPENING ARCHIVE…</p>
       <div class="founder-journey-controls journey-selector-controls" role="navigation" aria-label="Journey selection"><button type="button" class="founder-journey-control is-previous">← PREVIOUS</button><button type="button" class="founder-journey-control journey-menu-return">BACK</button><button type="button" class="founder-journey-control is-next">NEXT →</button></div>`;
     const space=shell.querySelector('.journey-space'),message=shell.querySelector('.journey-scene-message');
@@ -10,7 +10,8 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     const buttons=[],timers=[];let scene=null,disposed=false,opening=false,swipe=null,suppressClick=false,hovered=null;
     const isReduced=()=>false;
     shell.classList.add('has-motion');
-    const fallback=()=>{space.classList.remove('is-scene');space.classList.add('is-static');buttons.forEach(b=>{b.hidden=false;b.style.transform='';});message.textContent='3D UNAVAILABLE — SELECT A CHAPTER BELOW';};
+    const reveal=()=>{if(disposed)return;space.style.visibility='';space.inert=false;space.setAttribute('aria-busy','false');};
+    const fallback=()=>{space.classList.remove('is-scene');space.classList.add('is-static');buttons.forEach(b=>{b.hidden=false;b.style.transform='';});message.textContent='3D UNAVAILABLE — SELECT A CHAPTER BELOW';reveal();};
     const select=(index,focus=false)=>{
         if(disposed||opening)return;
         selected=Math.max(0,Math.min(index,memories.length-1));onSelect(selected);
@@ -77,11 +78,12 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
         if(disposed)return;
         scene=mountJourneyScene(space,memories,{
             getSelected:()=>selected,getHovered:()=>hovered,isOpening:()=>opening,isReduced,onFailure:fallback,
+            onReady:()=>{message.textContent='';reveal();},
             onLoaded:(i,failed)=>{buttons[i].classList.toggle('has-error',failed);buttons[i].querySelector('.journey-object-state').textContent=failed?'UNAVAILABLE':'';},
             onLabel:(i,p)=>{if(!space.classList.contains('is-scene'))return;buttons[i].hidden=!p;if(p)buttons[i].style.transform=`translate(${Math.round(p.x)}px,${Math.round(p.y)}px) translate(-50%,0)`;}
         });
         // Expose the owned scene on this component for lifecycle diagnostics, not global state.
-        shell.journeyScene=scene;space.classList.remove('is-static');space.classList.add('is-scene');message.textContent='';
+        shell.journeyScene=scene;space.classList.add('is-scene');
     }).catch(fallback);
     shell.focusSelected=()=>buttons[selected].focus({preventScroll:true});
     shell.dispose=()=>{disposed=true;timers.forEach(clearTimeout);scene?.detach();};

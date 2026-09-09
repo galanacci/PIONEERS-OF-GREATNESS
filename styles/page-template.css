@@ -121,16 +121,19 @@
     font-size: 0; display: grid; place-items: center; text-decoration: none;
 }
 /* Documentary: shared top alignment, centred introduction, inline archive controls. */
-#documentary-room .documentary-content {
+#documentary-room .documentary-content,
+#field-notes-room .field-notes-content {
     padding-top: max(20px, env(safe-area-inset-top));
 }
-#documentary-room .documentary-header {
+#documentary-room .documentary-header,
+#field-notes-room .field-notes-header {
     min-height: 44px; box-sizing: border-box;
     display: flex; flex-direction: column; justify-content: center;
     width: min(620px, calc(100vw - 100px));
     margin: 0 calc((100% - 100vw) / 2 + clamp(18px, 3vw, 40px)) 0 0;
 }
-#documentary-room .documentary-header h1 { margin: 4px 0 0; }
+#documentary-room .documentary-header h1,
+#field-notes-room .field-notes-header h1 { margin: 4px 0 0; }
 #documentary-room .documentary-feature {
     margin-top: clamp(56px, 12vh, 128px);
 }

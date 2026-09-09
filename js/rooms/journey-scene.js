@@ -102,7 +102,7 @@ class JourneyScene {
     }
 
     attach(host,hooks) {
-        this.detach();this.host=host;this.hooks=hooks;this.snap=true;
+        this.detach();this.host=host;this.hooks=hooks;this.snap=true;this.ready=false;
         host.prepend(this.renderer.domElement);
         this.observer=new ResizeObserver(()=>this.resize());this.observer.observe(host);
         document.addEventListener('visibilitychange',this.onVisibility);
@@ -186,6 +186,9 @@ class JourneyScene {
             const onScreen=Math.abs(this.anchor.x)<1.05&&Math.abs(this.anchor.y)<1.05&&Math.abs(this.anchor.z)<1;
             this.hooks.onLabel(i,onScreen?{x:(this.anchor.x*.5+.5)*this.width,y:(-.5*this.anchor.y+.5)*this.height}:null);
         });
+        if(!this.ready&&this.models.every(item=>item.loaded)){
+            this.ready=true;this.hooks.onReady?.();
+        }
         this.frame=requestAnimationFrame(this.tick);
     }
     pick(clientX,clientY) {
