@@ -502,7 +502,7 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });
 
-test("Founder Journey behaves like an eight-slot save history", async ({ page }) => {
+test("Founder Journey presents eight spatial artefacts", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
@@ -512,17 +512,18 @@ test("Founder Journey behaves like an eight-slot save history", async ({ page })
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await page.locator('[data-founder-section="journey"]').click();
     await expect(page.locator("#founder-journey-menu-title")).toHaveText("THE JOURNEY");
-    await expect(page.locator(".founder-journey-item")).toHaveCount(8);
-    await expect(page.locator(".founder-journey-item").first()).toHaveClass(/is-selected/);
+    await expect(page.locator(".journey-object")).toHaveCount(8);
+    await expect(page.locator(".journey-object").first()).toHaveClass(/is-selected/);
     expect(await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
 
-    await page.keyboard.press("ArrowDown");
-    await expect(page.locator('.founder-journey-item[data-journey-entry="the-pivot"]')).toHaveClass(/is-selected/);
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator('.journey-object[data-journey-entry="the-pivot"]')).toHaveClass(/is-selected/);
     await page.keyboard.press("Enter");
     await expect(page.locator(".founder-journey-count")).toHaveText("02 / 08");
     await expect(page.locator("#founder-journey-entry-title")).toHaveText("THE PIVOT");
     await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO JOURNEY");
-    await expect(page.locator(".founder-media-placeholder")).toContainText("THE PIVOT");
+    await expect(page.locator(".founder-journey-media model-viewer")).toHaveJSProperty("src", "src/founder/journey/02-the-pivot.glb");
+    await expect(page.locator(".founder-journey-media model-viewer")).toHaveJSProperty("loaded", true);
     if (page.viewportSize()?.width >= 560) {
         const alignment = await page.locator(".founder-journey-entry-header").evaluate((header) => {
             const headerRect = header.getBoundingClientRect();
@@ -546,11 +547,13 @@ test("Founder Journey behaves like an eight-slot save history", async ({ page })
     await expect(page.locator("#founder-journey-menu-title")).toBeVisible();
     await expect(page.locator("#founder-room .room-return")).toHaveText("← RETURN TO FOUNDER");
     await page.locator('[data-journey-entry="greatness"]').click();
-    await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
+    if (await page.locator('.journey-open').isVisible()) await page.locator('.journey-open').click();
+    await expect(page.locator(".founder-journey-media model-viewer")).toHaveJSProperty("src", "src/founder/journey/04-greatness.glb");
     await expect(page.locator(".founder-journey-return")).toHaveText("RETURN TO MENU");
     await page.locator("#founder-room .room-return").click();
     await page.locator('[data-journey-entry="the-first-piece"]').click();
-    await expect(page.locator(".founder-journey-media img")).toHaveAttribute("src", "src/founder/greatness-tee.webp");
+    if (await page.locator('.journey-open').isVisible()) await page.locator('.journey-open').click();
+    await expect(page.locator(".founder-journey-media model-viewer")).toHaveJSProperty("src", "src/founder/journey/06-the-first-piece.glb");
     await page.locator(".founder-journey-return").click();
     await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);

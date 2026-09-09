@@ -1,13 +1,38 @@
 {
-  "version": 1,
+  "version": 2,
   "title": "FOUNDER",
   "identity": "GALANACCI",
   "hub": [
-    { "id": "origin", "number": "01", "label": "ORIGIN", "status": "available" },
-    { "id": "journey", "number": "02", "label": "THE JOURNEY", "status": "available" },
-    { "id": "code", "number": "03", "label": "THE CODE", "status": "development" },
-    { "id": "notes", "number": "04", "label": "FOUNDER NOTES", "status": "development" },
-    { "id": "mission", "number": "05", "label": "CURRENT MISSION", "status": "development" }
+    {
+      "id": "origin",
+      "number": "01",
+      "label": "ORIGIN",
+      "status": "available"
+    },
+    {
+      "id": "journey",
+      "number": "02",
+      "label": "THE JOURNEY",
+      "status": "available"
+    },
+    {
+      "id": "code",
+      "number": "03",
+      "label": "THE CODE",
+      "status": "development"
+    },
+    {
+      "id": "notes",
+      "number": "04",
+      "label": "FOUNDER NOTES",
+      "status": "development"
+    },
+    {
+      "id": "mission",
+      "number": "05",
+      "label": "CURRENT MISSION",
+      "status": "development"
+    }
   ],
   "origin": [
     {
@@ -55,89 +80,354 @@
       "id": "architecture",
       "number": "01",
       "title": "ARCHITECTURE",
-      "media": { "type": "placeholder", "label": "ARCHITECTURE" },
+      "media": {
+        "type": "model",
+        "src": "src/founder/journey/01-architecture.glb",
+        "alt": "ARCHITECTURE — original Journey artefact",
+        "orbit": "25deg 65deg auto"
+      },
       "copy": [
-        "Architecture taught me how to think through space, structure, proportion and ideas.",
-        "But the life I wanted to build existed somewhere else."
-      ]
+        "Before fashion, there was architecture. It taught me to think through structure, proportion and purpose — and, more importantly, how to take something that exists only in the mind and give it physical form."
+      ],
+      "scene": {
+        "position": [
+          -3.2,
+          2.1,
+          0.2
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          0.4363323129985824,
+          -0.4363323129985824,
+          0
+        ],
+        "startRotation": 0.3141592653589793,
+        "idleRotationSpeed": 0.2617993877991494,
+        "idleRotationDirection": 1,
+        "floatAmplitude": 0.025,
+        "floatSpeed": 0.8975979010256552,
+        "floatPhase": 0,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "the-pivot",
       "number": "02",
       "title": "THE PIVOT",
-      "media": { "type": "placeholder", "label": "THE PIVOT" },
+      "media": {
+        "type": "model",
+        "src": "src/founder/journey/02-the-pivot.glb",
+        "alt": "THE PIVOT — original Journey artefact",
+        "orbit": "0deg 25deg auto"
+      },
       "copy": [
-        "I left the conventional architecture path without a guaranteed destination.",
-        "I moved toward fashion, art and independent creative work."
-      ]
+        "I walked away from the path I had trained for without knowing exactly where the next one would lead. There was no master plan. I only knew that I wanted to create on my own terms — and I was willing to accept the uncertainty that came with it."
+      ],
+      "scene": {
+        "position": [
+          0,
+          2.4,
+          -0.2
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          1.1344640137963142,
+          0,
+          0
+        ],
+        "startRotation": -0.12217304763960307,
+        "idleRotationSpeed": 0.2026833970057931,
+        "idleRotationDirection": -1,
+        "floatAmplitude": 0.034,
+        "floatSpeed": 0.8055365778435367,
+        "floatPhase": 0.83,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "galanacci",
       "number": "03",
       "title": "GALANACCI",
-      "media": { "type": "placeholder", "label": "GALANACCI — EARLY YEARS" },
+      "media": {
+        "type": "model",
+        "src": "src/founder/journey/03-galanacci.glb",
+        "alt": "GALANACCI — original Journey artefact",
+        "orbit": "0deg 75deg auto"
+      },
       "copy": [
-        "GALANACCI became the space where I learned to build through experimentation.",
-        "FASHION. ILLUSTRATION. OBJECTS. STORYTELLING."
-      ]
+        "GALANACCI became the place where I learned what kind of creator I was. Fashion, illustration, footwear, objects, storytelling — I experimented across disciplines without asking permission to stay in one lane. Years of making taught me that the medium could change while the mind behind it remained the same."
+      ],
+      "scene": {
+        "position": [
+          3.2,
+          2,
+          0.1
+        ],
+        "scale": 2.2,
+        "baseRotation": [
+          0.17453292519943295,
+          0,
+          0
+        ],
+        "startRotation": 0.5934119456780721,
+        "idleRotationSpeed": 0.23271056693257727,
+        "idleRotationDirection": 1,
+        "floatAmplitude": 0.043,
+        "floatSpeed": 0.7306029426953008,
+        "floatPhase": 1.66,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "greatness",
       "number": "04",
       "title": "GREATNESS",
       "media": {
-        "type": "image",
-        "src": "src/founder/greatness-poem-original.webp",
-        "alt": "The original handwritten GREATNESS poem by GALANACCI",
-        "width": 1600,
-        "height": 2118
+        "type": "model",
+        "src": "src/founder/journey/04-greatness.glb",
+        "alt": "GREATNESS — original Journey artefact",
+        "orbit": "0deg 65deg auto"
       },
       "copy": [
-        "The philosophy came before the brand.",
-        "GREATNESS became the idea that everything else would grow from."
-      ]
+        "Before PIONEERS OF GREATNESS had a name, a product or an identity, there was a question that kept following me: what does it actually take to become great? I wrote GREATNESS as an attempt to put that pursuit into words. I didn't know it at the time, but I had written the foundation of what would eventually become PoG."
+      ],
+      "scene": {
+        "position": [
+          -1.6,
+          0.1,
+          0
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          0.17453292519943295,
+          0,
+          0
+        ],
+        "startRotation": 0.06981317007977318,
+        "idleRotationSpeed": 0.16534698176788384,
+        "idleRotationDirection": -1,
+        "floatAmplitude": 0.025,
+        "floatSpeed": 0.6684239688488921,
+        "floatPhase": 2.4899999999999998,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "pioneers-of-greatness",
       "number": "05",
       "title": "PIONEERS OF GREATNESS",
-      "media": { "type": "placeholder", "label": "PIONEERS OF GREATNESS — EARLY WORLD" },
+      "media": {
+        "type": "model",
+        "src": "src/founder/journey/05-pioneers-of-greatness.glb",
+        "alt": "PIONEERS OF GREATNESS — original Journey artefact",
+        "orbit": "0deg 75deg auto"
+      },
       "copy": [
-        "The philosophy found its physical language.",
-        "BOXING GAVE IT MEANING. FASHION GAVE IT FORM."
-      ]
+        "Boxing gave GREATNESS a language. Discipline. Sacrifice. Solitude. Resilience. The willingness to keep going when circumstances aren't in your favour. PIONEERS OF GREATNESS became a way of giving that philosophy an identity — and eventually, a world of its own."
+      ],
+      "scene": {
+        "position": [
+          1.6,
+          0,
+          -0.3
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          0.17453292519943295,
+          0,
+          0
+        ],
+        "startRotation": -0.2792526803190927,
+        "idleRotationSpeed": 0.19039955476301776,
+        "idleRotationDirection": 1,
+        "floatAmplitude": 0.034,
+        "floatSpeed": 0.6159985595274104,
+        "floatPhase": 3.32,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "the-first-piece",
       "number": "06",
       "title": "THE FIRST PIECE",
       "media": {
-        "type": "image",
-        "src": "src/founder/greatness-tee.webp",
-        "alt": "GALANACCI holding the first PIONEERS OF GREATNESS product, the GREATNESS tee",
-        "width": 1200,
-        "height": 1600
+        "type": "model",
+        "src": "src/founder/journey/06-the-first-piece.glb",
+        "alt": "THE FIRST PIECE — original Journey artefact",
+        "orbit": "0deg 75deg auto"
       },
       "copy": [
-        "PATTERNS. PROTOTYPES. MISTAKES. ADJUSTMENTS.",
-        "The idea became tangible."
-      ]
+        "Until this point, PIONEERS OF GREATNESS existed as an idea. The first piece changed that. Patterns, prototypes, mistakes, revisions and construction turned philosophy into something that could finally be worn. What had lived in my head now existed in the real world."
+      ],
+      "scene": {
+        "position": [
+          -3.1,
+          -2,
+          0.1
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          0.17453292519943295,
+          0,
+          0
+        ],
+        "startRotation": 0.19198621771937624,
+        "idleRotationSpeed": 0.21666156231653746,
+        "idleRotationDirection": -1,
+        "floatAmplitude": 0.043,
+        "floatSpeed": 0.5711986642890533,
+        "floatPhase": 4.1499999999999995,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "the-first-sale",
       "number": "07",
       "title": "THE FIRST SALE",
-      "media": { "type": "placeholder", "label": "THE FIRST SALE" },
+      "media": {
+        "type": "model",
+        "src": "src/founder/journey/07-the-first-sale.glb",
+        "alt": "THE FIRST SALE — original Journey artefact",
+        "orbit": "0deg 75deg auto"
+      },
       "copy": [
-        "Someone chose to spend their own money on something that previously existed only in my mind."
-      ]
+        "The first sale was small in the scale of what I'm trying to build, but enormous in what it represented. Someone exchanged their money for something that had once existed only in my imagination. PoG was no longer something only I believed in."
+      ],
+      "scene": {
+        "position": [
+          0,
+          -2.2,
+          -0.2
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          0.17453292519943295,
+          0,
+          0
+        ],
+        "startRotation": -0.3839724354387525,
+        "idleRotationSpeed": 0.15707963267948966,
+        "idleRotationDirection": 1,
+        "floatAmplitude": 0.025,
+        "floatSpeed": 0.5324733311169141,
+        "floatPhase": 4.9799999999999995,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "SAVED"
+      }
     },
     {
       "id": "now-2026",
       "number": "08",
       "title": "NOW — 2026",
-      "media": { "type": "placeholder", "label": "NOW — 2026" },
-      "copy": ["STILL BUILDING."]
+      "media": {
+        "type": "model",
+        "src": "src/founder/journey/08-now-2026.glb",
+        "alt": "NOW — 2026 — original Journey artefact",
+        "orbit": "0deg 75deg auto"
+      },
+      "copy": [
+        "There is no ending to write here yet. I'm still building PoG while living the philosophy it represents — working with what I have, adapting when circumstances change and continuing when the path isn't clear. The products are evolving. The world is expanding. The community is still being built.",
+        "STILL BUILDING."
+      ],
+      "scene": {
+        "position": [
+          3.1,
+          -2,
+          0
+        ],
+        "scale": 1.95,
+        "baseRotation": [
+          0.17453292519943295,
+          0,
+          0
+        ],
+        "startRotation": 0.13962634015954636,
+        "idleRotationSpeed": 0.17951958020513104,
+        "idleRotationDirection": -1,
+        "floatAmplitude": 0.034,
+        "floatSpeed": 0.49866550056980835,
+        "floatPhase": 5.81,
+        "labelOffset": [
+          0,
+          -1.12,
+          0
+        ],
+        "focusOffset": [
+          0,
+          0,
+          0.35
+        ],
+        "status": "IN PROGRESS"
+      }
     }
   ]
 }

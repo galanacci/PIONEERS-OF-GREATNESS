@@ -58,8 +58,8 @@
             <ul class="menu-list" role="menu">
                 <li><button type="button" class="menu-item is-selected" role="menuitem" data-menu-action="waitlist">JOIN WAITLIST</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="founder">FOUNDER</button></li>
-                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="documentary-room">DOCUMENTARY</button></li>
-                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="field-notes-room">FIELD NOTES</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="documentary-room">VIDEO JOURNAL</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="field-notes-room">BEHIND THE SCENES</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" aria-disabled="true">COLLECTIONS</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="exit">EXIT</button></li>
             </ul>
@@ -230,15 +230,14 @@
         <div class="world-room-content documentary-content">
             <button type="button" class="room-return" data-room-close>&larr; RETURN TO MENU</button>
             <header class="documentary-header">
-                <p class="room-kicker">DOCUMENTARY SCREENING ROOM</p>
+                <p class="room-kicker">VIDEO JOURNAL</p>
                 <h1 id="documentary-title">UNCUT</h1>
-                <p class="documentary-intro">UNCUT is a raw, unfiltered video journal series where I document my weekly journey as I build my fashion brand and more.</p>
             </header>
-            <div class="room-divider" aria-hidden="true"></div>
             <div id="documentary-feature" class="documentary-feature" aria-live="polite"></div>
-            <p class="room-season">EPISODE ARCHIVE</p>
+            <div id="documentary-archive-heading" class="documentary-archive-heading">
+                <p class="room-season">EPISODE ARCHIVE</p>
+            </div>
             <div id="documentary-list" class="documentary-archive" aria-label="UNCUT episodes"></div>
-            <div class="room-divider" aria-hidden="true"></div>
             <a class="room-watch" href="https://www.youtube.com/playlist?list=PL_UEBZlt-mUL5Hc2zGP4_Xsr6ayZAtWs3" target="_blank" rel="noopener noreferrer">WATCH ON YOUTUBE</a>
         </div>
     </section>
@@ -248,8 +247,7 @@
             <button type="button" class="room-return" data-room-close>&larr; RETURN TO MENU</button>
             <header class="field-notes-header">
                 <p class="room-kicker">JOURNAL ROOM</p>
-                <h1 id="field-notes-title">FIELD NOTES</h1>
-                <p class="field-notes-intro">Fragments from the making of PIONEERS OF GREATNESS.</p>
+                <h1 id="field-notes-title">BEHIND THE SCENES</h1>
             </header>
             <div class="room-divider" aria-hidden="true"></div>
             <div id="field-notes-list" class="field-notes-list" aria-live="polite"></div>

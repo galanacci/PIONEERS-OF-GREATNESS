@@ -1,4 +1,5 @@
 import { initAudio } from "./core/audio.js";
+import { initPageTemplate } from "./rooms/page-template.js";
 import { initMenu } from "./core/menu.js";
 import { initMenuSound } from "./core/menu-sound.js";
 import { initPresentationLock } from "./core/presentation-lock.js";
@@ -11,6 +12,7 @@ import { initFounderMission } from "./rooms/founder-mission.js";
 import { initWaitlist } from "./services/waitlist.js";
 
 initWaitlist();
+initPageTemplate();
 initAudio();
 initMenuSound();
 initMenu();

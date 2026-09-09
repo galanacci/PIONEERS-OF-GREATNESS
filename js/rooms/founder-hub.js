@@ -1,3 +1,6 @@
+import { createJourneyArtefact } from './journey-artefact.js';
+import { pageControls, openMenu } from './page-template.js';
+import { createJourneySelector } from './journey-selector.js';
 const ROOM_ID = "founder-room";
 
 export function initFounderHub() {
@@ -17,15 +20,23 @@ export function initFounderHub() {
     let activeExperience = null;
     let buttons = [];
     let content = null;
+    let artefact = null;
+    let collection = null;
+    const stopArtefact = () => {
+        collection?.dispose();
+        collection = null;
+        artefact?.dispose();
+        artefact = null;
+    };
 
     const updateTopReturn = () => {
         const destination = activeExperience === "journey-entry"
-            ? { state: "journey", label: "← RETURN TO JOURNEY", accessible: "Return to Journey" }
+            ? { state: "journey", label: "BACK", accessible: "Back to Journey" }
             : activeExperience !== null
-                ? { state: "founder", label: "← RETURN TO FOUNDER", accessible: "Return to Founder" }
-                : { state: "", label: "← RETURN TO MENU", accessible: "Return to menu" };
+                ? { state: "founder", label: "BACK", accessible: "Back to Founder" }
+                : { state: "", label: "BACK", accessible: "Back to menu" };
         topReturn.dataset.roomClose = destination.state;
-        topReturn.textContent = destination.label;
+        topReturn.textContent = '<';
         topReturn.setAttribute("aria-label", destination.accessible);
     };
 
@@ -43,6 +54,7 @@ export function initFounderHub() {
     };
 
     const stopExperienceMedia = () => {
+        stopArtefact();
         experience.querySelectorAll("[data-founder-video-player]").forEach((player) => {
             window.dispatchEvent(new CustomEvent("pog:founder-video-stop", { detail: { player } }));
         });
@@ -61,7 +73,10 @@ export function initFounderHub() {
     const createExperienceMedia = (frame, className = "founder-origin-media") => {
         const media = document.createElement("div");
         media.className = `${className} is-${frame.media.type}`;
-        if (frame.media.type === "image") {
+        if (frame.media.type === "model") {
+            artefact = createJourneyArtefact(frame);
+            media.append(artefact);
+        } else if (frame.media.type === "image") {
             const image = document.createElement("img");
             image.src = frame.media.src;
             image.alt = frame.media.alt;
@@ -166,8 +181,8 @@ export function initFounderHub() {
         const back = document.createElement("button");
         back.type = "button";
         back.className = "founder-origin-control founder-origin-return";
-        back.textContent = "RETURN TO MENU";
-        back.addEventListener("click", () => window.dispatchEvent(new CustomEvent("pog:close-room")));
+        back.textContent = "MENU";
+        back.addEventListener("click", openMenu);
         const next = document.createElement("button");
         next.type = "button";
         next.className = "founder-origin-control is-next";
@@ -175,8 +190,8 @@ export function initFounderHub() {
         next.disabled = originFrame === content.origin.length - 1;
         next.addEventListener("click", () => renderOrigin(originFrame + 1));
         controls.append(previous, back, next);
+        if (frame.copy?.length) header.append(copy);
         shell.append(header, media);
-        if (frame.copy?.length) shell.append(copy);
         shell.append(controls);
         experience.replaceChildren(shell);
         experience.setAttribute("aria-labelledby", title.id);
@@ -193,23 +208,12 @@ export function initFounderHub() {
         renderOrigin(0);
     };
 
-    const selectJourney = (index, focus = false) => {
-        const journeyButtons = [...experience.querySelectorAll(".founder-journey-item")];
-        if (!journeyButtons.length) return;
-        journeySelected = (index + journeyButtons.length) % journeyButtons.length;
-        journeyButtons.forEach((button, buttonIndex) => {
-            const current = buttonIndex === journeySelected;
-            button.classList.toggle("is-selected", current);
-            button.tabIndex = current ? 0 : -1;
-            button.toggleAttribute("aria-current", current);
-        });
-        if (focus) journeyButtons[journeySelected]?.focus();
-    };
-
     const renderJourneyEntry = (index, focus = true) => {
+        stopExperienceMedia();
         activeExperience = "journey-entry";
         updateTopReturn();
         journeyEntry = Math.max(0, Math.min(index, content.journey.length - 1));
+        journeySelected = journeyEntry;
         const memory = content.journey[journeyEntry];
         const shell = document.createElement("article");
         shell.className = "founder-journey-entry";
@@ -241,8 +245,8 @@ export function initFounderHub() {
         const back = document.createElement("button");
         back.type = "button";
         back.className = "founder-journey-control founder-journey-return";
-        back.textContent = "RETURN TO MENU";
-        back.addEventListener("click", () => window.dispatchEvent(new CustomEvent("pog:close-room")));
+        back.textContent = "MENU";
+        back.addEventListener("click", openMenu);
         const next = document.createElement("button");
         next.type = "button";
         next.className = "founder-journey-control is-next";
@@ -250,7 +254,8 @@ export function initFounderHub() {
         next.disabled = journeyEntry === content.journey.length - 1;
         next.addEventListener("click", () => renderJourneyEntry(journeyEntry + 1));
         controls.append(previous, back, next);
-        shell.append(header, media, copy, controls);
+        header.append(copy);
+        shell.append(header, media, controls);
         experience.replaceChildren(shell);
         experience.setAttribute("aria-labelledby", title.id);
         experience.hidden = false;
@@ -258,57 +263,19 @@ export function initFounderHub() {
     };
 
     function renderJourneyMenu(focus = true) {
+        stopExperienceMedia();
         activeExperience = "journey-menu";
         updateTopReturn();
-        const shell = document.createElement("section");
-        shell.className = "founder-journey-menu";
-        const header = document.createElement("header");
-        header.className = "founder-journey-menu-header";
-        const kicker = document.createElement("p");
-        kicker.className = "founder-journey-kicker";
-        kicker.textContent = "SAVE HISTORY";
-        const title = document.createElement("h2");
-        title.id = "founder-journey-menu-title";
-        title.textContent = "THE JOURNEY";
-        header.append(kicker, title);
-        const journeyList = document.createElement("div");
-        journeyList.className = "founder-journey-list";
-        journeyList.setAttribute("role", "menu");
-        journeyList.setAttribute("aria-label", "Founder Journey memories");
-        content.journey.forEach((memory, index) => {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "founder-journey-item";
-            button.dataset.journeyEntry = memory.id;
-            button.setAttribute("role", "menuitem");
-            const number = document.createElement("span");
-            number.className = "founder-journey-item-number";
-            number.textContent = memory.number;
-            const label = document.createElement("span");
-            label.className = "founder-journey-item-label";
-            label.textContent = memory.title;
-            button.append(number, label);
-            // A stationary pointer may already sit over the newly rendered list;
-            // require deliberate movement before it changes the initial save slot.
-            button.addEventListener("pointermove", () => selectJourney(index));
-            button.addEventListener("click", () => renderJourneyEntry(index));
-            journeyList.append(button);
+        collection = createJourneySelector(content.journey, {
+            selected: journeySelected,
+            onSelect: index => { journeySelected = index; },
+            onOpen: index => renderJourneyEntry(index),
+            onReturn: openMenu
         });
-        const footer = document.createElement("footer");
-        footer.className = "founder-journey-menu-footer";
-        const back = document.createElement("button");
-        back.type = "button";
-        back.className = "founder-journey-menu-return";
-        back.textContent = "← RETURN TO FOUNDER";
-        back.addEventListener("click", () => showHub());
-        const instructions = document.createElement("p");
-        instructions.textContent = "↑ ↓ SELECT   ENTER OPEN   ESC RETURN";
-        footer.append(back, instructions);
-        shell.append(header, journeyList, footer);
-        experience.replaceChildren(shell);
-        experience.setAttribute("aria-labelledby", title.id);
+        experience.replaceChildren(collection);
+        experience.setAttribute("aria-labelledby", "founder-journey-menu-title");
         experience.hidden = false;
-        selectJourney(journeySelected, focus);
+        if (focus) collection.focusSelected();
     }
 
     const openJourney = () => {
@@ -373,6 +340,7 @@ export function initFounderHub() {
         }
     };
 
+    hub.append(pageControls(() => select(selected - 1, true), () => select(selected + 1, true)).bar);
     hub.addEventListener("keydown", (event) => {
         if (event.key === "ArrowUp" || event.key === "ArrowDown") {
             event.preventDefault();
@@ -395,12 +363,6 @@ export function initFounderHub() {
         } else if (activeExperience === "origin" && event.key === "ArrowRight" && originFrame < content.origin.length - 1) {
             event.preventDefault();
             renderOrigin(originFrame + 1);
-        } else if (activeExperience === "journey-menu" && ["ArrowUp", "ArrowDown"].includes(event.key)) {
-            event.preventDefault();
-            selectJourney(journeySelected + (event.key === "ArrowDown" ? 1 : -1), true);
-        } else if (activeExperience === "journey-menu" && event.key === "Enter") {
-            event.preventDefault();
-            renderJourneyEntry(journeySelected);
         } else if (activeExperience === "journey-entry" && event.key === "ArrowLeft" && journeyEntry > 0) {
             event.preventDefault();
             renderJourneyEntry(journeyEntry - 1);

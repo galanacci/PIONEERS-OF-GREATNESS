@@ -170,7 +170,8 @@ export async function initDocumentary() {
                 if (!controls.contains(event.target)) setOpen(false);
             });
             controls.append(trigger, options);
-            archive.replaceChildren(controls, chapter);
+            document.getElementById('documentary-archive-heading').append(controls);
+            archive.replaceChildren(chapter);
             selectYear(selectedYear);
         } catch (error) {
             initialized = false;
