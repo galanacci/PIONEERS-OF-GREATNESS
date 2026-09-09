@@ -24,7 +24,7 @@ export function initMenuSound() {
     let unlockPromise = null;
     let audioWarmed = false;
 
-    const interactiveFrom = (target) => target instanceof Element
+    const interactiveFrom = (target) => target instanceof Element && !target.closest('.journey-object')
         ? target.closest("button, a[href], [role='button'], [role='option'], [role='menuitem']")
         : null;
     const isMainMenuControl = (control) => control?.matches(".menu-item");

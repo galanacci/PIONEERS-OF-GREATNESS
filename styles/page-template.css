@@ -80,6 +80,7 @@
 .page-template button:disabled { opacity: .3; cursor: default; }
 .page-template button:focus-visible { outline: 1px solid #673caf; outline-offset: 3px; }
 .page-template button:hover:not(:disabled) { color: #a981e8; }
+.page-template .journey-space .journey-object.is-hovered { color: #a981e8; }
 .page-template :is(.field-notes-years,.documentary-years) { position: relative; inset: auto; margin: 0; width: auto; z-index: 6; }
 .page-template :is(.field-notes-year-options,.documentary-year-options) { top: auto; bottom: 100%; background: #080808; padding: 8px; max-height: 40dvh; overflow-y: auto; }
 .page-template .documentary-feature { min-height: 0; display: flex; align-items: center; justify-content: center; margin: 0; }

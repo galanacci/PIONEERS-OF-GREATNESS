@@ -9,6 +9,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     const mobile=matchMedia('(max-width:700px)');
     const buttons=[],timers=[];let scene=null,disposed=false,opening=false,swipe=null,suppressClick=false,hovered=null;
     const isReduced=()=>false;
+    const sound=name=>window.dispatchEvent(new CustomEvent('pog:menu-sound',{detail:{name}}));
     shell.classList.add('has-motion');
     const reveal=()=>{if(disposed)return;space.style.visibility='';space.inert=false;space.setAttribute('aria-busy','false');};
     const fallback=()=>{space.classList.remove('is-scene');space.classList.add('is-static');buttons.forEach(b=>{b.hidden=false;b.style.transform='';});message.textContent='3D UNAVAILABLE — SELECT A CHAPTER BELOW';reveal();};
@@ -37,7 +38,8 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
         const number=document.createElement('span');number.className='journey-object-number';number.textContent=memory.number;
         const name=document.createElement('span');name.className='journey-object-name';name.textContent=memory.title;
         const status=document.createElement('span');status.className='journey-object-state';
-        button.append(number,name,status);button.addEventListener('click',()=>{if(i===selected)open();else select(i);});
+        button.append(number,name,status);button.addEventListener('click',()=>{sound('confirm');if(i===selected)open();else select(i);});
+        button.addEventListener('focus',()=>{if(button.matches(':focus-visible'))sound('select');});
         buttons.push(button);space.append(button);
     });
     shell.querySelector('.journey-menu-return').textContent = 'MENU';
@@ -56,7 +58,10 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     space.addEventListener('pointermove',event=>{
         if(event.pointerType!=='mouse'||!scene)return;
         const label=event.target.closest('.journey-object');
-        const hit=label?buttons.indexOf(label):scene.pick(event.clientX,event.clientY);hovered=hit;space.style.cursor=hit===null?'default':'pointer';
+        const hit=label?buttons.indexOf(label):scene.pick(event.clientX,event.clientY);
+        // Model and number share one artefact identity, including their hover sound.
+        if(hit!==null&&hit!==hovered)sound('select');
+        hovered=hit;space.style.cursor=hit===null?'default':'pointer';
         buttons.forEach((b,i)=>b.classList.toggle('is-hovered',i===hit));
     });
     space.addEventListener('pointerleave',()=>{hovered=null;buttons.forEach(b=>b.classList.remove('is-hovered'));});
@@ -71,7 +76,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     space.addEventListener('click',e=>{
         if(suppressClick){e.preventDefault();e.stopImmediatePropagation();return;}
         if(e.target.closest('.journey-object'))return;
-        const hit=scene?.pick(e.clientX,e.clientY);if(Number.isInteger(hit)){if(hit===selected)open();else select(hit);}
+        const hit=scene?.pick(e.clientX,e.clientY);if(Number.isInteger(hit)){sound('confirm');if(hit===selected)open();else select(hit);}
     },true);
     select(selected);
     import('./journey-scene.js').then(({mountJourneyScene})=>{

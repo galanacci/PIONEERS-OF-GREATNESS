@@ -90,7 +90,7 @@
     top: calc(100% + 7px);
     right: 0;
     min-width: 100%;
-    background: transparent;
+    background: #000;
     text-align: right;
 }
 
@@ -133,6 +133,8 @@
 }
 
 .field-notes-chapter {
+    position: relative;
+    z-index: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(44px, 7vw, 90px) clamp(24px, 5vw, 70px);
