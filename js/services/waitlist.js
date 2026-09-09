@@ -6,6 +6,14 @@ export function initWaitlist() {
     const status = document.getElementById("status");
     const placeholder = document.getElementById("animated-placeholder");
     if (!form || !email || !status || !placeholder) return;
+    const submit = form.querySelector('[type="submit"]');
+    let completionTimer = null, pending = false, requestVersion = 0;
+    const resetRequest = () => {
+        clearTimeout(completionTimer);
+        requestVersion += 1;
+        pending = false;
+        submit.disabled = false;
+    };
 
     const marquee = document.createElement("span");
     marquee.className = "scrolling-text-container";
@@ -18,12 +26,14 @@ export function initWaitlist() {
     placeholder.replaceChildren(marquee);
 
     window.addEventListener("pog:waitlist-requested", () => {
+        resetRequest();
         form.classList.add("is-direct-entry");
         placeholder.hidden = true;
         status.textContent = "";
         status.style.removeProperty("color");
     });
     window.addEventListener("pog:waitlist-dismissed", () => {
+        resetRequest();
         status.textContent = "";
         status.style.removeProperty("color");
         form.classList.remove("is-direct-entry");
@@ -37,15 +47,20 @@ export function initWaitlist() {
     });
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
+        if (pending) return;
         const value = email.value.trim();
         if (!value) { status.textContent = "Please enter an email."; return; }
+        pending = true;
+        submit.disabled = true;
+        const version = ++requestVersion;
         status.textContent = "Joining...";
         try {
             const body = new FormData();
             body.append("email", value);
             const response = await fetch(SCRIPT_URL, { method: "POST", body });
             const data = await response.json();
-            const states = { success: "Welcome to the movement.", duplicate: "Already signed up." };
+            if (version !== requestVersion) return;
+            const states = { success: "You’re on the waitlist. Welcome to the movement.", duplicate: "Already signed up." };
             const message = states[data.status] || "Something went wrong.";
             status.textContent = message;
             status.style.removeProperty("color");
@@ -53,10 +68,21 @@ export function initWaitlist() {
                 email.value = "";
                 form.classList.remove("is-direct-entry");
                 placeholder.hidden = false;
-                status.textContent = "";
-                window.dispatchEvent(new CustomEvent("pog:waitlist-complete", { detail: { status: data.status } }));
+                completionTimer = setTimeout(() => {
+                    if (version !== requestVersion) return;
+                    status.textContent = "";
+                    pending = false;
+                    submit.disabled = false;
+                    window.dispatchEvent(new CustomEvent("pog:waitlist-complete", { detail: { status: data.status } }));
+                }, 5000);
+            } else {
+                pending = false;
+                submit.disabled = false;
             }
         } catch (error) {
+            if (version !== requestVersion) return;
+            pending = false;
+            submit.disabled = false;
             console.error("Waitlist request failed.", error);
             status.textContent = "Unable to connect.";
             status.style.removeProperty("color");
