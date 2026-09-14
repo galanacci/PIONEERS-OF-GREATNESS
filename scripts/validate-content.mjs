@@ -5,6 +5,7 @@ const FIELD_NOTES_PATH = "data/field-notes.json";
 const DOCUMENTARY_PATH = "data/documentary.json";
 const GREATNESS_POEM_PATH = "data/greatness-poem.json";
 const FOUNDER_ROOM_PATH = "data/founder-room.json";
+const PRE_POG_PATH = "data/pre-pog.json";
 
 function assert(condition, message) {
     if (!condition) throw new Error(message);
@@ -115,16 +116,34 @@ export function validateFounderRoom(payload) {
     });
 }
 
+export async function validatePrePog(payload, { requireFiles = true } = {}) {
+    assert(Array.isArray(payload) && payload.length === 94, "Pre-PoG archive must contain all 94 images.");
+    const ids = new Set();
+    for (const item of payload) {
+        assert(typeof item.id === "string" && item.id, "Every Pre-PoG image needs an id.");
+        assert(!ids.has(item.id), `Duplicate Pre-PoG image id: ${item.id}`);
+        ids.add(item.id);
+        assert(typeof item.alt === "string" && item.alt.trim(), `Pre-PoG image ${item.id} needs accessible text.`);
+        assert(Number.isFinite(item.width) && item.width > 0, `Pre-PoG image ${item.id} has invalid width.`);
+        assert(Number.isFinite(item.height) && item.height > 0, `Pre-PoG image ${item.id} has invalid height.`);
+        assert(/^src\/founder\/origin\/pre-pog\/[\w-]+\.webp$/.test(item.src), `Pre-PoG image ${item.id} has an invalid full image path.`);
+        assert(/^src\/founder\/origin\/pre-pog\/thumbs\/[\w-]+\.webp$/.test(item.thumb), `Pre-PoG image ${item.id} has an invalid thumbnail path.`);
+        if (requireFiles) await Promise.all([access(item.src), access(item.thumb)]);
+    }
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [fieldNotes, documentary, greatnessPoem, founderRoom] = await Promise.all([
+    const [fieldNotes, documentary, greatnessPoem, founderRoom, prePog] = await Promise.all([
         readJson(FIELD_NOTES_PATH),
         readJson(DOCUMENTARY_PATH),
         readJson(GREATNESS_POEM_PATH),
-        readJson(FOUNDER_ROOM_PATH)
+        readJson(FOUNDER_ROOM_PATH),
+        readJson(PRE_POG_PATH)
     ]);
     await validateFieldNotes(fieldNotes);
     validateDocumentary(documentary);
     validateGreatnessPoem(greatnessPoem);
     validateFounderRoom(founderRoom);
-    console.log(`Content valid: ${fieldNotes.notes.length} Field Notes, ${documentary.episodes.length} UNCUT episodes, ${greatnessPoem.title} v${greatnessPoem.version} and Founder Hub v${founderRoom.version}.`);
+    await validatePrePog(prePog);
+    console.log(`Content valid: ${fieldNotes.notes.length} Field Notes, ${documentary.episodes.length} UNCUT episodes, ${greatnessPoem.title} v${greatnessPoem.version}, Founder Hub v${founderRoom.version}, and ${prePog.length} Pre-PoG images.`);
 }

@@ -1,6 +1,7 @@
 import { createJourneyArtefact } from './journey-artefact.js';
 import { pageControls, openMenu, roomNavigationCredit } from './page-template.js';
 import { createJourneySelector } from './journey-selector.js';
+import { createOriginArchive } from './origin-archive.js';
 const ROOM_ID = "founder-room";
 
 export function initFounderHub() {
@@ -14,7 +15,6 @@ export function initFounderHub() {
 
     let initialized = false;
     let selected = 0;
-    let originFrame = 0;
     let journeySelected = 0;
     let journeyEntry = 0;
     let activeExperience = null;
@@ -22,7 +22,10 @@ export function initFounderHub() {
     let content = null;
     let artefact = null;
     let collection = null;
+    let originArchive = null;
     const stopArtefact = () => {
+        originArchive?.dispose();
+        originArchive = null;
         collection?.dispose();
         collection = null;
         artefact?.dispose();
@@ -122,93 +125,17 @@ export function initFounderHub() {
         return media;
     };
 
-    const renderOrigin = (index, focus = true) => {
+    const openOrigin = () => {
         stopExperienceMedia();
         activeExperience = "origin";
         updateTopReturn();
-        originFrame = Math.max(0, Math.min(index, content.origin.length - 1));
-        const frame = content.origin[originFrame];
-        const shell = document.createElement("div");
-        shell.className = "founder-origin-frame";
-        shell.classList.toggle("is-visual-only", !frame.copy?.length);
-        const header = document.createElement("header");
-        header.className = "founder-origin-frame-header";
-        const count = document.createElement("p");
-        count.className = "founder-origin-frame-count";
-        count.textContent = `FRAME ${frame.number} / ${String(content.origin.length).padStart(2, "0")}`;
-        const title = document.createElement("h2");
-        title.id = "founder-origin-frame-title";
-        title.textContent = frame.title;
-        header.append(count, title);
-        if (frame.date) {
-            const date = document.createElement("p");
-            date.className = "founder-origin-frame-date";
-            date.textContent = frame.date;
-            header.append(date);
-        }
-        const media = createExperienceMedia(frame);
-        if (frame.id === "first-physical-expression") {
-            const image = media.querySelector("img");
-            if (image) {
-                const poemTrigger = document.createElement("button");
-                poemTrigger.type = "button";
-                poemTrigger.className = "founder-origin-poem-trigger";
-                poemTrigger.setAttribute("aria-label", "Replay the animated GREATNESS POEM");
-                poemTrigger.addEventListener("click", () => {
-                    window.dispatchEvent(new CustomEvent("pog:poem-replay-requested", {
-                        detail: { trigger: poemTrigger }
-                    }));
-                });
-                poemTrigger.append(image);
-                media.append(poemTrigger);
-            }
-        }
-        const copy = document.createElement("div");
-        copy.className = "founder-origin-copy";
-        frame.copy?.forEach((paragraph) => {
-            const line = document.createElement("p");
-            line.textContent = paragraph;
-            copy.append(line);
-        });
-        const controls = document.createElement("div");
-        controls.className = "founder-origin-controls";
-        const previous = document.createElement("button");
-        previous.type = "button";
-        previous.className = "founder-origin-control is-previous";
-        previous.textContent = "PREVIOUS";
-        previous.disabled = originFrame === 0;
-        previous.addEventListener("click", () => renderOrigin(originFrame - 1));
-        const back = document.createElement("button");
-        back.type = "button";
-        back.className = "founder-origin-control founder-origin-return";
-        back.textContent = "MENU";
-        back.addEventListener("click", openMenu);
-        const next = document.createElement("button");
-        next.type = "button";
-        next.className = "founder-origin-control is-next";
-        next.textContent = "NEXT";
-        next.disabled = originFrame === content.origin.length - 1;
-        next.addEventListener("click", () => renderOrigin(originFrame + 1));
-        controls.append(previous, back, next, roomNavigationCredit());
-        if (frame.copy?.length) header.append(copy);
-        shell.append(header, media);
-        shell.append(controls);
-        experience.replaceChildren(shell);
-        experience.setAttribute("aria-labelledby", title.id);
-        experience.hidden = false;
-        experience.querySelectorAll("[data-founder-video-player]").forEach((player) => {
-            window.dispatchEvent(new CustomEvent("pog:founder-video-ready", { detail: { player } }));
-        });
-        if (focus) {
-            title.tabIndex = -1;
-            title.focus({ preventScroll: true });
-        }
-    };
-
-    const openOrigin = () => {
         hub.hidden = true;
-        originFrame = 0;
-        renderOrigin(0);
+        originArchive = createOriginArchive();
+        experience.replaceChildren(originArchive);
+        experience.removeAttribute("aria-labelledby");
+        experience.setAttribute("aria-label", "Pre-PoG visual archive");
+        experience.hidden = false;
+        requestAnimationFrame(() => originArchive?.focus({ preventScroll: true }));
     };
 
     const renderJourneyEntry = (index, focus = true) => {
@@ -360,13 +287,7 @@ export function initFounderHub() {
     });
 
     experience.addEventListener("keydown", (event) => {
-        if (activeExperience === "origin" && event.key === "ArrowLeft" && originFrame > 0) {
-            event.preventDefault();
-            renderOrigin(originFrame - 1);
-        } else if (activeExperience === "origin" && event.key === "ArrowRight" && originFrame < content.origin.length - 1) {
-            event.preventDefault();
-            renderOrigin(originFrame + 1);
-        } else if (activeExperience === "journey-entry" && event.key === "ArrowLeft" && journeyEntry > 0) {
+        if (activeExperience === "journey-entry" && event.key === "ArrowLeft" && journeyEntry > 0) {
             event.preventDefault();
             renderJourneyEntry(journeyEntry - 1);
         } else if (activeExperience === "journey-entry" && event.key === "ArrowRight" && journeyEntry < content.journey.length - 1) {

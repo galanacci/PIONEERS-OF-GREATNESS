@@ -317,7 +317,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     })), { timeout: 3000 }).toEqual({ level: targetLevel, muted: false });
 });
 
-test("the poem gates the first visit and replays from the first physical expression", async ({ page }) => {
+test("the poem gates the first visit and returning visitors continue directly", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 320, height: 568 });
     await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
         status: 200,
@@ -377,28 +377,6 @@ test("the poem gates the first visit and replays from the first physical express
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
     await expect(page.locator("#founder-poem-reveal")).toBeHidden();
-    await page.getByRole("menuitem", { name: "FOUNDER" }).click();
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
-    await page.locator('[data-founder-section="origin"]').click();
-    await page.locator(".founder-origin-control.is-next").click();
-    await page.locator(".founder-origin-control.is-next").click();
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
-    const replayTrigger = page.getByRole("button", { name: "Replay the animated GREATNESS POEM" });
-    await replayTrigger.click();
-    await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
-    await expect(page.locator("#founder-introduction-skip")).toBeHidden();
-    await expect(page.locator("#founder-introduction-skip")).toBeVisible();
-    await expect(page.locator("#founder-introduction-copy")).toContainText("A", { timeout: 500 });
-    await page.locator("#founder-introduction-skip").evaluate((button) => button.click());
-    await expect(page.locator("#founder-introduction-copy")).toHaveClass(/is-dismissing/);
-    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/);
-    expect(await page.locator("#founder-introduction-copy").evaluate((element) => (
-        Number.parseFloat(getComputedStyle(element).transitionDuration)
-    ))).toBeCloseTo(0.6, 1);
-    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
-    await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
-    await expect(replayTrigger).toBeFocused();
 });
 
 test("Founder opens into the interactive five-chapter hub", async ({ page }) => {
@@ -430,7 +408,7 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });
 
-test("Founder Origin moves through three finite cinematic frames", async ({ page }) => {
+test("Founder Origin opens a kinetic pre-PoG visual archive", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
@@ -440,57 +418,28 @@ test("Founder Origin moves through three finite cinematic frames", async ({ page
     await page.locator('[data-founder-section="origin"]').click();
     await expect(page.locator("#founder-hub")).toBeHidden();
     await expect(page.locator("#founder-experience")).toBeVisible();
-    await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 01 / 03");
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE SHARED BEDROOM, WHERE IT STARTED");
-    await expect(page.locator(".founder-origin-frame-date")).toHaveText("24 NOVEMBER 2021");
-    await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/the-beginning-room.webp");
-    await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
-    await expect(page.locator(".founder-origin-control.is-previous")).toBeDisabled();
-    let frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
-    expect(frameFits).toBe(true);
-    await page.locator(".founder-origin-control.is-next").click();
-    await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 02 / 03");
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE POEM BEFORE THE BRAND");
-    await expect(page.locator(".founder-origin-frame-date")).toHaveText("27 JUNE 2021");
-    await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/greatness-poem-original.webp");
-    await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
-    frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
-    expect(frameFits).toBe(true);
-    await expect(page.getByRole("button", { name: "Replay the animated GREATNESS POEM" })).toHaveCount(0);
-    await page.keyboard.press("ArrowRight");
-    await expect(page.locator(".founder-origin-frame-count")).toHaveText("FRAME 03 / 03");
-    await expect(page.locator("#founder-origin-frame-title")).toHaveText("THE FIRST PHYSICAL EXPRESSION");
-    await expect(page.locator(".founder-origin-frame-date")).toHaveText("13 OCTOBER 2021");
-    await expect(page.locator(".founder-origin-media img")).toHaveAttribute("src", "src/founder/greatness-tee.webp");
-    await expect(page.locator(".founder-origin-video")).toHaveCount(0);
-    await expect(page.locator(".founder-origin-copy")).toHaveCount(0);
-    await expect(page.locator(".founder-origin-control.is-next")).toBeDisabled();
-    if (page.viewportSize()?.width >= 560) {
-        const composition = await page.locator(".founder-origin-frame").evaluate((frame) => {
-            const media = frame.querySelector(".founder-origin-media")?.getBoundingClientRect();
-            const header = frame.querySelector(".founder-origin-frame-header")?.getBoundingClientRect();
-            const menu = document.querySelector("#founder-room .room-return")?.getBoundingClientRect();
-            return {
-                mediaTop: media?.top ?? Infinity,
-                mediaHeight: media?.height ?? 0,
-                headerTop: header?.top ?? Infinity,
-                headerRight: header?.right ?? 0,
-                menuTop: menu?.top ?? -Infinity,
-                viewportHeight: window.innerHeight,
-                viewportWidth: window.innerWidth
-            };
-        });
-        expect(composition.mediaTop).toBeLessThan(composition.viewportHeight * 0.3);
-        expect(composition.mediaHeight).toBeGreaterThan(composition.viewportHeight * 0.5);
-        expect(Math.abs(composition.headerTop - composition.menuTop)).toBeLessThanOrEqual(1);
-        expect(composition.viewportWidth - composition.headerRight).toBe(40);
-    }
-    frameFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
-    expect(frameFits).toBe(true);
-    await expect(page.locator(".founder-origin-return")).toHaveText("RETURN TO MENU");
-    await page.locator(".founder-origin-return").click();
-    await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
-    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator(".founder-origin-archive")).toHaveClass(/is-ready/, { timeout: 10000 });
+    await expect(page.locator(".origin-memory")).toHaveCount(94);
+    await expect(page.locator(".founder-origin-frame-header")).toHaveCount(0);
+    await expect(page.locator(".founder-origin-controls")).toHaveCount(0);
+    await expect(page.locator(".origin-room-credit")).toHaveText("© 2026 A GALANACCI® COMPANY");
+    await expect(page.locator("#founder-room .room-return")).toHaveAttribute("aria-label", "Back to Founder");
+
+    const firstMemory = page.locator(".origin-memory").first();
+    const startingTransform = await firstMemory.evaluate((node) => node.style.transform);
+    await page.waitForTimeout(150);
+    await expect.poll(() => firstMemory.evaluate((node) => node.style.transform)).not.toBe(startingTransform);
+
+    await firstMemory.click();
+    await expect(page.locator(".founder-origin-archive")).toHaveClass(/is-focused/);
+    await expect(firstMemory).toHaveClass(/is-focused/);
+    await expect(firstMemory).toHaveAttribute("aria-pressed", "true");
+    await firstMemory.click();
+    await expect(page.locator(".founder-origin-archive")).not.toHaveClass(/is-focused/);
+    await expect(firstMemory).toHaveAttribute("aria-pressed", "false");
+
+    await page.locator("#founder-room .room-return").click();
+    await expect(page.locator("#founder-hub")).toBeVisible();
 });
 
 test("Founder Journey presents eight spatial artefacts", async ({ page }) => {
