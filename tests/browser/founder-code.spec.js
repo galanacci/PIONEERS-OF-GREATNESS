@@ -6,6 +6,7 @@ test("The Code presents all thirteen laws as a navigable manifesto", async ({ pa
         detail: { roomId: "founder-room" }
     })));
 
+    await expect(page.locator('[data-founder-section="code"] .founder-hub-item-label')).toHaveText("THE 13 LAWS");
     await page.locator('[data-founder-section="code"]').click();
     await expect(page.locator(".founder-code-entry")).toBeVisible();
     await expect(page.locator("#founder-code-title")).toHaveText("THE 13 LAWS");

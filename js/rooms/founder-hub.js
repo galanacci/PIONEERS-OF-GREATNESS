@@ -18,6 +18,7 @@ export function initFounderHub() {
     let journeySelected = 0;
     let journeyEntry = 0;
     let codeEntry = 0;
+    let missionEntry = 0;
     let activeExperience = null;
     let buttons = [];
     let content = null;
@@ -279,6 +280,111 @@ export function initFounderHub() {
         renderCodeEntry(0);
     };
 
+    const createMissionPixels = () => {
+        const field = document.createElement("div");
+        field.className = "founder-mission-pixels";
+        field.setAttribute("aria-hidden", "true");
+        const glyphs = ["0", "1", "■", "+", "·"];
+        for (let index = 0; index < 36; index += 1) {
+            const pixel = document.createElement("span");
+            pixel.className = "founder-mission-pixel";
+            pixel.textContent = glyphs[index % glyphs.length];
+            pixel.style.setProperty("--mission-x", `${(index * 37) % 101}%`);
+            pixel.style.setProperty("--mission-delay", `${-((index * 0.41) % 6).toFixed(2)}s`);
+            pixel.style.setProperty("--mission-duration", `${4.4 + (index % 7) * 0.58}s`);
+            pixel.style.setProperty("--mission-opacity", `${0.12 + (index % 5) * 0.07}`);
+            field.append(pixel);
+        }
+        return field;
+    };
+
+    const renderMissionEntry = (index, focus = true) => {
+        stopExperienceMedia();
+        activeExperience = "mission-entry";
+        updateTopReturn();
+        missionEntry = Math.max(0, Math.min(index, content.missions.length - 1));
+        const mission = content.missions[missionEntry];
+
+        const shell = document.createElement("article");
+        shell.className = `founder-mission-entry is-${mission.state}`;
+        const header = document.createElement("header");
+        header.className = "founder-mission-entry-header";
+        const count = document.createElement("p");
+        count.className = "founder-mission-count";
+        count.textContent = `${mission.number} / ${String(content.missions.length).padStart(2, "0")}`;
+        const kicker = document.createElement("p");
+        kicker.className = "room-kicker founder-mission-state";
+        kicker.textContent = mission.label;
+        const title = document.createElement("h2");
+        title.id = "founder-mission-title";
+        title.textContent = mission.title;
+        const phase = document.createElement("p");
+        phase.className = "founder-mission-phase";
+        phase.textContent = mission.phase;
+        header.append(count, kicker, title, phase);
+
+        const stage = document.createElement("div");
+        stage.className = "founder-mission-stage";
+        stage.tabIndex = -1;
+        const terminal = document.createElement("section");
+        terminal.className = "founder-mission-terminal";
+        const terminalLabel = document.createElement("p");
+        terminalLabel.className = "founder-mission-terminal-label";
+        terminalLabel.textContent = "MISSION BRIEF";
+        const objective = document.createElement("h3");
+        objective.className = "founder-mission-objective";
+        objective.textContent = mission.objective;
+        const brief = document.createElement("p");
+        brief.className = "founder-mission-brief";
+        brief.textContent = mission.brief;
+        const details = document.createElement("dl");
+        details.className = "founder-mission-details";
+        mission.details.forEach(([term, description]) => {
+            const row = document.createElement("div");
+            const key = document.createElement("dt");
+            key.textContent = term;
+            const value = document.createElement("dd");
+            value.textContent = description;
+            row.append(key, value);
+            details.append(row);
+        });
+        terminal.append(terminalLabel, objective, brief, details);
+        if (mission.priorities?.length) {
+            const priorities = document.createElement("div");
+            priorities.className = "founder-mission-priorities";
+            const prioritiesLabel = document.createElement("p");
+            prioritiesLabel.textContent = "CURRENT PRIORITIES";
+            const list = document.createElement("ol");
+            mission.priorities.forEach((priority) => {
+                const item = document.createElement("li");
+                item.textContent = priority;
+                list.append(item);
+            });
+            priorities.append(prioritiesLabel, list);
+            terminal.append(priorities);
+        }
+        const signal = document.createElement("p");
+        signal.className = "founder-mission-signal";
+        signal.textContent = mission.state === "active" ? "SIGNAL LIVE" : "ARCHIVE LOCKED";
+        terminal.append(signal);
+        stage.append(createMissionPixels(), terminal);
+
+        const controls = pageControls(
+            missionEntry > 0 ? () => renderMissionEntry(missionEntry - 1) : null,
+            missionEntry < content.missions.length - 1 ? () => renderMissionEntry(missionEntry + 1) : null
+        );
+        shell.append(header, stage, controls.bar);
+        experience.replaceChildren(shell);
+        experience.setAttribute("aria-labelledby", title.id);
+        experience.hidden = false;
+        if (focus) stage.focus({ preventScroll: true });
+    };
+
+    const openMission = () => {
+        hub.hidden = true;
+        renderMissionEntry(content.missions.length - 1);
+    };
+
     const activate = (button) => {
         select(buttons.indexOf(button));
         const item = content.hub[selected];
@@ -294,6 +400,10 @@ export function initFounderHub() {
         }
         if (item.status === "available" && item.id === "code") {
             openCode();
+            return;
+        }
+        if (item.status === "available" && item.id === "mission") {
+            openMission();
             return;
         }
         status.textContent = `${item.label} — CHAPTER IN DEVELOPMENT`;
@@ -327,7 +437,7 @@ export function initFounderHub() {
             const response = await fetch("data/founder-room.json", { cache: "no-cache" });
             if (!response.ok) throw new Error(`Founder Room request failed: ${response.status}`);
             content = await response.json();
-            if (!Array.isArray(content.hub) || content.hub.length !== 4 || !Array.isArray(content.code) || content.code.length !== 13 || !Array.isArray(content.origin) || !Array.isArray(content.journey)) throw new Error("Founder Room is incomplete.");
+            if (!Array.isArray(content.hub) || content.hub.length !== 4 || !Array.isArray(content.code) || content.code.length !== 13 || !Array.isArray(content.origin) || !Array.isArray(content.journey) || !Array.isArray(content.missions) || !content.missions.length) throw new Error("Founder Room is incomplete.");
             buttons = content.hub.map(createItem);
             list.replaceChildren(...buttons);
             select(0);
@@ -368,6 +478,12 @@ export function initFounderHub() {
         } else if (activeExperience === "code-entry" && event.key === "ArrowRight" && codeEntry < content.code.length) {
             event.preventDefault();
             renderCodeEntry(codeEntry + 1);
+        } else if (activeExperience === "mission-entry" && event.key === "ArrowLeft" && missionEntry > 0) {
+            event.preventDefault();
+            renderMissionEntry(missionEntry - 1);
+        } else if (activeExperience === "mission-entry" && event.key === "ArrowRight" && missionEntry < content.missions.length - 1) {
+            event.preventDefault();
+            renderMissionEntry(missionEntry + 1);
         } else if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();

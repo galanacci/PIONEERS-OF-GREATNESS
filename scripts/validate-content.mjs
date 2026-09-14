@@ -82,6 +82,18 @@ export function validateFounderRoom(payload) {
         assert(law.number === String(index + 1).padStart(2, "0"), `Invalid law number at index ${index}.`);
         assert(typeof law.statement === "string" && law.statement.trim(), `Law ${law.number} needs a statement.`);
     });
+    assert(Array.isArray(payload.missions) && payload.missions.length > 0, "Founder Missions must contain at least one mission.");
+    payload.missions.forEach((mission, index) => {
+        assert(mission.number === String(index + 1).padStart(2, "0"), `Invalid Founder Mission number at index ${index}.`);
+        assert(typeof mission.id === "string" && mission.id, `Founder Mission ${index} needs an id.`);
+        assert(mission.state === (index === payload.missions.length - 1 ? "active" : "complete"), `Invalid state for Founder Mission ${mission.id}.`);
+        for (const key of ["label", "title", "phase", "objective", "brief"]) {
+            assert(typeof mission[key] === "string" && mission[key].trim(), `Founder Mission ${mission.id} needs ${key}.`);
+        }
+        assert(Array.isArray(mission.details) && mission.details.length > 0, `Founder Mission ${mission.id} needs details.`);
+        assert(mission.details.every((entry) => Array.isArray(entry) && entry.length === 2 && entry.every((value) => typeof value === "string" && value.trim())), `Founder Mission ${mission.id} has invalid details.`);
+        if (mission.priorities !== undefined) assert(Array.isArray(mission.priorities) && mission.priorities.every((priority) => typeof priority === "string" && priority.trim()), `Founder Mission ${mission.id} has invalid priorities.`);
+    });
     assert(Array.isArray(payload.origin) && payload.origin.length === 3, "Founder Origin must contain three frames.");
     payload.origin.forEach((frame, index) => {
         assert(typeof frame.id === "string" && frame.id, `Founder Origin frame ${index} needs an id.`);

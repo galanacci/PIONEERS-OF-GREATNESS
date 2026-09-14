@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 7,
   "title": "FOUNDER",
   "identity": "GALANACCI",
   "hub": [
@@ -18,14 +18,14 @@
     {
       "id": "code",
       "number": "03",
-      "label": "THE CODE",
+      "label": "THE 13 LAWS",
       "status": "available"
     },
     {
       "id": "mission",
       "number": "04",
       "label": "CURRENT MISSION",
-      "status": "development"
+      "status": "available"
     }
   ],
   "code": [
@@ -49,6 +49,60 @@
     "width": 766,
     "height": 1280
   },
+  "missions": [
+    {
+      "id": "make-the-idea-physical",
+      "number": "01",
+      "state": "complete",
+      "label": "COMPLETED MISSION",
+      "title": "MAKE THE IDEA PHYSICAL",
+      "phase": "FOUNDATION",
+      "objective": "TURN THE PHILOSOPHY INTO ITS FIRST WEARABLE FORM.",
+      "brief": "Patterns, prototypes, mistakes and revisions carried PIONEERS OF GREATNESS out of the mind and into the real world.",
+      "details": [
+        ["PROJECT", "PIONEERS OF GREATNESS"],
+        ["OUTCOME", "THE FIRST PIECE"],
+        ["STATUS", "MISSION COMPLETE"]
+      ]
+    },
+    {
+      "id": "prove-belief",
+      "number": "02",
+      "state": "complete",
+      "label": "COMPLETED MISSION",
+      "title": "PROVE THE BELIEF",
+      "phase": "FIRST RELEASE",
+      "objective": "PLACE THE FIRST PIECE INTO THE HANDS OF SOMEONE WHO BELIEVED IN IT.",
+      "brief": "The first sale proved that the idea could live beyond its founder. Belief became an exchange, and the world became real.",
+      "details": [
+        ["PROJECT", "PIONEERS OF GREATNESS"],
+        ["OUTCOME", "THE FIRST SALE"],
+        ["STATUS", "MISSION COMPLETE"]
+      ]
+    },
+    {
+      "id": "build-the-second-release",
+      "number": "03",
+      "state": "active",
+      "label": "CURRENT MISSION",
+      "title": "BUILD THE SECOND RELEASE",
+      "phase": "FORGE",
+      "objective": "BUILD THE SECOND MADE-TO-ORDER RELEASE.",
+      "brief": "Build with what is available. Refine the product, strengthen the community and document the journey while it is still being lived.",
+      "details": [
+        ["PROJECT", "PIONEERS OF GREATNESS"],
+        ["LOCATION", "LONDON"],
+        ["COLLECTION", "FORGE"],
+        ["UPDATED", "SEPTEMBER 2026"]
+      ],
+      "priorities": [
+        "BUILD CAPITAL",
+        "REFINE PRODUCT",
+        "BUILD COMMUNITY",
+        "DOCUMENT THE JOURNEY"
+      ]
+    }
+  ],
   "origin": [
     {
       "id": "origin-studio",

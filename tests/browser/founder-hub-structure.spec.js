@@ -12,6 +12,6 @@ test("Founder Hub contains four distinct chapters without Founder Notes", async 
     await expect(page.locator('[data-founder-section="origin"]')).not.toHaveAttribute("aria-disabled", "true");
     await expect(page.locator('[data-founder-section="journey"]')).not.toHaveAttribute("aria-disabled", "true");
     await expect(page.locator('[data-founder-section="code"]')).not.toHaveAttribute("aria-disabled", "true");
-    await expect(page.locator('[data-founder-section="mission"]')).toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator('[data-founder-section="mission"]')).not.toHaveAttribute("aria-disabled", "true");
     await expect(page.locator('[data-founder-section="mission"] .founder-hub-item-number')).toHaveText("04");
 });

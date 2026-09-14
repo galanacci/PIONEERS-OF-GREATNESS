@@ -11,7 +11,7 @@
     position: absolute; top: max(20px, env(safe-area-inset-top)); left: var(--page-edge);
     width: 44px; height: 44px; padding: 0; z-index: 5; font-size: 25px; background: transparent;
 }
-.page-template :is(.documentary-header,.field-notes-header,.founder-hub-header,.founder-origin-frame-header,.founder-journey-entry-header,.founder-code-header) {
+.page-template :is(.documentary-header,.field-notes-header,.founder-hub-header,.founder-origin-frame-header,.founder-journey-entry-header,.founder-code-header,.founder-mission-entry-header) {
     position: static; grid-area: auto; width: auto; max-width: none; margin: 0 0 0 56px;
     padding: 0; text-align: right; justify-self: stretch; align-self: start;
     max-height: 30dvh; overflow-y: auto;
@@ -27,7 +27,7 @@
 .page-template .page-details { max-width: 620px; margin-left: auto; }
 .page-template :is(.room-divider,.room-season,.founder-hub-instructions) { display: none; }
 .page-template.founder-content { display: flex; flex-direction: column; }
-.page-template :is(.founder-hub,.founder-origin-frame,.founder-origin-frame.is-visual-only,.founder-journey-entry,.founder-code-entry,.journey-collection) {
+.page-template :is(.founder-hub,.founder-origin-frame,.founder-origin-frame.is-visual-only,.founder-journey-entry,.founder-code-entry,.founder-mission-entry,.journey-collection) {
     display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0,1fr) auto;
     grid-template-areas: none; height: 100%; min-height: 0; padding: 0; gap: 12px;
 }
