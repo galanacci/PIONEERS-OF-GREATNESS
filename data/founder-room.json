@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "title": "FOUNDER",
   "identity": "GALANACCI",
   "hub": [
@@ -43,6 +43,12 @@
     { "number": "12", "statement": "THE MOMENT YOU STOP LEARNING, IT’S GAME OVER." },
     { "number": "13", "statement": "WITHOUT PURPOSE, YOU HAVE NO DIRECTION." }
   ],
+  "codeArchive": {
+    "src": "src/founder/13-laws-handwritten.jpg",
+    "alt": "The original handwritten 13 Laws of GALANACCI",
+    "width": 766,
+    "height": 1280
+  },
   "origin": [
     {
       "id": "origin-studio",

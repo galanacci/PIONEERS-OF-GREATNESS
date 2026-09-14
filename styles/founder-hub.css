@@ -111,6 +111,21 @@
     animation: founder-code-enter 360ms ease both;
 }
 
+.founder-code-stage.is-archive::before,
+.founder-code-stage.is-archive::after {
+    display: none;
+}
+
+.founder-code-archive-image {
+    display: block;
+    width: auto;
+    max-width: min(100%, 766px);
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    animation: founder-code-enter 420ms ease both;
+}
+
 @keyframes founder-code-enter {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -138,7 +153,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .founder-code-law { animation: none; }
+    .founder-code-law,
+    .founder-code-archive-image { animation: none; }
 }
 
 .founder-origin-frame {

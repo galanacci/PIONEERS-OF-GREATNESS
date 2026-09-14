@@ -219,8 +219,10 @@ export function initFounderHub() {
         stopExperienceMedia();
         activeExperience = "code-entry";
         updateTopReturn();
-        codeEntry = Math.max(0, Math.min(index, content.code.length - 1));
-        const law = content.code[codeEntry];
+        const archiveIndex = content.code.length;
+        codeEntry = Math.max(0, Math.min(index, archiveIndex));
+        const isArchive = codeEntry === archiveIndex;
+        const law = isArchive ? content.code.at(-1) : content.code[codeEntry];
 
         const shell = document.createElement("article");
         shell.className = "founder-code-entry";
@@ -239,20 +241,31 @@ export function initFounderHub() {
         header.append(kicker, count, title);
 
         const stage = document.createElement("div");
-        stage.className = "founder-code-stage";
+        stage.className = `founder-code-stage${isArchive ? " is-archive" : ""}`;
         stage.tabIndex = -1;
-        const numeral = document.createElement("span");
-        numeral.className = "founder-code-numeral";
-        numeral.setAttribute("aria-hidden", "true");
-        numeral.textContent = law.number;
-        const statement = document.createElement("p");
-        statement.className = "founder-code-law";
-        statement.textContent = law.statement;
-        stage.append(numeral, statement);
+        if (isArchive) {
+            const image = document.createElement("img");
+            image.className = "founder-code-archive-image";
+            image.src = content.codeArchive.src;
+            image.alt = content.codeArchive.alt;
+            image.width = content.codeArchive.width;
+            image.height = content.codeArchive.height;
+            image.decoding = "async";
+            stage.append(image);
+        } else {
+            const numeral = document.createElement("span");
+            numeral.className = "founder-code-numeral";
+            numeral.setAttribute("aria-hidden", "true");
+            numeral.textContent = law.number;
+            const statement = document.createElement("p");
+            statement.className = "founder-code-law";
+            statement.textContent = law.statement;
+            stage.append(numeral, statement);
+        }
 
         const controls = pageControls(
             codeEntry > 0 ? () => renderCodeEntry(codeEntry - 1) : null,
-            codeEntry < content.code.length - 1 ? () => renderCodeEntry(codeEntry + 1) : null
+            codeEntry < archiveIndex ? () => renderCodeEntry(codeEntry + 1) : null
         );
         shell.append(header, stage, controls.bar);
         experience.replaceChildren(shell);
@@ -352,7 +365,7 @@ export function initFounderHub() {
         } else if (activeExperience === "code-entry" && event.key === "ArrowLeft" && codeEntry > 0) {
             event.preventDefault();
             renderCodeEntry(codeEntry - 1);
-        } else if (activeExperience === "code-entry" && event.key === "ArrowRight" && codeEntry < content.code.length - 1) {
+        } else if (activeExperience === "code-entry" && event.key === "ArrowRight" && codeEntry < content.code.length) {
             event.preventDefault();
             renderCodeEntry(codeEntry + 1);
         } else if (event.key === "Escape") {

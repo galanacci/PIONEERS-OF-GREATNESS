@@ -20,6 +20,17 @@ test("The Code presents all thirteen laws as a navigable manifesto", async ({ pa
     await expect(page.locator(".founder-code-stage")).toBeFocused();
     expect(await page.getByRole("button", { name: "MENU" }).evaluate((element) => getComputedStyle(element).color)).toBe("rgb(255, 255, 255)");
 
+    for (let index = 0; index < 11; index += 1) await page.keyboard.press("ArrowRight");
+    await expect(page.locator(".founder-code-law")).toHaveText("WITHOUT PURPOSE, YOU HAVE NO DIRECTION.");
+    await page.locator("#founder-experience .page-controls .is-next").click();
+    await expect(page.locator(".founder-code-stage.is-archive")).toBeVisible();
+    await expect(page.locator(".founder-code-count")).toHaveText("13 / 13");
+    await expect(page.locator(".founder-code-archive-image")).toHaveAttribute("src", "src/founder/13-laws-handwritten.jpg");
+    await expect(page.locator("#founder-experience .page-controls .is-next")).toBeDisabled();
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(page.locator(".founder-code-law")).toHaveText("WITHOUT PURPOSE, YOU HAVE NO DIRECTION.");
+
     await page.locator("#founder-room .room-return").click();
     await expect(page.locator("#founder-hub")).toBeVisible();
 });
