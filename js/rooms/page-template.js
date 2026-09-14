@@ -1,4 +1,10 @@
 export const openMenu = () => window.dispatchEvent(new CustomEvent('pog:close-room'));
+export function roomNavigationCredit() {
+    const credit = document.createElement('p');
+    credit.className = 'room-navigation-credit';
+    credit.textContent = '© 2026 A GALANACCI® COMPANY';
+    return credit;
+}
 export function pageControls(previous, next) {
     const bar = document.createElement('div'); bar.className = 'page-controls';
     bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', 'Page controls');
@@ -8,7 +14,8 @@ export function pageControls(previous, next) {
     };
     const prev = button('PREVIOUS', previous); prev.classList.add('is-previous');
     const center = document.createElement('div'); center.className = 'page-controls-center'; center.append(button('MENU', openMenu));
-    const forward = button('NEXT', next); forward.classList.add('is-next'); bar.append(prev, center, forward);
+    const forward = button('NEXT', next); forward.classList.add('is-next');
+    bar.append(prev, center, forward, roomNavigationCredit());
     return { bar, center, previous: prev, next: forward };
 }
 export function initPageTemplate() {
@@ -84,11 +91,12 @@ export function initPageTemplate() {
         if (content.matches('.documentary-content,.field-notes-content')) {
             content.classList.add('archive-heading-right');
             const room=content.closest('.world-room');
-            if(!room.querySelector('.archive-bottom-menu')){
+            if(!room.querySelector('.archive-bottom-navigation')){
+                const navigation=document.createElement('div');navigation.className='archive-bottom-navigation';
                 const menu=document.createElement('button');menu.type='button';
                 menu.className='archive-bottom-menu';menu.textContent='MENU';
                 menu.setAttribute('aria-haspopup','true');menu.setAttribute('aria-expanded','false');
-                room.append(menu);
+                navigation.append(menu,roomNavigationCredit());room.append(navigation);
             }
             return;
         }

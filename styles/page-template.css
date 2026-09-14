@@ -3,7 +3,7 @@
 .world-room .page-template {
     --page-edge: clamp(18px, 3vw, 40px);
     width: 100%; height: 100dvh; min-height: 0; margin: 0;
-    padding: max(20px, env(safe-area-inset-top)) var(--page-edge) max(12px, env(safe-area-inset-bottom));
+    padding: max(20px, env(safe-area-inset-top)) var(--page-edge) max(25px, env(safe-area-inset-bottom));
     display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 12px; box-sizing: border-box; overflow: hidden;
 }
@@ -68,19 +68,24 @@
 .page-template :is(.founder-origin-media img,.founder-origin-poem-trigger,.founder-origin-video,.founder-origin-video video) { max-height: 100%; height: 100%; width: 100%; object-fit: contain; }
 .page-template :is(.founder-origin-controls,.founder-journey-controls,.page-controls) {
     position: static; grid-area: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-    width: min(100%, 720px); gap: clamp(8px, 1.5vw, 14px); align-items: center;
+    width: min(100%, 720px); column-gap: clamp(8px, 1.5vw, 14px); row-gap: 15px; align-items: center;
     min-height: 44px; margin: 0 auto; padding: 0;
 }
 .page-template :is(.page-controls button,.founder-origin-control,.founder-journey-control) {
-    box-sizing: border-box; width: 100%; min-width: 0; height: 44px; min-height: 44px;
-    padding: 0 clamp(8px, 1.4vw, 14px); display: inline-flex; align-items: center; justify-content: center;
+    box-sizing: border-box; width: 100%; min-width: 72px; height: 42px; min-height: 42px;
+    padding: 0 14px; display: inline-flex; align-items: center; justify-content: center;
     background: #000; border: 1px solid #fff; color: #fff;
-    font-family: var(--font-brand); font-size: 10px; letter-spacing: .12em; cursor: pointer;
+    font-family: var(--font-brand); font-size: 11px; font-weight: 600; letter-spacing: .18em; cursor: pointer;
     transition: color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 .page-controls > :first-child,
 .page-controls > :last-child { justify-self: stretch; }
 .page-controls-center { width: 100%; display: flex; gap: 20px; align-items: center; justify-content: center; }
+.room-navigation-credit {
+    grid-column: 1 / -1; justify-self: center; margin: 0;
+    color: #fff; font-size: 8px; font-weight: 700; line-height: normal;
+    letter-spacing: 0; text-align: center; white-space: nowrap;
+}
 .page-template :is(.founder-origin-control,.founder-journey-control,.page-controls > button):is(.is-previous,.is-next) {
     gap: 8px;
 }
@@ -123,7 +128,9 @@
     }
     .page-template :is(.documentary-intro,.field-notes-intro) { font-size: 11px; }
     .page-controls-center { gap: 12px; }
-    .page-template :is(.founder-origin-controls,.founder-journey-controls,.page-controls) { gap: 8px; }
+    .page-template :is(.founder-origin-controls,.founder-journey-controls,.page-controls) {
+        column-gap: 8px; row-gap: 15px;
+    }
 }
 .page-template [hidden] { display: none !important; }
 .journey-collection > :is(.journey-selector-header,.journey-space) {
@@ -135,14 +142,18 @@
 @media (prefers-reduced-motion: reduce) {
     .journey-collection > :is(.journey-selector-header,.journey-space) { transition: none; }
 }
-.archive-bottom-menu {
-    position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); left: 50%;
+.archive-bottom-navigation {
+    position: fixed; bottom: max(25px, env(safe-area-inset-bottom)); left: 50%;
     transform: translateX(-50%); z-index: 20;
-    box-sizing: border-box; width: clamp(88px, 20vw, 226px); height: 44px; min-height: 44px;
+    display: flex; flex-direction: column; align-items: center; gap: 15px;
+}
+.archive-bottom-menu {
+    position: static; transform: none;
+    box-sizing: border-box; width: clamp(88px, 20vw, 226px); min-width: 72px; height: 42px; min-height: 42px;
     padding: 0 14px; display: inline-flex; align-items: center; justify-content: center;
     border: 1px solid #fff; background: #000;
-    color: #fff; font-family: var(--font-brand); font-size: 10px;
-    letter-spacing: .1em; cursor: pointer;
+    color: #fff; font-family: var(--font-brand); font-size: 11px; font-weight: 600;
+    letter-spacing: .18em; cursor: pointer;
     transition: color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 .world-room :is(.archive-bottom-menu,.journey-menu-return,.founder-origin-return,.founder-journey-return,.page-controls-center > button) {

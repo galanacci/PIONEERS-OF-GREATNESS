@@ -1,3 +1,5 @@
+import { roomNavigationCredit } from './page-template.js';
+
 export function createJourneySelector(memories, { selected = 0, onSelect, onOpen, onReturn }) {
     const shell=document.createElement('section');shell.className='journey-collection is-loading';
     shell.innerHTML=`<h2 id="founder-journey-menu-title" class="journey-section-label">THE JOURNEY</h2>
@@ -5,6 +7,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
       <div class="journey-space" role="group" aria-label="Journey artefacts" aria-busy="true" inert style="visibility:hidden"></div>
       <p class="journey-scene-message" role="status">OPENING ARCHIVE…</p>
       <div class="founder-journey-controls journey-selector-controls" role="navigation" aria-label="Journey selection"><button type="button" class="founder-journey-control is-previous">PREVIOUS</button><button type="button" class="founder-journey-control journey-menu-return">BACK</button><button type="button" class="founder-journey-control is-next">NEXT</button></div>`;
+    shell.querySelector('.journey-selector-controls').append(roomNavigationCredit());
     const space=shell.querySelector('.journey-space'),message=shell.querySelector('.journey-scene-message');
     const mobile=matchMedia('(max-width:700px)');
     const buttons=[],timers=[];let scene=null,disposed=false,opening=false,swipe=null,suppressClick=false,hovered=null;

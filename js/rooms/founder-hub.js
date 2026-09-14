@@ -1,5 +1,5 @@
 import { createJourneyArtefact } from './journey-artefact.js';
-import { pageControls, openMenu } from './page-template.js';
+import { pageControls, openMenu, roomNavigationCredit } from './page-template.js';
 import { createJourneySelector } from './journey-selector.js';
 const ROOM_ID = "founder-room";
 
@@ -189,7 +189,7 @@ export function initFounderHub() {
         next.textContent = "NEXT";
         next.disabled = originFrame === content.origin.length - 1;
         next.addEventListener("click", () => renderOrigin(originFrame + 1));
-        controls.append(previous, back, next);
+        controls.append(previous, back, next, roomNavigationCredit());
         if (frame.copy?.length) header.append(copy);
         shell.append(header, media);
         shell.append(controls);
@@ -256,7 +256,7 @@ export function initFounderHub() {
         next.textContent = "NEXT";
         next.disabled = journeyEntry === content.journey.length - 1;
         next.addEventListener("click", () => renderJourneyEntry(journeyEntry + 1));
-        controls.append(previous, back, next);
+        controls.append(previous, back, next, roomNavigationCredit());
         header.append(copy);
         shell.append(header, media, controls);
         experience.replaceChildren(shell);
