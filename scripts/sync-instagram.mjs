@@ -169,7 +169,7 @@ function assignEntryNumbers(notes) {
     const totalDigits = Math.max(3, String(chronological.length).length);
 
     chronological.forEach((note, index) => {
-        note.entry = `FIELD NOTE ${String(index + 1).padStart(totalDigits, "0")}`;
+        note.entry = `ENTRY ${String(index + 1).padStart(totalDigits, "0")}`;
     });
 
     return chronological.reverse();

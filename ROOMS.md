@@ -14,7 +14,7 @@ Every interactive room must be registered in `js/room-registry.js` and have a ma
 
 ## Current rooms
 
-- `founder-room`: reached directly from the main menu after the site-wide BEGIN threshold. The full GREATNESS POEM animation and Greatness Tee image-and-ENTER reveal form a one-time initiation; CONTINUE enters the menu directly. In ORIGIN, pressing the `THE FIRST PHYSICAL EXPRESSION` image replays the poem with SKIP and returns to the same frame. The five-choice Founder Hub currently opens two finished chapters: ORIGIN is a three-frame, non-looping visual sequence containing the dated London bedroom, original poem and first Greatness Tee. THE JOURNEY presents eight artefacts inside one shared 3D archive with finite entry navigation.
+- `founder-room`: reached directly from the main menu after the site-wide BEGIN threshold. Its four-choice Founder Hub opens three finished chapters: ORIGIN is the moving Pre-PoG visual archive, THE JOURNEY presents eight artefacts inside one shared 3D archive, and THE CODE presents the 13 Laws of Greatness as a navigable manifesto. CURRENT MISSION remains locked while in development.
 - `documentary-room`: UNCUT screening room, grouped by release year. Its YouTube iframe is removed on exit so hidden playback cannot continue.
 - `field-notes-room`: Instagram-derived journal. Multi-image entries expose pointer and keyboard carousel controls.
 

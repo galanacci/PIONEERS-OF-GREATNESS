@@ -17,6 +17,7 @@ export function initFounderHub() {
     let selected = 0;
     let journeySelected = 0;
     let journeyEntry = 0;
+    let codeEntry = 0;
     let activeExperience = null;
     let buttons = [];
     let content = null;
@@ -214,6 +215,56 @@ export function initFounderHub() {
         renderJourneyMenu();
     };
 
+    const renderCodeEntry = (index, focus = true) => {
+        stopExperienceMedia();
+        activeExperience = "code-entry";
+        updateTopReturn();
+        codeEntry = Math.max(0, Math.min(index, content.code.length - 1));
+        const law = content.code[codeEntry];
+
+        const shell = document.createElement("article");
+        shell.className = "founder-code-entry";
+
+        const header = document.createElement("header");
+        header.className = "founder-code-header";
+        const kicker = document.createElement("p");
+        kicker.className = "room-kicker";
+        kicker.textContent = "PIONEERS OF GREATNESS";
+        const count = document.createElement("p");
+        count.className = "founder-code-count";
+        count.textContent = `${law.number} / ${String(content.code.length).padStart(2, "0")}`;
+        const title = document.createElement("h2");
+        title.id = "founder-code-title";
+        title.textContent = "THE 13 LAWS OF GREATNESS";
+        header.append(kicker, count, title);
+
+        const stage = document.createElement("div");
+        stage.className = "founder-code-stage";
+        const numeral = document.createElement("span");
+        numeral.className = "founder-code-numeral";
+        numeral.setAttribute("aria-hidden", "true");
+        numeral.textContent = law.number;
+        const statement = document.createElement("p");
+        statement.className = "founder-code-law";
+        statement.textContent = law.statement;
+        stage.append(numeral, statement);
+
+        const controls = pageControls(
+            codeEntry > 0 ? () => renderCodeEntry(codeEntry - 1) : null,
+            codeEntry < content.code.length - 1 ? () => renderCodeEntry(codeEntry + 1) : null
+        );
+        shell.append(header, stage, controls.bar);
+        experience.replaceChildren(shell);
+        experience.setAttribute("aria-labelledby", title.id);
+        experience.hidden = false;
+        if (focus) controls.center.querySelector("button")?.focus();
+    };
+
+    const openCode = () => {
+        hub.hidden = true;
+        renderCodeEntry(0);
+    };
+
     const activate = (button) => {
         select(buttons.indexOf(button));
         const item = content.hub[selected];
@@ -225,6 +276,10 @@ export function initFounderHub() {
         }
         if (item.status === "available" && item.id === "journey") {
             openJourney();
+            return;
+        }
+        if (item.status === "available" && item.id === "code") {
+            openCode();
             return;
         }
         status.textContent = `${item.label} — CHAPTER IN DEVELOPMENT`;
@@ -258,7 +313,7 @@ export function initFounderHub() {
             const response = await fetch("data/founder-room.json", { cache: "no-cache" });
             if (!response.ok) throw new Error(`Founder Room request failed: ${response.status}`);
             content = await response.json();
-            if (!Array.isArray(content.hub) || content.hub.length !== 5 || !Array.isArray(content.origin) || !Array.isArray(content.journey)) throw new Error("Founder Room is incomplete.");
+            if (!Array.isArray(content.hub) || content.hub.length !== 4 || !Array.isArray(content.code) || content.code.length !== 13 || !Array.isArray(content.origin) || !Array.isArray(content.journey)) throw new Error("Founder Room is incomplete.");
             buttons = content.hub.map(createItem);
             list.replaceChildren(...buttons);
             select(0);
@@ -293,6 +348,12 @@ export function initFounderHub() {
         } else if (activeExperience === "journey-entry" && event.key === "ArrowRight" && journeyEntry < content.journey.length - 1) {
             event.preventDefault();
             renderJourneyEntry(journeyEntry + 1);
+        } else if (activeExperience === "code-entry" && event.key === "ArrowLeft" && codeEntry > 0) {
+            event.preventDefault();
+            renderCodeEntry(codeEntry - 1);
+        } else if (activeExperience === "code-entry" && event.key === "ArrowRight" && codeEntry < content.code.length - 1) {
+            event.preventDefault();
+            renderCodeEntry(codeEntry + 1);
         } else if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();

@@ -28,7 +28,7 @@ export async function validateFieldNotes(payload, { requireFiles = true } = {}) 
         assert(typeof note.id === "string" && note.id, "Every Field Note needs an id.");
         assert(!ids.has(note.id), `Duplicate Field Note id: ${note.id}`);
         ids.add(note.id);
-        assert(/^FIELD NOTE \d{3,}$/.test(note.entry), `Invalid entry label for ${note.id}.`);
+        assert(/^ENTRY \d{3,}$/.test(note.entry), `Invalid entry label for ${note.id}.`);
         assert(validDate(note.timestamp), `Invalid timestamp for ${note.id}.`);
         assert(Array.isArray(note.images) && note.images.length > 0, `Field Note ${note.id} has no images.`);
         assert(note.images.every((path) => path.endsWith(".webp")), `Field Note ${note.id} contains a non-WebP derivative.`);
@@ -67,7 +67,7 @@ export function validateFounderRoom(payload) {
     assert(Number.isInteger(payload.version) && payload.version > 0, "Founder Room version must be a positive integer.");
     assert(payload.title === "FOUNDER", "Founder Room title must be FOUNDER.");
     assert(typeof payload.identity === "string" && payload.identity.trim(), "Founder identity is required.");
-    assert(Array.isArray(payload.hub) && payload.hub.length === 5, "Founder Hub must contain five sections.");
+    assert(Array.isArray(payload.hub) && payload.hub.length === 4, "Founder Hub must contain four sections.");
     const ids = new Set();
     payload.hub.forEach((item, index) => {
         assert(typeof item.id === "string" && item.id, `Founder Hub item ${index} needs an id.`);
@@ -76,6 +76,11 @@ export function validateFounderRoom(payload) {
         assert(/^\d{2}$/.test(item.number), `Invalid Founder Hub number for ${item.id}.`);
         assert(typeof item.label === "string" && item.label, `Founder Hub item ${item.id} needs a label.`);
         assert(["development", "available"].includes(item.status), `Invalid Founder Hub status for ${item.id}.`);
+    });
+    assert(Array.isArray(payload.code) && payload.code.length === 13, "The Code must contain thirteen laws.");
+    payload.code.forEach((law, index) => {
+        assert(law.number === String(index + 1).padStart(2, "0"), `Invalid law number at index ${index}.`);
+        assert(typeof law.statement === "string" && law.statement.trim(), `Law ${law.number} needs a statement.`);
     });
     assert(Array.isArray(payload.origin) && payload.origin.length === 3, "Founder Origin must contain three frames.");
     payload.origin.forEach((frame, index) => {

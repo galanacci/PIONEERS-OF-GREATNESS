@@ -183,7 +183,7 @@ test("game-like feedback extends to room controls without duplicating the main m
             detail: { roomId: "founder-room", skipTransition: true }
         }));
     });
-    await expect(page.locator(".founder-hub-item")).toHaveCount(5);
+    await expect(page.locator(".founder-hub-item")).toHaveCount(4);
     const origin = page.locator('[data-founder-section="origin"]');
     await origin.dispatchEvent("pointerover", { pointerType: "mouse" });
     await origin.click();
@@ -379,7 +379,7 @@ test("the poem gates the first visit and returning visitors continue directly", 
     await expect(page.locator("#founder-poem-reveal")).toBeHidden();
 });
 
-test("Founder opens into the interactive five-chapter hub", async ({ page }) => {
+test("Founder opens into the interactive four-chapter hub", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
@@ -387,7 +387,7 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     })));
     await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
-    await expect(page.locator(".founder-hub-item")).toHaveCount(5);
+    await expect(page.locator(".founder-hub-item")).toHaveCount(4);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await expect(page.locator(".founder-legacy")).toHaveCount(0);
     if (page.viewportSize()?.width < 560) {
