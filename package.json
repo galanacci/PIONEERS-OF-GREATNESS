@@ -7,6 +7,7 @@
     "test:browser": "playwright test",
     "sync:field-notes": "node scripts/sync-instagram.mjs",
     "sync:documentary": "node scripts/sync-youtube.mjs",
+    "build:social-preview": "node scripts/generate-social-preview.mjs",
     "test": "npm run validate && npm run test:browser"
   },
   "dependencies": {

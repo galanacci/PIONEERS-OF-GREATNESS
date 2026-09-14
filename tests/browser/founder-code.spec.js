@@ -8,9 +8,9 @@ test("The Code presents all thirteen laws as a navigable manifesto", async ({ pa
 
     await page.locator('[data-founder-section="code"]').click();
     await expect(page.locator(".founder-code-entry")).toBeVisible();
-    await expect(page.locator("#founder-code-title")).toHaveText("THE 13 LAWS OF GREATNESS");
+    await expect(page.locator("#founder-code-title")).toHaveText("THE 13 LAWS");
     await expect(page.locator(".founder-code-count")).toHaveText("01 / 13");
-    await expect(page.locator(".founder-code-law")).toHaveText("BELIEVE IN YOURSELF — AND BACK IT UP.");
+    await expect(page.locator(".founder-code-law")).toHaveText("BELIEVE IN YOURSELF. BACK IT UP.");
     await expect(page.locator(".founder-code-stage")).toBeFocused();
     expect(await page.locator(".founder-code-law").evaluate((element) => getComputedStyle(element).textAlign)).toBe("left");
 

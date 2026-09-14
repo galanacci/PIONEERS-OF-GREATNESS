@@ -235,7 +235,7 @@ export function initFounderHub() {
         count.textContent = `${law.number} / ${String(content.code.length).padStart(2, "0")}`;
         const title = document.createElement("h2");
         title.id = "founder-code-title";
-        title.textContent = "THE 13 LAWS OF GREATNESS";
+        title.textContent = "THE 13 LAWS";
         header.append(kicker, count, title);
 
         const stage = document.createElement("div");
