@@ -11,10 +11,14 @@ test("The Code presents all thirteen laws as a navigable manifesto", async ({ pa
     await expect(page.locator("#founder-code-title")).toHaveText("THE 13 LAWS OF GREATNESS");
     await expect(page.locator(".founder-code-count")).toHaveText("01 / 13");
     await expect(page.locator(".founder-code-law")).toHaveText("BELIEVE IN YOURSELF — AND BACK IT UP.");
+    await expect(page.locator(".founder-code-stage")).toBeFocused();
+    expect(await page.locator(".founder-code-law").evaluate((element) => getComputedStyle(element).textAlign)).toBe("left");
 
     await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-code-count")).toHaveText("02 / 13");
     await expect(page.locator(".founder-code-law")).toContainText("MEDIOCRITY NEVER INSPIRED ANYONE");
+    await expect(page.locator(".founder-code-stage")).toBeFocused();
+    expect(await page.getByRole("button", { name: "MENU" }).evaluate((element) => getComputedStyle(element).color)).toBe("rgb(255, 255, 255)");
 
     await page.locator("#founder-room .room-return").click();
     await expect(page.locator("#founder-hub")).toBeVisible();

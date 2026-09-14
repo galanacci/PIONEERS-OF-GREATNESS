@@ -240,6 +240,7 @@ export function initFounderHub() {
 
         const stage = document.createElement("div");
         stage.className = "founder-code-stage";
+        stage.tabIndex = -1;
         const numeral = document.createElement("span");
         numeral.className = "founder-code-numeral";
         numeral.setAttribute("aria-hidden", "true");
@@ -257,7 +258,7 @@ export function initFounderHub() {
         experience.replaceChildren(shell);
         experience.setAttribute("aria-labelledby", title.id);
         experience.hidden = false;
-        if (focus) controls.center.querySelector("button")?.focus();
+        if (focus) stage.focus({ preventScroll: true });
     };
 
     const openCode = () => {
