@@ -250,6 +250,12 @@
     .documentary-episode-status {
         text-align: right;
     }
+
+    .room-watch {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
 }
 
 @media (max-width: 480px) {

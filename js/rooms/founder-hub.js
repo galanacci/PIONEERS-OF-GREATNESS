@@ -175,7 +175,7 @@ export function initFounderHub() {
         const previous = document.createElement("button");
         previous.type = "button";
         previous.className = "founder-origin-control is-previous";
-        previous.textContent = "← PREVIOUS";
+        previous.textContent = "PREVIOUS";
         previous.disabled = originFrame === 0;
         previous.addEventListener("click", () => renderOrigin(originFrame - 1));
         const back = document.createElement("button");
@@ -186,7 +186,7 @@ export function initFounderHub() {
         const next = document.createElement("button");
         next.type = "button";
         next.className = "founder-origin-control is-next";
-        next.textContent = "NEXT →";
+        next.textContent = "NEXT";
         next.disabled = originFrame === content.origin.length - 1;
         next.addEventListener("click", () => renderOrigin(originFrame + 1));
         controls.append(previous, back, next);
@@ -242,7 +242,7 @@ export function initFounderHub() {
         const previous = document.createElement("button");
         previous.type = "button";
         previous.className = "founder-journey-control is-previous";
-        previous.textContent = "← PREVIOUS";
+        previous.textContent = "PREVIOUS";
         previous.disabled = journeyEntry === 0;
         previous.addEventListener("click", () => renderJourneyEntry(journeyEntry - 1));
         const back = document.createElement("button");
@@ -253,7 +253,7 @@ export function initFounderHub() {
         const next = document.createElement("button");
         next.type = "button";
         next.className = "founder-journey-control is-next";
-        next.textContent = "NEXT →";
+        next.textContent = "NEXT";
         next.disabled = journeyEntry === content.journey.length - 1;
         next.addEventListener("click", () => renderJourneyEntry(journeyEntry + 1));
         controls.append(previous, back, next);

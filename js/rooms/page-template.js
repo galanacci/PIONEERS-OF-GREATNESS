@@ -6,9 +6,9 @@ export function pageControls(previous, next) {
         const node = document.createElement('button'); node.type = 'button'; node.textContent = label;
         node.disabled = !action; if (action) node.addEventListener('click', action); return node;
     };
-    const prev = button('← PREVIOUS', previous);
+    const prev = button('PREVIOUS', previous); prev.classList.add('is-previous');
     const center = document.createElement('div'); center.className = 'page-controls-center'; center.append(button('MENU', openMenu));
-    const forward = button('NEXT →', next); bar.append(prev, center, forward);
+    const forward = button('NEXT', next); forward.classList.add('is-next'); bar.append(prev, center, forward);
     return { bar, center, previous: prev, next: forward };
 }
 export function initPageTemplate() {
@@ -30,9 +30,14 @@ export function initPageTemplate() {
         quickMenu=document.createElement('div');quickMenu.setAttribute('role','navigation');
         quickMenu.setAttribute('popover','manual');
         quickMenu.className='page-quick-menu';quickMenu.setAttribute('aria-label','Quick navigation');
+        const currentRoom=button.closest('.world-room')?.id;
         document.querySelectorAll('#menu-overlay .menu-item').forEach(original=>{
             const option=document.createElement('button');option.type='button';
             option.textContent=original.textContent;
+            const isCurrent=currentRoom==='founder-room'
+                ? original.dataset.menuAction==='founder'
+                : original.dataset.roomTarget===currentRoom;
+            if(isCurrent){option.classList.add('is-current');option.setAttribute('aria-current','page');}
             if(original.getAttribute('aria-disabled')==='true')option.setAttribute('aria-disabled','true');
             option.addEventListener('click',()=>{
                 if(option.getAttribute('aria-disabled')==='true')return;

@@ -233,6 +233,12 @@
     .field-note-caption {
         -webkit-line-clamp: 5;
     }
+
+    .field-note-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
 }
 
 @media (max-width: 480px) {

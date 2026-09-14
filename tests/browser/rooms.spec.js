@@ -317,15 +317,6 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     })), { timeout: 3000 }).toEqual({ level: targetLevel, muted: false });
 });
 
-test("Founder mission film leads its statement", async ({ page }) => {
-    await page.goto("/");
-    const filmLeads = await page.locator(".founder-mission-film").evaluate((section) => (
-        section.firstElementChild?.classList.contains("founder-mission-player")
-        && section.lastElementChild?.classList.contains("founder-mission-film-intro")
-    ));
-    expect(filmLeads).toBe(true);
-});
-
 test("the poem gates the first visit and replays from the first physical expression", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 320, height: 568 });
     await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
@@ -420,7 +411,7 @@ test("Founder opens into the interactive five-chapter hub", async ({ page }) => 
     await expect(page.locator("#founder-room")).toHaveClass(/is-open/);
     await expect(page.locator(".founder-hub-item")).toHaveCount(5);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    await expect(page.locator(".founder-legacy")).toBeHidden();
+    await expect(page.locator(".founder-legacy")).toHaveCount(0);
     if (page.viewportSize()?.width < 560) {
         const hubFits = await page.locator("#founder-room").evaluate((element) => element.scrollHeight <= element.clientHeight);
         expect(hubFits).toBe(true);

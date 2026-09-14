@@ -1,10 +1,10 @@
 export function createJourneySelector(memories, { selected = 0, onSelect, onOpen, onReturn }) {
-    const shell=document.createElement('section');shell.className='journey-collection';
+    const shell=document.createElement('section');shell.className='journey-collection is-loading';
     shell.innerHTML=`<h2 id="founder-journey-menu-title" class="journey-section-label">THE JOURNEY</h2>
       <header class="founder-journey-entry-header journey-selector-header" aria-live="polite" aria-atomic="true"><p class="founder-journey-count journey-selection-count"></p><h2 class="journey-selection-title"></h2><p class="journey-selection-status"></p></header>
       <div class="journey-space" role="group" aria-label="Journey artefacts" aria-busy="true" inert style="visibility:hidden"></div>
       <p class="journey-scene-message" role="status">OPENING ARCHIVE…</p>
-      <div class="founder-journey-controls journey-selector-controls" role="navigation" aria-label="Journey selection"><button type="button" class="founder-journey-control is-previous">← PREVIOUS</button><button type="button" class="founder-journey-control journey-menu-return">BACK</button><button type="button" class="founder-journey-control is-next">NEXT →</button></div>`;
+      <div class="founder-journey-controls journey-selector-controls" role="navigation" aria-label="Journey selection"><button type="button" class="founder-journey-control is-previous">PREVIOUS</button><button type="button" class="founder-journey-control journey-menu-return">BACK</button><button type="button" class="founder-journey-control is-next">NEXT</button></div>`;
     const space=shell.querySelector('.journey-space'),message=shell.querySelector('.journey-scene-message');
     const mobile=matchMedia('(max-width:700px)');
     const buttons=[],timers=[];let scene=null,disposed=false,opening=false,swipe=null,suppressClick=false,hovered=null;
@@ -12,7 +12,16 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     let soundHover=null, hoverExitTimer;
     const sound=name=>window.dispatchEvent(new CustomEvent('pog:menu-sound',{detail:{name}}));
     shell.classList.add('has-motion');
-    const reveal=()=>{if(disposed)return;space.style.visibility='';space.inert=false;space.setAttribute('aria-busy','false');};
+    const reveal=()=>{
+        if(disposed)return;
+        space.style.visibility='';space.inert=false;space.setAttribute('aria-busy','false');
+        shell.classList.remove('is-loading');
+        // Explicit keyframes also run when a cached desktop scene is ready before first paint.
+        const duration=matchMedia('(prefers-reduced-motion:reduce)').matches?0:650;
+        shell.querySelectorAll('.journey-selector-header,.journey-space').forEach(node=>{
+            node.animate([{opacity:0},{opacity:1}],{duration,easing:'ease',fill:'backwards'});
+        });
+    };
     const fallback=()=>{space.classList.remove('is-scene');space.classList.add('is-static');buttons.forEach(b=>{b.hidden=false;b.style.transform='';});message.textContent='3D UNAVAILABLE — SELECT A CHAPTER BELOW';reveal();};
     const select=(index,focus=false)=>{
         if(disposed||opening)return;

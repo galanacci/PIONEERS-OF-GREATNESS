@@ -3,6 +3,7 @@ html, body {
     flex-direction: column;
     justify-content: space-between;
     height: 100vh;
+    height: 100dvh;
     margin: 0;
     font-family: 'Lora', serif;
     background-color: black;

@@ -36,6 +36,7 @@
     padding: 0;
     list-style: none;
     max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
     overflow-y: auto;
     scrollbar-width: thin;
     transition: opacity 160ms ease, visibility 0s linear 0s;
@@ -61,6 +62,29 @@
 
 .menu-waitlist .menu-toggle {
     display: none;
+}
+.menu-waitlist #email-form {
+    box-sizing: border-box; padding: 0;
+    border: 1px solid rgba(255,255,255,.4); background: #000;
+    align-items: stretch;
+}
+.menu-waitlist #email-form:focus-within { border-color: #673caf; }
+.menu-waitlist #email-form .input-container { flex: 1; min-width: 0; max-width: none; }
+.menu-waitlist #email-form input[type="email"] {
+    width: 100%; max-width: none; min-width: 0;
+    border: 0; outline: none; box-shadow: none; appearance: none;
+}
+.menu-waitlist #email-form > button[type="submit"] {
+    flex: 0 0 44px; border: 0; outline: none; box-shadow: none; background: #000;
+}
+.menu-waitlist #email-form > button[type="submit"]:focus-visible { color: #a981e8; }
+@media (max-width: 700px) {
+    .menu-overlay { background-color: #000; }
+}
+@media (max-width: 600px) {
+    .menu-waitlist #email-form input[type="email"] { font-size: 16px; letter-spacing: .04em; height: 46px; }
+    .menu-waitlist #email-form input[type="email"]::placeholder { font-size: 11px; letter-spacing: .12em; }
+    .menu-waitlist #email-form > button[type="submit"] { height: 46px; }
 }
 
 .menu-list li + li {
