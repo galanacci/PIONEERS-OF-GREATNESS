@@ -296,7 +296,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     }).toBeGreaterThan(targetLevel - 0.005);
     await expect(page.locator("#site-ambience")).toHaveAttribute("data-output-mode", "webaudio");
     const timeBeforeDocumentary = await page.locator("#site-ambience").evaluate((audio) => audio.currentTime);
-    await page.getByRole("menuitem", { name: "DOCUMENTARY" }).click();
+    await page.getByRole("menuitem", { name: "VIDEO JOURNAL" }).click();
     await expect(page.locator("#documentary-room")).toHaveClass(/is-open/);
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => ({
         level: Number(audio.dataset.outputLevel),
@@ -550,9 +550,10 @@ test("Documentary selects one year chapter and removes playback on exit", async 
     await page.goto("/");
     expect(requests).toBe(0);
     await openMenu(page);
-    await page.getByRole("menuitem", { name: "DOCUMENTARY" }).click();
+    await page.getByRole("menuitem", { name: "VIDEO JOURNAL" }).click();
     await expect(page.locator("#documentary-room")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#documentary-feature iframe")).toHaveCount(1);
+    await expect(page.locator("#documentary-feature .documentary-feature-summary")).not.toBeEmpty();
     await expect(page.locator(".documentary-year-trigger")).toHaveText("2026");
     await expect(page.locator(".documentary-year-option")).toHaveCount(3);
     await expect(page.locator(".documentary-chapter .documentary-episode")).toHaveCount(18);
@@ -570,10 +571,12 @@ test("Documentary selects one year chapter and removes playback on exit", async 
     await expect(page.locator(".documentary-chapter .documentary-episode")).toHaveCount(47);
     await expect(page.locator('.documentary-list[aria-label="UNCUT episodes from 2025"]')).toBeVisible();
     await expect(page.locator("#documentary-feature time")).toHaveAttribute("datetime", /^2025-/);
+    const firstSummary = await page.locator("#documentary-feature .documentary-feature-summary").textContent();
     const firstEpisode = page.locator(".documentary-episode-button").first();
     await firstEpisode.focus();
     await page.keyboard.press("ArrowDown");
     await expect(page.locator(".documentary-episode-button").nth(1)).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("#documentary-feature .documentary-feature-summary")).not.toHaveText(firstSummary);
     await page.locator("#documentary-room [data-room-close]").first().click();
     await expect(page.locator("#documentary-feature iframe")).toHaveCount(0);
     expect(requests).toBe(1);

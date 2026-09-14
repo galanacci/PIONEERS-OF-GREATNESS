@@ -162,6 +162,15 @@
     line-height: 1.25;
 }
 
+.documentary-feature-summary {
+    max-width: 720px;
+    margin: 14px 0 0;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: clamp(13px, 1.45vw, 16px);
+    letter-spacing: 0.025em;
+    line-height: 1.65;
+}
+
 .documentary-list {
     margin: 0;
     padding: 0;
@@ -233,6 +242,12 @@
 
     .documentary-header {
         margin-top: 76px;
+    }
+
+    .documentary-feature-summary {
+        margin-top: 12px;
+        font-size: 13px;
+        line-height: 1.6;
     }
 
     .documentary-episode-button {

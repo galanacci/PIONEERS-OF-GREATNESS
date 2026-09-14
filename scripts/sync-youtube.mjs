@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { validateDocumentary } from "./validate-content.mjs";
+import { createDocumentarySummary } from "./documentary-summary.mjs";
 
 const apiKey = process.env.YOUTUBE_API_KEY;
 const playlistId = process.env.YOUTUBE_PLAYLIST_ID || "PL_UEBZlt-mUL5Hc2zGP4_Xsr6ayZAtWs3";
@@ -59,12 +60,15 @@ function buildArchive(items) {
         const snippet = item.snippet;
         const videoId = item.contentDetails.videoId;
 
+        const description = snippet.description || "";
+
         return {
             episode: `EPISODE ${String(available.length - index).padStart(3, "0")}`,
             playlistPosition: Number.isInteger(snippet.position) ? snippet.position : index,
             videoId,
             title: snippet.title || "UNTITLED",
-            description: snippet.description || "",
+            description,
+            summary: createDocumentarySummary(description, snippet.title),
             publishedAt: snippet.videoPublishedAt || snippet.publishedAt,
             thumbnail: snippet.thumbnails?.maxres?.url
                 || snippet.thumbnails?.standard?.url

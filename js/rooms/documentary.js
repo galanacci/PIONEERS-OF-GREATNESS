@@ -37,7 +37,10 @@ export async function initDocumentary() {
         const date = document.createElement("time"); date.dateTime = episode.publishedAt; date.textContent = formatDate(episode.publishedAt);
         meta.append(number, date);
         const title = document.createElement("h2"); title.textContent = episode.title;
-        feature.replaceChildren(player, meta, title);
+        const summary = document.createElement("p");
+        summary.className = "documentary-feature-summary";
+        summary.textContent = episode.summary || "";
+        feature.replaceChildren(player, meta, title, summary);
         buttons.forEach((button) => {
             const current = Number(button.dataset.episodeIndex) === selected;
             button.closest(".documentary-episode").classList.toggle("is-current", current);

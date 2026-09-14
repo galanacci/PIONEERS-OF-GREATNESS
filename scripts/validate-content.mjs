@@ -48,6 +48,8 @@ export function validateDocumentary(payload) {
         ids.add(episode.videoId);
         assert(/^EPISODE \d{3,}$/.test(episode.episode), `Invalid episode label at index ${index}.`);
         assert(validDate(episode.publishedAt), `Invalid published date for ${episode.videoId}.`);
+        assert(typeof episode.summary === "string" && episode.summary.trim(), `Episode ${episode.videoId} has no summary.`);
+        assert(episode.summary.length <= 360, `Episode ${episode.videoId} summary is too long.`);
     });
 }
 
