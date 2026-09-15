@@ -10,20 +10,23 @@ test("The 13 Laws remain a thirteen-page manifesto with a floating source image"
     await page.locator('[data-founder-section="code"]').click();
     await expect(page.locator(".founder-code-entry")).toBeVisible();
     await expect(page.locator("#founder-code-title")).toHaveText("THE 13 LAWS");
-    await expect(page.locator(".founder-code-count")).toHaveText("01 / 13");
+    await expect(page.locator(".founder-code-count")).toHaveCount(0);
     await expect(page.locator(".founder-code-law")).toHaveText("BELIEVE IN YOURSELF. BACK IT UP.");
     await expect(page.locator(".founder-code-stage")).toBeFocused();
     expect(await page.locator(".founder-code-law").evaluate((element) => getComputedStyle(element).textAlign)).toBe("left");
-    await expect(page.locator(".founder-code-numeral")).toHaveCSS("color", "rgba(143, 95, 218, 0.12)");
-    const numeralScale = await page.locator(".founder-code-numeral").evaluate((element) => {
-        const stage = element.parentElement.getBoundingClientRect();
-        return {
-            fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
-            stageWidth: stage.width,
-            stageHeight: stage.height
-        };
-    });
-    expect(numeralScale.fontSize).toBeGreaterThan(Math.min(numeralScale.stageWidth * 0.3, numeralScale.stageHeight * 0.55));
+    await expect(page.locator(".founder-code-numeral")).toHaveCount(0);
+    await expect(page.locator(".founder-code-law-number")).toHaveText("01");
+    await expect(page.locator(".founder-code-law-number")).toHaveCSS("color", "rgb(103, 60, 175)");
+    const typeScale = await page.locator(".founder-code-statement").evaluate((element) => ({
+        law: Number.parseFloat(getComputedStyle(element.querySelector(".founder-code-law")).fontSize),
+        number: Number.parseFloat(getComputedStyle(element.querySelector(".founder-code-law-number")).fontSize),
+        menu: Number.parseFloat(getComputedStyle(document.querySelector(".page-controls-center button")).fontSize)
+    }));
+    expect(typeScale.number).toBe(typeScale.menu);
+    expect(typeScale.law).toBeLessThanOrEqual(29);
+    expect(typeScale.law / typeScale.number).toBeGreaterThanOrEqual(1.75);
+    await expect(page.locator(".founder-code-statement")).toHaveCSS("animation-name", "founder-code-enter");
+    await expect(page.locator(".founder-code-law")).toHaveCSS("animation-name", "none");
     await expect(page.locator(".founder-code-stage")).not.toHaveClass(/is-archive/);
     const decoration = await page.locator(".founder-code-stage").evaluate((element) => ({
         before: getComputedStyle(element, "::before").content,
@@ -33,7 +36,7 @@ test("The 13 Laws remain a thirteen-page manifesto with a floating source image"
 
     const source = page.locator(".founder-code-source");
     await expect(source).toBeVisible();
-    await expect(source.locator(".founder-code-archive-image")).toHaveAttribute("src", "src/founder/13-laws-full-wall.jpg");
+    await expect(source.locator(".founder-code-archive-image")).toHaveAttribute("src", "src/founder/13-laws-cropped.jpg");
     const startingTransform = await source.evaluate((element) => element.style.transform);
     await expect.poll(() => source.evaluate((element) => element.style.transform)).not.toBe(startingTransform);
     const smallWidth = (await source.boundingBox()).width;
@@ -48,7 +51,7 @@ test("The 13 Laws remain a thirteen-page manifesto with a floating source image"
     await source.evaluate((element) => { element.dataset.persistenceMarker = "same-artefact"; });
     const beforeNavigation = await source.evaluate((element) => element.style.transform);
     await page.keyboard.press("ArrowRight");
-    await expect(page.locator(".founder-code-count")).toHaveText("02 / 13");
+    await expect(page.locator(".founder-code-law-number")).toHaveText("02");
     await expect(page.locator(".founder-code-law")).toContainText("MEDIOCRITY NEVER INSPIRED ANYONE");
     await expect(page.locator(".founder-code-stage")).toBeFocused();
     await expect(source).toHaveAttribute("data-persistence-marker", "same-artefact");
@@ -62,11 +65,9 @@ test("The 13 Laws remain a thirteen-page manifesto with a floating source image"
 
     for (let index = 0; index < 11; index += 1) await page.keyboard.press("ArrowRight");
     await expect(page.locator(".founder-code-law")).toHaveText("WITHOUT PURPOSE, YOU HAVE NO DIRECTION.");
-    await expect(page.locator(".founder-code-count")).toHaveText("13 / 13");
     await expect(page.locator("#founder-experience .page-controls .is-next")).toBeDisabled();
 
     await page.keyboard.press("ArrowLeft");
-    await expect(page.locator(".founder-code-count")).toHaveText("12 / 13");
     await expect(page.locator(".founder-code-law")).toContainText("STOP LEARNING");
 
     await page.locator("#founder-room .room-return").click();

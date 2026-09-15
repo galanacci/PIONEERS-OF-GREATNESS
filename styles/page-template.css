@@ -208,7 +208,7 @@
 }
 .field-notes-content.archive-heading-right > .room-divider { display: none; }
 .world-room :is(.page-template,.archive-heading-right) > .room-return {
-    font-size: 0; display: grid; place-items: center; text-decoration: none;
+    font-size: 0; display: grid; align-items: center; justify-items: start; text-decoration: none;
 }
 /* Documentary: shared top alignment, centred introduction, inline archive controls. */
 #documentary-room .documentary-content,
@@ -243,10 +243,21 @@
 #documentary-room .documentary-year-options { background: #000; padding: 8px; }
 #documentary-room .room-watch { margin-top: 32px; }
 .world-room :is(.page-template,.archive-heading-right) > .room-return::before {
-    content: ''; display: block; width: 8px; height: 10px;
+    content: ''; display: block; width: 18px; height: 28px;
     background-color: currentColor;
-    clip-path: polygon(100% 0, 0 50%, 100% 100%);
+    -webkit-mask: url('../src/ui/k2g-emblem-filled.svg') center / contain no-repeat;
+    mask: url('../src/ui/k2g-emblem-filled.svg') center / contain no-repeat;
+    transform: rotate(0deg); transform-origin: 50% 50%;
+    transition: transform 220ms ease, background-color 160ms ease;
     pointer-events: none;
+}
+.world-room :is(.page-template,.archive-heading-right) > .room-return.is-emblem-pressed::before {
+    transform: rotate(90deg);
+}
+@media (hover: hover) and (pointer: fine) {
+    .world-room :is(.page-template,.archive-heading-right) > .room-return:is(:hover,:focus-visible)::before {
+        transform: rotate(90deg);
+    }
 }
 .archive-heading-right :is(.documentary-header,.field-notes-header) {
     position: relative; align-self: flex-end; text-align: right;

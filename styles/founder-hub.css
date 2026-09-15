@@ -72,37 +72,38 @@
     isolation: isolate;
 }
 
-.founder-code-numeral {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 0;
-    color: rgba(143, 95, 218, 0.12);
+.founder-code-statement {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: min(72%, 620px);
+    animation: founder-code-enter 360ms ease both;
+}
+
+.founder-code-law-number {
+    flex: 0 0 auto;
+    margin-top: 0.65em;
+    color: #673caf;
     font-family: var(--font-brand);
-    font-size: clamp(260px, min(72vw, 70dvh), 760px);
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: -0.04em;
-    line-height: 0.72;
-    white-space: nowrap;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    user-select: none;
+    letter-spacing: 0.18em;
+    line-height: 1;
 }
 
 .founder-code-law {
-    position: relative;
-    z-index: 1;
-    width: min(82%, 820px);
+    width: auto;
     margin: 0;
     color: #fff;
     font-family: var(--font-brand);
-    font-size: clamp(24px, 4.2vw, 58px);
+    font-size: clamp(14px, 2.1vw, 29px);
     font-weight: 600;
     letter-spacing: 0.075em;
     line-height: 1.35;
     text-align: left;
     text-wrap: balance;
-    animation: founder-code-enter 360ms ease both;
 }
 
 .founder-code-source-backdrop {
@@ -181,9 +182,13 @@
     }
 
     .founder-code-law {
-        width: 82%;
-        font-size: clamp(20px, 7vw, 32px);
+        font-size: clamp(20px, 5.8vw, 24px);
         line-height: 1.4;
+    }
+
+    .founder-code-statement {
+        width: 82%;
+        gap: 9px;
     }
 }
 

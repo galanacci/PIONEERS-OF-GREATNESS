@@ -103,7 +103,8 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
     await continueButton.click();
     const entrySounds = await page.evaluate(() => window.__menuSoundLog.slice());
     expect(entrySounds.filter((sound) => sound === "select")).toHaveLength(1);
-    expect(entrySounds.filter((sound) => sound === "confirm")).toHaveLength(1);
+    expect(entrySounds.filter((sound) => sound === "boot")).toHaveLength(1);
+    expect(entrySounds).not.toContain("confirm");
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await page.getByRole("menuitem", { name: "FOUNDER" }).dispatchEvent("pointerover", { pointerType: "mouse" });
@@ -112,9 +113,44 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await page.keyboard.press("ArrowUp");
     const soundLog = await page.evaluate(() => window.__menuSoundLog);
-    expect(soundLog).toContain("confirm");
+    expect(soundLog).toContain("boot");
     expect(soundLog).toContain("select");
     expect(soundLog).toContain("locked");
+});
+
+test("EXIT emits a dedicated shutdown sound instead of the standard confirmation", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => {
+        window.__menuSoundLog = [];
+        window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
+        window.dispatchEvent(new CustomEvent("pog:return-to-menu"));
+    });
+    await page.getByRole("menuitem", { name: "EXIT" }).click();
+    const sounds = await page.evaluate(() => window.__menuSoundLog);
+    expect(sounds).toContain("shutdown");
+    expect(sounds).not.toContain("confirm");
+});
+
+test("BEGIN and CONTINUE emit the dedicated boot-up sound", async ({ page }) => {
+    const captureEntrySound = async () => {
+        await page.evaluate(() => {
+            window.__entrySoundLog = [];
+            window.addEventListener("pog:menu-sound", (event) => window.__entrySoundLog.push(event.detail.name));
+        });
+    };
+
+    await page.goto("/");
+    await captureEntrySound();
+    await page.getByRole("button", { name: "Begin experience" }).click();
+    expect(await page.evaluate(() => window.__entrySoundLog)).toContain("boot");
+    expect(await page.evaluate(() => window.__entrySoundLog)).not.toContain("confirm");
+
+    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
+    await page.reload();
+    await captureEntrySound();
+    await page.getByRole("button", { name: "Continue experience" }).click();
+    expect(await page.evaluate(() => window.__entrySoundLog)).toContain("boot");
+    expect(await page.evaluate(() => window.__entrySoundLog)).not.toContain("confirm");
 });
 
 test("a direct mobile touch unlocks and warms the SFX engine", async ({ page }) => {
@@ -497,6 +533,17 @@ test("Founder Journey presents eight spatial artefacts", async ({ page }) => {
     await page.locator(".founder-journey-return").click();
     await expect(page.locator("#founder-room")).not.toHaveClass(/is-open/);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+});
+
+test("Behind the Scenes images do not zoom on hover", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "field-notes-room", skipTransition: true }
+    })));
+    const firstEntry = page.locator(".field-notes-chapter .field-note").first();
+    await expect(firstEntry).toBeVisible();
+    await firstEntry.hover();
+    await expect(firstEntry.locator(".field-note-media img")).toHaveCSS("transform", "none");
 });
 
 test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {

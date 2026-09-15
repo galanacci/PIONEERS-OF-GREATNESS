@@ -48,7 +48,7 @@ export function initFounderHub() {
                 ? { state: "founder", label: "BACK", accessible: "Back to Founder" }
                 : { state: "", label: "BACK", accessible: "Back to menu" };
         topReturn.dataset.roomClose = destination.state;
-        topReturn.textContent = '<';
+        topReturn.textContent = '';
         topReturn.setAttribute("aria-label", destination.accessible);
     };
 
@@ -406,25 +406,25 @@ export function initFounderHub() {
         const kicker = document.createElement("p");
         kicker.className = "room-kicker";
         kicker.textContent = "PIONEERS OF GREATNESS";
-        const count = document.createElement("p");
-        count.className = "founder-code-count";
-        count.textContent = `${law.number} / ${String(content.code.length).padStart(2, "0")}`;
         const title = document.createElement("h2");
         title.id = "founder-code-title";
         title.textContent = "THE 13 LAWS";
-        header.append(kicker, count, title);
+        header.append(kicker, title);
 
         const stage = document.createElement("div");
         stage.className = "founder-code-stage";
         stage.tabIndex = -1;
-        const numeral = document.createElement("span");
-        numeral.className = "founder-code-numeral";
-        numeral.setAttribute("aria-hidden", "true");
-        numeral.textContent = law.number;
+        const statementLockup = document.createElement("div");
+        statementLockup.className = "founder-code-statement";
+        const lawNumber = document.createElement("span");
+        lawNumber.className = "founder-code-law-number";
+        lawNumber.setAttribute("aria-hidden", "true");
+        lawNumber.textContent = law.number;
         const statement = document.createElement("p");
         statement.className = "founder-code-law";
         statement.textContent = law.statement;
-        stage.append(numeral, statement);
+        statementLockup.append(lawNumber, statement);
+        stage.append(statementLockup);
         if (codeSource) codeSource.attach(stage);
         else codeSource = createCodeSource(stage);
 

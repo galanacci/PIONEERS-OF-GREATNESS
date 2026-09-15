@@ -87,7 +87,17 @@ export function initPageTemplate() {
     window.addEventListener('resize',dismiss);
     document.querySelectorAll('.world-room > .world-room-content').forEach(content => {
         const back = content.querySelector('.room-return');
-        if (back) { back.textContent = '<'; back.setAttribute('aria-label', 'Back'); }
+        if (back) {
+            back.textContent = '';
+            back.setAttribute('aria-label', 'Back');
+            let pressTimer;
+            back.addEventListener('pointerdown', () => {
+                clearTimeout(pressTimer);
+                back.classList.add('is-emblem-pressed');
+                pressTimer = setTimeout(() => back.classList.remove('is-emblem-pressed'), 260);
+            });
+            back.addEventListener('pointercancel', () => back.classList.remove('is-emblem-pressed'));
+        }
         if (content.matches('.documentary-content,.field-notes-content')) {
             content.classList.add('archive-heading-right');
             const room=content.closest('.world-room');

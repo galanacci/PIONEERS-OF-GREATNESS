@@ -6,9 +6,21 @@ const SOUND_SHAPES = {
         { frequency: 310, endFrequency: 430, duration: 0.07, gain: 0.026, type: "triangle" },
         { frequency: 620, endFrequency: 760, duration: 0.055, gain: 0.018, type: "sine", delay: 0.035 }
     ],
+    boot: [
+        { frequency: 58, endFrequency: 116, duration: 0.42, gain: 0.022, type: "sine" },
+        { frequency: 145, endFrequency: 290, duration: 0.2, gain: 0.026, type: "triangle", delay: 0.14 },
+        { frequency: 290, endFrequency: 580, duration: 0.18, gain: 0.028, type: "square", delay: 0.3 },
+        { frequency: 580, endFrequency: 880, duration: 0.24, gain: 0.022, type: "sine", delay: 0.44 }
+    ],
     locked: [
         { frequency: 190, endFrequency: 105, duration: 0.16, gain: 0.032, type: "square" },
         { frequency: 95, endFrequency: 70, duration: 0.18, gain: 0.018, type: "triangle", delay: 0.025 }
+    ],
+    shutdown: [
+        { frequency: 520, endFrequency: 360, duration: 0.14, gain: 0.026, type: "square" },
+        { frequency: 360, endFrequency: 220, duration: 0.18, gain: 0.03, type: "triangle", delay: 0.11 },
+        { frequency: 220, endFrequency: 82, duration: 0.34, gain: 0.034, type: "sawtooth", delay: 0.25 },
+        { frequency: 110, endFrequency: 48, duration: 0.42, gain: 0.022, type: "sine", delay: 0.34 }
     ]
 };
 
@@ -120,6 +132,6 @@ export function initMenuSound() {
     document.addEventListener("click", (event) => {
         const control = interactiveFrom(event.target);
         if (!control || isMainMenuControl(control)) return;
-        emit(isLocked(control) ? "locked" : "confirm");
+        emit(isLocked(control) ? "locked" : control.matches(".menu-toggle") ? "boot" : "confirm");
     });
 }

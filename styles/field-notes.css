@@ -156,13 +156,12 @@
     height: 100%;
     object-fit: cover;
     filter: saturate(0.82) contrast(1.04);
-    transition: filter 220ms ease, transform 220ms ease;
+    transition: filter 220ms ease;
 }
 
 .field-note:hover .field-note-media img,
 .field-note:focus-within .field-note-media img {
     filter: saturate(1) contrast(1.02);
-    transform: scale(1.012);
 }
 
 .field-note-count {

@@ -77,7 +77,7 @@ export function initMenu() {
             sound("locked");
             return;
         }
-        sound("confirm");
+        sound(item.dataset.menuAction === "exit" ? "shutdown" : "confirm");
         item.classList.add("is-activated");
         if (item.dataset.menuAction === "waitlist") {
             showWaitlist();

@@ -1,5 +1,38 @@
 import { expect, test } from "@playwright/test";
 
+test("K2G back emblems align with the page edge and rotate on interaction", async ({ page }) => {
+    await page.goto("/");
+
+    const arrows = await page.locator(".world-room > .world-room-content > .room-return").evaluateAll((buttons) => buttons.map((button) => {
+        const buttonBounds = button.getBoundingClientRect();
+        const buttonStyle = getComputedStyle(button);
+        const emblemStyle = getComputedStyle(button, "::before");
+        return {
+            left: buttonBounds.left,
+            justifyItems: buttonStyle.justifyItems,
+            emblemWidth: emblemStyle.width,
+            emblemHeight: emblemStyle.height,
+            emblemMask: emblemStyle.maskImage || emblemStyle.webkitMaskImage
+        };
+    }));
+    const expectedEdge = Math.min(40, Math.max(18, page.viewportSize().width * 0.03));
+
+    expect(arrows).toHaveLength(3);
+    arrows.forEach((arrow) => {
+        expect(Math.abs(arrow.left - expectedEdge)).toBeLessThanOrEqual(1);
+        expect(arrow.justifyItems).toBe("start");
+        expect(arrow.emblemWidth).toBe("18px");
+        expect(arrow.emblemHeight).toBe("28px");
+        expect(arrow.emblemMask).toContain("k2g-emblem-filled.svg");
+    });
+
+    const founderBack = page.locator("#founder-room .room-return");
+    await founderBack.dispatchEvent("pointerdown", { pointerType: "touch" });
+    await expect(founderBack).toHaveClass(/is-emblem-pressed/);
+    const pressedTransform = await founderBack.evaluate((button) => getComputedStyle(button, "::before").transform);
+    expect(pressedTransform).not.toBe("none");
+});
+
 test("Founder Hub contains four distinct chapters without Founder Notes", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
@@ -8,6 +41,9 @@ test("Founder Hub contains four distinct chapters without Founder Notes", async 
 
     const chapters = page.locator(".founder-hub-item");
     await expect(chapters).toHaveCount(4);
+    await expect(page.locator(".founder-hub-header .room-kicker")).toHaveText("GALANACCI THE CREATOR");
+    await expect(page.locator("#founder-title")).toHaveText("FOUNDER");
+    await expect(page.locator(".founder-hub-identity")).toHaveCount(0);
     await expect(page.locator('[data-founder-section="notes"]')).toHaveCount(0);
     await expect(page.locator('[data-founder-section="origin"]')).not.toHaveAttribute("aria-disabled", "true");
     await expect(page.locator('[data-founder-section="journey"]')).not.toHaveAttribute("aria-disabled", "true");
