@@ -25,7 +25,6 @@ export function createOriginArchive() {
     let focused = null;
     let motionPausedUntil = 0;
     const memories = [];
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const bounds = () => ({
         width: window.innerWidth,
@@ -54,7 +53,7 @@ export function createOriginArchive() {
         memory.x = randomBetween(area.edge, Math.max(area.edge, area.width - size.width - area.edge));
         memory.y = randomBetween(area.edge, Math.max(area.edge, area.height - size.height - area.footer));
         const angle = randomBetween(0, Math.PI * 2);
-        const speed = randomBetween(reducedMotion ? 5 : 12, reducedMotion ? 10 : 28);
+        const speed = randomBetween(12, 28);
         memory.vx = Math.cos(angle) * speed;
         memory.vy = Math.sin(angle) * speed;
         if (Math.abs(memory.vx) < 4) memory.vx = Math.sign(memory.vx || 1) * 4;

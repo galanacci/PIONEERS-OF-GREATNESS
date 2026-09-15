@@ -11,7 +11,6 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     const space=shell.querySelector('.journey-space'),message=shell.querySelector('.journey-scene-message');
     const mobile=matchMedia('(max-width:700px)');
     const buttons=[],timers=[];let scene=null,disposed=false,opening=false,swipe=null,suppressClick=false,hovered=null;
-    const isReduced=()=>false;
     let soundHover=null, hoverExitTimer;
     const sound=name=>window.dispatchEvent(new CustomEvent('pog:menu-sound',{detail:{name}}));
     shell.classList.add('has-motion');
@@ -20,7 +19,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
         space.style.visibility='';space.inert=false;space.setAttribute('aria-busy','false');
         shell.classList.remove('is-loading');
         // Explicit keyframes also run when a cached desktop scene is ready before first paint.
-        const duration=matchMedia('(prefers-reduced-motion:reduce)').matches?0:650;
+        const duration=650;
         shell.querySelectorAll('.journey-selector-header,.journey-space').forEach(node=>{
             node.animate([{opacity:0},{opacity:1}],{duration,easing:'ease',fill:'backwards'});
         });
@@ -42,8 +41,8 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     };
     const open=()=>{
         if(opening||disposed)return;opening=true;shell.classList.add('is-opening');
-        timers.push(setTimeout(()=>shell.classList.add('is-fading'),isReduced()?0:180));
-        timers.push(setTimeout(()=>{if(!disposed)onOpen(selected);},isReduced()?0:420));
+        timers.push(setTimeout(()=>shell.classList.add('is-fading'),180));
+        timers.push(setTimeout(()=>{if(!disposed)onOpen(selected);},420));
     };
     memories.forEach((memory,i)=>{
         const button=document.createElement('button');button.type='button';button.className='journey-object';button.dataset.journeyEntry=memory.id;
@@ -102,7 +101,7 @@ export function createJourneySelector(memories, { selected = 0, onSelect, onOpen
     import('./journey-scene.js').then(({mountJourneyScene})=>{
         if(disposed)return;
         scene=mountJourneyScene(space,memories,{
-            getSelected:()=>selected,getHovered:()=>hovered,isOpening:()=>opening,isReduced,onFailure:fallback,
+            getSelected:()=>selected,getHovered:()=>hovered,isOpening:()=>opening,onFailure:fallback,
             onReady:()=>{message.textContent='';reveal();},
             onLoaded:(i,failed)=>{buttons[i].classList.toggle('has-error',failed);buttons[i].querySelector('.journey-object-state').textContent=failed?'UNAVAILABLE':'';},
             onLabel:(i,p)=>{if(!space.classList.contains('is-scene'))return;buttons[i].hidden=!p;if(p)buttons[i].style.transform=`translate(${Math.round(p.x)}px,${Math.round(p.y)}px) translate(-50%,0)`;}

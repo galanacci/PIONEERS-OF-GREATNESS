@@ -108,11 +108,3 @@
     text-align: center;
     white-space: nowrap;
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .founder-origin-archive,
-    .origin-focus-backdrop,
-    .origin-memory {
-        transition-duration: 180ms;
-    }
-}

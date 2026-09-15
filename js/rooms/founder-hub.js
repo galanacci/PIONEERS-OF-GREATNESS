@@ -25,7 +25,14 @@ export function initFounderHub() {
     let artefact = null;
     let collection = null;
     let originArchive = null;
-    const stopArtefact = () => {
+    let codeSource = null;
+    let missionTypingRun = 0;
+    const viewedMissions = new Set();
+    const stopArtefact = ({ preserveCodeSource = false } = {}) => {
+        if (!preserveCodeSource) {
+            codeSource?.dispose();
+            codeSource = null;
+        }
         originArchive?.dispose();
         originArchive = null;
         collection?.dispose();
@@ -58,8 +65,13 @@ export function initFounderHub() {
         if (focus) buttons[selected].focus();
     };
 
-    const stopExperienceMedia = () => {
-        stopArtefact();
+    const stopExperienceMedia = (options) => {
+        missionTypingRun += 1;
+        stopArtefact(options);
+        experience.querySelectorAll("video[data-founder-background-video]").forEach((video) => {
+            video.pause();
+            video.currentTime = 0;
+        });
         experience.querySelectorAll("[data-founder-video-player]").forEach((player) => {
             window.dispatchEvent(new CustomEvent("pog:founder-video-stop", { detail: { player } }));
         });
@@ -149,6 +161,28 @@ export function initFounderHub() {
         const memory = content.journey[journeyEntry];
         const shell = document.createElement("article");
         shell.className = "founder-journey-entry";
+        let backgroundVideo = null;
+        if (memory.backgroundVideo) {
+            shell.classList.add("has-background-video");
+            backgroundVideo = document.createElement("video");
+            backgroundVideo.className = "founder-journey-background-video";
+            backgroundVideo.dataset.founderBackgroundVideo = "";
+            backgroundVideo.src = memory.backgroundVideo;
+            backgroundVideo.autoplay = true;
+            backgroundVideo.loop = true;
+            backgroundVideo.muted = true;
+            backgroundVideo.defaultMuted = true;
+            backgroundVideo.playsInline = true;
+            backgroundVideo.preload = "auto";
+            backgroundVideo.tabIndex = -1;
+            backgroundVideo.setAttribute("muted", "");
+            backgroundVideo.setAttribute("playsinline", "");
+            backgroundVideo.setAttribute("aria-hidden", "true");
+            const backgroundShade = document.createElement("div");
+            backgroundShade.className = "founder-journey-background-shade";
+            backgroundShade.setAttribute("aria-hidden", "true");
+            shell.append(backgroundVideo, backgroundShade);
+        }
         const header = document.createElement("header");
         header.className = "founder-journey-entry-header";
         const count = document.createElement("p");
@@ -191,6 +225,7 @@ export function initFounderHub() {
         experience.replaceChildren(shell);
         experience.setAttribute("aria-labelledby", title.id);
         experience.hidden = false;
+        backgroundVideo?.play().catch(() => {});
         if (focus) back.focus();
     };
 
@@ -216,14 +251,152 @@ export function initFounderHub() {
         renderJourneyMenu();
     };
 
+    const createCodeSource = (stage) => {
+        let currentStage = stage;
+        const backdrop = document.createElement("div");
+        backdrop.className = "founder-code-source-backdrop";
+        backdrop.setAttribute("aria-hidden", "true");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "founder-code-source";
+        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("aria-label", `View ${content.codeArchive.alt}`);
+        const image = document.createElement("img");
+        image.className = "founder-code-archive-image";
+        image.src = content.codeArchive.src;
+        image.alt = content.codeArchive.alt;
+        image.width = content.codeArchive.width;
+        image.height = content.codeArchive.height;
+        image.decoding = "async";
+        button.append(image);
+        currentStage.append(backdrop, button);
+
+        let disposed = false;
+        let frame = 0;
+        let previousTime = performance.now();
+        let focused = false;
+        let x = 0;
+        let y = 0;
+        let home = null;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 22 + Math.random() * 14;
+        let vx = Math.cos(angle) * speed;
+        let vy = Math.sin(angle) * speed;
+        if (Math.abs(vx) < 8) vx = Math.sign(vx || 1) * 8;
+        if (Math.abs(vy) < 8) vy = Math.sign(vy || 1) * 8;
+
+        const area = () => ({ width: currentStage.clientWidth, height: currentStage.clientHeight });
+        const paint = () => { button.style.transform = `translate3d(${x}px, ${y}px, 0)`; };
+        const place = () => {
+            const bounds = area();
+            x = Math.random() * Math.max(0, bounds.width - button.offsetWidth);
+            y = Math.random() * Math.max(0, bounds.height - button.offsetHeight);
+            paint();
+        };
+        const positionFocused = () => {
+            const bounds = area();
+            const ratio = content.codeArchive.width / content.codeArchive.height;
+            const width = Math.min(bounds.width * 0.76, bounds.height * 0.86 * ratio);
+            button.style.width = `${width}px`;
+            x = (bounds.width - width) / 2;
+            y = (bounds.height - width / ratio) / 2;
+            paint();
+        };
+        const close = () => {
+            if (!focused) return false;
+            focused = false;
+            currentStage.classList.remove("is-source-focused");
+            button.classList.remove("is-focused");
+            button.setAttribute("aria-pressed", "false");
+            button.setAttribute("aria-label", `View ${content.codeArchive.alt}`);
+            button.style.width = `${home.width}px`;
+            x = home.x;
+            y = home.y;
+            paint();
+            button.focus({ preventScroll: true });
+            return true;
+        };
+        const open = () => {
+            home = { x, y, width: button.offsetWidth };
+            focused = true;
+            currentStage.classList.add("is-source-focused");
+            button.classList.add("is-focused");
+            button.setAttribute("aria-pressed", "true");
+            button.setAttribute("aria-label", `Close ${content.codeArchive.alt}`);
+            positionFocused();
+        };
+        button.addEventListener("click", () => { if (!close()) open(); });
+        button.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && focused) {
+                event.preventDefault();
+                event.stopPropagation();
+                close();
+            } else if (focused && event.key.startsWith("Arrow")) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        });
+        const resize = () => {
+            if (focused) return positionFocused();
+            const bounds = area();
+            x = Math.min(Math.max(0, x), Math.max(0, bounds.width - button.offsetWidth));
+            y = Math.min(Math.max(0, y), Math.max(0, bounds.height - button.offsetHeight));
+            paint();
+        };
+        const update = (time) => {
+            if (disposed) return;
+            const delta = Math.min(0.04, Math.max(0, (time - previousTime) / 1000));
+            previousTime = time;
+            if (!focused && !document.hidden) {
+                const bounds = area();
+                x += vx * delta;
+                y += vy * delta;
+                if (x <= 0 || x + button.offsetWidth >= bounds.width) {
+                    vx *= -1;
+                    x = Math.min(Math.max(0, x), Math.max(0, bounds.width - button.offsetWidth));
+                }
+                if (y <= 0 || y + button.offsetHeight >= bounds.height) {
+                    vy *= -1;
+                    y = Math.min(Math.max(0, y), Math.max(0, bounds.height - button.offsetHeight));
+                }
+                paint();
+            }
+            frame = requestAnimationFrame(update);
+        };
+        window.addEventListener("resize", resize);
+        requestAnimationFrame(() => {
+            if (disposed) return;
+            place();
+            previousTime = performance.now();
+            frame = requestAnimationFrame(update);
+        });
+        return {
+            button,
+            attach(nextStage) {
+                currentStage.classList.remove("is-source-focused");
+                currentStage = nextStage;
+                currentStage.append(backdrop, button);
+                if (focused) currentStage.classList.add("is-source-focused");
+                requestAnimationFrame(() => {
+                    if (disposed) return;
+                    if (focused) positionFocused();
+                    else resize();
+                });
+            },
+            dispose() {
+                disposed = true;
+                cancelAnimationFrame(frame);
+                window.removeEventListener("resize", resize);
+            }
+        };
+    };
+
     const renderCodeEntry = (index, focus = true) => {
-        stopExperienceMedia();
+        stopExperienceMedia({ preserveCodeSource: true });
         activeExperience = "code-entry";
         updateTopReturn();
-        const archiveIndex = content.code.length;
-        codeEntry = Math.max(0, Math.min(index, archiveIndex));
-        const isArchive = codeEntry === archiveIndex;
-        const law = isArchive ? content.code.at(-1) : content.code[codeEntry];
+        codeEntry = Math.max(0, Math.min(index, content.code.length - 1));
+        const law = content.code[codeEntry];
 
         const shell = document.createElement("article");
         shell.className = "founder-code-entry";
@@ -242,31 +415,22 @@ export function initFounderHub() {
         header.append(kicker, count, title);
 
         const stage = document.createElement("div");
-        stage.className = `founder-code-stage${isArchive ? " is-archive" : ""}`;
+        stage.className = "founder-code-stage";
         stage.tabIndex = -1;
-        if (isArchive) {
-            const image = document.createElement("img");
-            image.className = "founder-code-archive-image";
-            image.src = content.codeArchive.src;
-            image.alt = content.codeArchive.alt;
-            image.width = content.codeArchive.width;
-            image.height = content.codeArchive.height;
-            image.decoding = "async";
-            stage.append(image);
-        } else {
-            const numeral = document.createElement("span");
-            numeral.className = "founder-code-numeral";
-            numeral.setAttribute("aria-hidden", "true");
-            numeral.textContent = law.number;
-            const statement = document.createElement("p");
-            statement.className = "founder-code-law";
-            statement.textContent = law.statement;
-            stage.append(numeral, statement);
-        }
+        const numeral = document.createElement("span");
+        numeral.className = "founder-code-numeral";
+        numeral.setAttribute("aria-hidden", "true");
+        numeral.textContent = law.number;
+        const statement = document.createElement("p");
+        statement.className = "founder-code-law";
+        statement.textContent = law.statement;
+        stage.append(numeral, statement);
+        if (codeSource) codeSource.attach(stage);
+        else codeSource = createCodeSource(stage);
 
         const controls = pageControls(
             codeEntry > 0 ? () => renderCodeEntry(codeEntry - 1) : null,
-            codeEntry < archiveIndex ? () => renderCodeEntry(codeEntry + 1) : null
+            codeEntry < content.code.length - 1 ? () => renderCodeEntry(codeEntry + 1) : null
         );
         shell.append(header, stage, controls.bar);
         experience.replaceChildren(shell);
@@ -280,22 +444,41 @@ export function initFounderHub() {
         renderCodeEntry(0);
     };
 
-    const createMissionPixels = () => {
-        const field = document.createElement("div");
-        field.className = "founder-mission-pixels";
-        field.setAttribute("aria-hidden", "true");
-        const glyphs = ["0", "1", "■", "+", "·"];
-        for (let index = 0; index < 36; index += 1) {
-            const pixel = document.createElement("span");
-            pixel.className = "founder-mission-pixel";
-            pixel.textContent = glyphs[index % glyphs.length];
-            pixel.style.setProperty("--mission-x", `${(index * 37) % 101}%`);
-            pixel.style.setProperty("--mission-delay", `${-((index * 0.41) % 6).toFixed(2)}s`);
-            pixel.style.setProperty("--mission-duration", `${4.4 + (index % 7) * 0.58}s`);
-            pixel.style.setProperty("--mission-opacity", `${0.12 + (index % 5) * 0.07}`);
-            field.append(pixel);
+    const queueMissionText = (element, value, speed = 5) => {
+        element.dataset.missionType = value;
+        element.dataset.missionSpeed = String(speed);
+        element.setAttribute("aria-label", value);
+        element.textContent = "";
+    };
+
+    const playMissionTyping = async (terminal, run, animate = true) => {
+        const targets = [...terminal.querySelectorAll("[data-mission-type]")];
+        const revealAll = () => {
+            targets.forEach((target) => {
+                target.textContent = target.dataset.missionType;
+                target.classList.remove("is-typing");
+            });
+            terminal.classList.remove("is-typing");
+        };
+        if (!animate) {
+            revealAll();
+            return;
         }
-        return field;
+        terminal.classList.add("is-typing");
+        for (const target of targets) {
+            if (run !== missionTypingRun || !terminal.isConnected) return;
+            const value = target.dataset.missionType;
+            const speed = Number(target.dataset.missionSpeed) || 5;
+            target.classList.add("is-typing");
+            for (const character of value) {
+                if (run !== missionTypingRun || !terminal.isConnected) return;
+                target.textContent += character;
+                await new Promise((resolve) => window.setTimeout(resolve, speed));
+            }
+            target.classList.remove("is-typing");
+            await new Promise((resolve) => window.setTimeout(resolve, 18));
+        }
+        if (run === missionTypingRun) terminal.classList.remove("is-typing");
     };
 
     const renderMissionEntry = (index, focus = true) => {
@@ -330,21 +513,21 @@ export function initFounderHub() {
         terminal.className = "founder-mission-terminal";
         const terminalLabel = document.createElement("p");
         terminalLabel.className = "founder-mission-terminal-label";
-        terminalLabel.textContent = "MISSION BRIEF";
+        queueMissionText(terminalLabel, "MISSION BRIEF", 8);
         const objective = document.createElement("h3");
         objective.className = "founder-mission-objective";
-        objective.textContent = mission.objective;
+        queueMissionText(objective, mission.objective, 6);
         const brief = document.createElement("p");
         brief.className = "founder-mission-brief";
-        brief.textContent = mission.brief;
+        queueMissionText(brief, mission.brief, 2);
         const details = document.createElement("dl");
         details.className = "founder-mission-details";
         mission.details.forEach(([term, description]) => {
             const row = document.createElement("div");
             const key = document.createElement("dt");
-            key.textContent = term;
+            queueMissionText(key, term, 4);
             const value = document.createElement("dd");
-            value.textContent = description;
+            queueMissionText(value, description, 3);
             row.append(key, value);
             details.append(row);
         });
@@ -353,11 +536,11 @@ export function initFounderHub() {
             const priorities = document.createElement("div");
             priorities.className = "founder-mission-priorities";
             const prioritiesLabel = document.createElement("p");
-            prioritiesLabel.textContent = "CURRENT PRIORITIES";
+            queueMissionText(prioritiesLabel, "CURRENT PRIORITIES", 4);
             const list = document.createElement("ol");
             mission.priorities.forEach((priority) => {
                 const item = document.createElement("li");
-                item.textContent = priority;
+                queueMissionText(item, priority, 3);
                 list.append(item);
             });
             priorities.append(prioritiesLabel, list);
@@ -365,9 +548,9 @@ export function initFounderHub() {
         }
         const signal = document.createElement("p");
         signal.className = "founder-mission-signal";
-        signal.textContent = mission.state === "active" ? "SIGNAL LIVE" : "ARCHIVE LOCKED";
+        queueMissionText(signal, mission.state === "active" ? "SIGNAL LIVE" : "ARCHIVE LOCKED", 5);
         terminal.append(signal);
-        stage.append(createMissionPixels(), terminal);
+        stage.append(terminal);
 
         const controls = pageControls(
             missionEntry > 0 ? () => renderMissionEntry(missionEntry - 1) : null,
@@ -377,6 +560,9 @@ export function initFounderHub() {
         experience.replaceChildren(shell);
         experience.setAttribute("aria-labelledby", title.id);
         experience.hidden = false;
+        const shouldType = !viewedMissions.has(mission.id);
+        viewedMissions.add(mission.id);
+        playMissionTyping(terminal, missionTypingRun, shouldType);
         if (focus) stage.focus({ preventScroll: true });
     };
 
@@ -475,7 +661,7 @@ export function initFounderHub() {
         } else if (activeExperience === "code-entry" && event.key === "ArrowLeft" && codeEntry > 0) {
             event.preventDefault();
             renderCodeEntry(codeEntry - 1);
-        } else if (activeExperience === "code-entry" && event.key === "ArrowRight" && codeEntry < content.code.length) {
+        } else if (activeExperience === "code-entry" && event.key === "ArrowRight" && codeEntry < content.code.length - 1) {
             event.preventDefault();
             renderCodeEntry(codeEntry + 1);
         } else if (activeExperience === "mission-entry" && event.key === "ArrowLeft" && missionEntry > 0) {

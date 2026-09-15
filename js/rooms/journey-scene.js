@@ -132,14 +132,14 @@ class JourneyScene {
         this.frame=0;
         if(!this.host?.isConnected||document.hidden||this.destroyed)return;
         const dt=Math.min((now-this.last)/1000,.05);this.last=now;
-        const selected=this.hooks.getSelected(),mobile=this.mobile.matches,reduced=this.hooks.isReduced();
-        if(!reduced)this.elapsed+=dt;
-        const blend=reduced||this.snap?1:1-Math.exp(-dt*5);
+        const selected=this.hooks.getSelected(),mobile=this.mobile.matches;
+        this.elapsed+=dt;
+        const blend=this.snap?1:1-Math.exp(-dt*5);
         this.models.forEach((item,i)=>{
             const {config,group,orientation}=item;
             let delta=(i-selected+this.models.length)%this.models.length;if(delta>4)delta-=8;
             // Different phases, delays and speeds give each object its own rhythm.
-            if(!reduced&&this.elapsed>item.spinDelay)item.spin+=dt*item.spinSpeed*config.idleRotationDirection;
+            if(this.elapsed>item.spinDelay)item.spin+=dt*item.spinSpeed*config.idleRotationDirection;
             group.visible=!mobile||Math.abs(delta)<=2;
             item.glow.visible=group.visible;
             if(!group.visible){this.hooks.onLabel(i,null);return;}
@@ -154,18 +154,16 @@ class JourneyScene {
                 if(!mobile)this.target.x*=Math.max(1,this.camera.aspect*.95);
             }
             const active=i===selected;
-            if(active&&!reduced)this.target.add(new THREE.Vector3(...config.focusOffset));
+            if(active)this.target.add(new THREE.Vector3(...config.focusOffset));
             // The selected artefact breathes gently without rotating away from its viewing angle.
-            if(!reduced){
-                const floatSpeed=active?Math.PI*2/5.5:config.floatSpeed;
-                const floatAmplitude=active?.2:config.floatAmplitude;
-                this.target.y+=Math.sin(this.elapsed*floatSpeed+config.floatPhase)*floatAmplitude;
-            }
+            const floatSpeed=active?Math.PI*2/5.5:config.floatSpeed;
+            const floatAmplitude=active?.2:config.floatAmplitude;
+            this.target.y+=Math.sin(this.elapsed*floatSpeed+config.floatPhase)*floatAmplitude;
             group.position.lerp(this.target,blend);
             const scale=active?(mobile?1.42:1.65):(mobile?.48:.65);
-            const extra=this.hooks.isOpening()&&active&&!reduced?1.05:1;
+            const extra=this.hooks.isOpening()&&active?1.05:1;
             group.scale.lerp(this.target.setScalar(scale*extra),blend);
-            const idle=reduced?config.startRotation:item.spin;
+            const idle=item.spin;
             const angle=(active?0:idle)-item.yaw;
             // Resolve by the shortest arc: selecting never causes a rapid unwind.
             item.yaw+=Math.atan2(Math.sin(angle),Math.cos(angle))*blend;
@@ -174,7 +172,7 @@ class JourneyScene {
             item.glow.position.copy(group.position);item.glow.position.z-=config.scale*group.scale.x*.6;
             item.glow.scale.setScalar(config.scale*group.scale.x*1.85);
             const glowStrength=highlighted?.48:0;
-            item.glow.material.opacity=THREE.MathUtils.lerp(item.glow.material.opacity,glowStrength,reduced?1:1-Math.exp(-dt*10));
+            item.glow.material.opacity=THREE.MathUtils.lerp(item.glow.material.opacity,glowStrength,1-Math.exp(-dt*10));
             for(const {material,base} of item.materials)material.color.copy(base).multiplyScalar(active?1:.78);
         });
         this.snap=false;

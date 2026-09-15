@@ -53,7 +53,6 @@
  .journey-space.is-static { gap: 2px; }
  .journey-space.is-static .journey-object { font-size: 11px; padding: 6px; }
 }
-@media(prefers-reduced-motion:reduce) { .journey-collection { transition: none; } }
 .journey-collection.has-motion { transition: opacity 240ms ease; }
 .journey-collection:not(.has-motion) { transition: none; }
 .journey-collection { grid-template-rows: minmax(0,1fr) auto auto auto; padding-bottom: 24px; }

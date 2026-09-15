@@ -15,3 +15,65 @@ test("Founder Hub contains four distinct chapters without Founder Notes", async 
     await expect(page.locator('[data-founder-section="mission"]')).not.toHaveAttribute("aria-disabled", "true");
     await expect(page.locator('[data-founder-section="mission"] .founder-hub-item-number')).toHaveText("04");
 });
+
+test("Journey entries right-align their identity and justify their description", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "founder-room" }
+    })));
+
+    await page.locator('[data-founder-section="journey"]').click();
+    await page.locator('.journey-object[data-journey-entry="architecture"]').dispatchEvent("click");
+    await expect(page.locator("#founder-journey-entry-title")).toHaveText("ARCHITECTURE");
+    await expect(page.locator(".founder-journey-count")).toHaveCSS("text-align", "right");
+    await expect(page.locator(".founder-journey-entry-header h2")).toHaveCSS("text-align", "right");
+    await expect(page.locator(".founder-journey-copy p").first()).toHaveCSS("text-align", "justify");
+});
+
+test("NOW–2026 plays a muted looping background video behind the Journey viewer", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "founder-room" }
+    })));
+
+    await page.locator('[data-founder-section="journey"]').click();
+    const now = page.locator('.journey-object[data-journey-entry="now-2026"]');
+    await now.dispatchEvent("click");
+    await now.dispatchEvent("click");
+
+    await expect(page.locator("#founder-journey-entry-title")).toHaveText("NOW — 2026");
+    const background = page.locator(".founder-journey-background-video");
+    await expect(background).toHaveAttribute("src", "src/founder/journey/08-now-2026-background.mp4");
+    await expect(background).toHaveAttribute("muted", "");
+    await expect(background).toHaveJSProperty("muted", true);
+    await expect(background).toHaveJSProperty("loop", true);
+    await expect(background).toHaveJSProperty("autoplay", true);
+    await expect(page.locator(".founder-journey-background-shade")).toBeVisible();
+    if (page.viewportSize()?.width >= 560) {
+        const alignment = await page.locator(".founder-journey-entry-header").evaluate((header) => {
+            const headerRect = header.getBoundingClientRect();
+            const backRect = document.querySelector("#founder-room .room-return")?.getBoundingClientRect();
+            return {
+                topDifference: Math.abs(headerRect.top - backRect.top),
+                rightEdge: window.innerWidth - headerRect.right
+            };
+        });
+        expect(alignment.topDifference).toBeLessThanOrEqual(1);
+        expect(Math.abs(alignment.rightEdge - 40)).toBeLessThanOrEqual(2);
+    }
+    const fullBleed = await background.evaluate((video) => {
+        const bounds = video.getBoundingClientRect();
+        return {
+            left: bounds.left,
+            top: bounds.top,
+            right: window.innerWidth - bounds.right,
+            bottom: window.innerHeight - bounds.bottom
+        };
+    });
+    expect(fullBleed).toEqual({ left: 0, top: 0, right: 0, bottom: 0 });
+    await expect.poll(() => background.evaluate((video) => video.duration)).toBeCloseTo(19, 0);
+
+    await page.locator(".founder-journey-control.is-previous").click();
+    await expect(page.locator("#founder-journey-entry-title")).toHaveText("THE FIRST SALE");
+    await expect(page.locator(".founder-journey-background-video")).toHaveCount(0);
+});

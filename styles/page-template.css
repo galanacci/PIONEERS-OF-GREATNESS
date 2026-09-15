@@ -22,6 +22,19 @@
     font-size: 12px; line-height: 1.5; color: #aaa;
 }
 .page-template :is(.founder-origin-copy,.founder-journey-copy) p { font-size: 12px; line-height: 1.5; margin: 4px 0 4px auto; text-align: right; }
+.page-template .founder-journey-entry-header .founder-journey-copy {
+    width: 100%;
+    margin-left: auto;
+    text-align: left;
+}
+.page-template .founder-journey-entry-header .founder-journey-copy p {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: justify;
+    text-align-last: left;
+}
 .page-template :is(.room-kicker,.page-details,.field-note-meta,.field-note-caption,.documentary-feature-meta) { font-size: 11px; line-height: 1.5; margin: 4px 0; }
 .page-template .page-details p { margin: 4px 0; }
 .page-template .page-details { max-width: 620px; margin-left: auto; }
@@ -138,9 +151,6 @@
 }
 .journey-collection.is-loading > :is(.journey-selector-header,.journey-space) {
     opacity: 0; pointer-events: none;
-}
-@media (prefers-reduced-motion: reduce) {
-    .journey-collection > :is(.journey-selector-header,.journey-space) { transition: none; }
 }
 .archive-bottom-navigation {
     position: fixed; bottom: max(25px, env(safe-area-inset-bottom)); left: 50%;

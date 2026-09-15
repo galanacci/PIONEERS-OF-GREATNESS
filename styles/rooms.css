@@ -13,7 +13,6 @@
     pointer-events: none;
     transition: opacity 180ms ease, visibility 0s linear 180ms;
 }
-
 .world-room.is-open {
     opacity: 1;
     visibility: visible;
@@ -226,11 +225,3 @@
     }
 
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .world-room,
-    .room-transition {
-        transition: none;
-    }
-}
-

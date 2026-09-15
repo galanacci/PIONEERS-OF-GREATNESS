@@ -248,9 +248,3 @@
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .field-note-media img {
-        transition: none;
-    }
-}
-

@@ -30,8 +30,7 @@ export function createJourneyArtefact(memory, { interactive = true, idle = true 
             if (event.key.startsWith('Arrow')) event.stopPropagation();
         });
     }
-    const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    const rotate = () => viewer.toggleAttribute('auto-rotate', idle && !motion.matches && !document.hidden && shell.isConnected);
+    const rotate = () => viewer.toggleAttribute('auto-rotate', idle && !document.hidden && shell.isConnected);
     shell.viewer = viewer;
     if (!interactive) {
         viewer.setAttribute('inert', '');
@@ -54,13 +53,11 @@ export function createJourneyArtefact(memory, { interactive = true, idle = true 
         shell.prepend(viewer);
     }).catch(() => { if (!disposed) failed(); });
     document.addEventListener('visibilitychange', rotate);
-    motion.addEventListener('change', rotate);
     shell.dispose = () => {
         disposed = true;
         viewer.removeAttribute('auto-rotate');
         viewer.remove();
         document.removeEventListener('visibilitychange', rotate);
-        motion.removeEventListener('change', rotate);
     };
     return shell;
 }

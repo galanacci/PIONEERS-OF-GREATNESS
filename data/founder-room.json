@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "title": "FOUNDER",
   "identity": "GALANACCI",
   "hub": [
@@ -44,62 +44,112 @@
     { "number": "13", "statement": "WITHOUT PURPOSE, YOU HAVE NO DIRECTION." }
   ],
   "codeArchive": {
-    "src": "src/founder/13-laws-handwritten.jpg",
+    "src": "src/founder/13-laws-full-wall.jpg",
     "alt": "The original handwritten 13 Laws of GALANACCI",
     "width": 766,
     "height": 1280
   },
   "missions": [
     {
-      "id": "make-the-idea-physical",
+      "id": "build-the-hands",
       "number": "01",
       "state": "complete",
       "label": "COMPLETED MISSION",
-      "title": "MAKE THE IDEA PHYSICAL",
-      "phase": "FOUNDATION",
-      "objective": "TURN THE PHILOSOPHY INTO ITS FIRST WEARABLE FORM.",
-      "brief": "Patterns, prototypes, mistakes and revisions carried PIONEERS OF GREATNESS out of the mind and into the real world.",
+      "title": "BUILD THE HANDS",
+      "phase": "APPRENTICESHIP · JAN—JUL 2025",
+      "objective": "LEARN THE CRAFT FROM THE GROUND UP.",
+      "brief": "Six months shadowing Robert Jesse built practical fluency in pattern making, drafting, industrial sewing and garment construction. The training became real when those skills returned to PoG.",
       "details": [
         ["PROJECT", "PIONEERS OF GREATNESS"],
-        ["OUTCOME", "THE FIRST PIECE"],
+        ["DATE", "19 JUN—27 JUL 2025"],
+        ["OUTCOME", "PRODUCT DEVELOPMENT RESUMED"],
         ["STATUS", "MISSION COMPLETE"]
       ]
     },
     {
-      "id": "prove-belief",
+      "id": "forge-the-jacket",
       "number": "02",
       "state": "complete",
       "label": "COMPLETED MISSION",
-      "title": "PROVE THE BELIEF",
-      "phase": "FIRST RELEASE",
-      "objective": "PLACE THE FIRST PIECE INTO THE HANDS OF SOMEONE WHO BELIEVED IN IT.",
-      "brief": "The first sale proved that the idea could live beyond its founder. Belief became an exchange, and the world became real.",
+      "title": "FORGE THE JACKET",
+      "phase": "PRODUCT DEVELOPMENT · JUL—OCT 2025",
+      "objective": "TAKE THE FORGE DENIM JACKET FROM V1 TO A RESOLVED SAMPLE.",
+      "brief": "Pattern drafting, cutting, sewing, dyeing, hardware, screenprinting and repeated mistakes moved the jacket through four samples until its design language held together.",
       "details": [
         ["PROJECT", "PIONEERS OF GREATNESS"],
-        ["OUTCOME", "THE FIRST SALE"],
+        ["DATE", "30 JUL—31 OCT 2025"],
+        ["OUTCOME", "FORGE SAMPLE V4"],
         ["STATUS", "MISSION COMPLETE"]
       ]
     },
     {
-      "id": "build-the-second-release",
+      "id": "test-the-world",
       "number": "03",
+      "state": "complete",
+      "label": "COMPLETED MISSION",
+      "title": "TEST THE WORLD",
+      "phase": "FIELD TESTING · NOV—DEC 2025",
+      "objective": "WEAR THE PRODUCT, BUILD THE IMAGE AND PROVE THE LANGUAGE OUTSIDE THE STUDIO.",
+      "brief": "FORGE travelled through Japan alongside the denim jeans prototype. Product testing became photography, campaign material and the first clear view of the world surrounding the clothes.",
+      "details": [
+        ["PROJECT", "PIONEERS OF GREATNESS"],
+        ["DATE", "21 NOV—23 DEC 2025"],
+        ["OUTCOME", "PRODUCT AND IMAGE VALIDATED"],
+        ["STATUS", "MISSION COMPLETE"]
+      ]
+    },
+    {
+      "id": "deliver-the-first-order",
+      "number": "04",
+      "state": "complete",
+      "label": "COMPLETED MISSION",
+      "title": "DELIVER THE FIRST ORDER",
+      "phase": "MADE TO ORDER · JAN—APR 2026",
+      "objective": "TAKE FORGE FROM SAMPLE TO A FINISHED MADE-TO-ORDER GARMENT.",
+      "brief": "The jacket moved beyond prototyping. The first order was constructed with felled seams, followed by a custom piece graded to a new size, cut in a different denim and adapted to its wearer.",
+      "details": [
+        ["PROJECT", "PIONEERS OF GREATNESS"],
+        ["DATE", "23 JAN—11 APR 2026"],
+        ["OUTCOME", "MADE-TO-ORDER FULFILLED"],
+        ["STATUS", "MISSION COMPLETE"]
+      ]
+    },
+    {
+      "id": "expand-the-language",
+      "number": "05",
+      "state": "complete",
+      "label": "COMPLETED MISSION",
+      "title": "EXPAND THE LANGUAGE",
+      "phase": "PRODUCT SYSTEM · FEB—JUN 2026",
+      "objective": "PROVE THAT FORGE CAN BECOME A SYSTEM, NOT A SINGLE JACKET.",
+      "brief": "The language expanded into a denim vest, jeans, new construction ideas and rapid-prototyped accessories. Form, function, material and detail began connecting products without depending on logos.",
+      "details": [
+        ["PROJECT", "PIONEERS OF GREATNESS"],
+        ["DATE", "12 FEB—30 JUN 2026"],
+        ["OUTCOME", "VEST · JEANS · ACCESSORY R&D"],
+        ["STATUS", "MISSION COMPLETE"]
+      ]
+    },
+    {
+      "id": "secure-the-runway",
+      "number": "06",
       "state": "active",
       "label": "CURRENT MISSION",
-      "title": "BUILD THE SECOND RELEASE",
-      "phase": "FORGE",
-      "objective": "BUILD THE SECOND MADE-TO-ORDER RELEASE.",
-      "brief": "Build with what is available. Refine the product, strengthen the community and document the journey while it is still being lived.",
+      "title": "SECURE THE RUNWAY",
+      "phase": "STABILISATION · JUL—SEP 2026",
+      "objective": "BUILD THE FINANCIAL AND DIGITAL FOUNDATION THAT KEEPS POG MOVING.",
+      "brief": "Restore stability without abandoning the vision. Secure dependable income, protect creative capacity and finish a digital world that documents what PoG is becoming beyond the products.",
       "details": [
         ["PROJECT", "PIONEERS OF GREATNESS"],
         ["LOCATION", "LONDON"],
-        ["COLLECTION", "FORGE"],
+        ["DATE", "12 JUL—14 SEP 2026"],
         ["UPDATED", "SEPTEMBER 2026"]
       ],
       "priorities": [
-        "BUILD CAPITAL",
-        "REFINE PRODUCT",
-        "BUILD COMMUNITY",
-        "DOCUMENT THE JOURNEY"
+        "SECURE STABLE INCOME",
+        "FINISH THE DIGITAL WORLD",
+        "RESTORE THE CREATIVE RHYTHM",
+        "RETURN TO PRODUCT DEVELOPMENT"
       ]
     }
   ],
@@ -457,6 +507,7 @@
       "id": "now-2026",
       "number": "08",
       "title": "NOW — 2026",
+      "backgroundVideo": "src/founder/journey/08-now-2026-background.mp4",
       "media": {
         "type": "model",
         "src": "src/founder/journey/08-now-2026.glb",

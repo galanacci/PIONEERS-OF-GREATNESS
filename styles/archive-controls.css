@@ -52,7 +52,3 @@
 @media (max-width: 680px) {
     .field-note-nav { width: 32%; opacity: 0.82; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .field-note-nav { transition: none; }
-}
