@@ -58,6 +58,7 @@ export function initOpening() {
     let replayDestination = "reveal";
     let returnFocus = null;
     let backgroundState = new Map();
+    let activeTyping = null;
 
     function renderEntryState() {
         const returning = hasCompletedIntroduction();
@@ -101,6 +102,8 @@ export function initOpening() {
     }
 
     function closeIntroduction() {
+        activeTyping?.wake?.();
+        activeTyping = null;
         sequence += 1;
         introduction.classList.remove("is-open");
         introduction.setAttribute("aria-hidden", "true");
@@ -145,22 +148,52 @@ export function initOpening() {
         }, 650);
     }
 
+    const waitForTypingDelay = (milliseconds, token) => new Promise((resolve) => {
+        const typing = activeTyping;
+        if (!typing || typing.token !== token || token !== sequence) {
+            resolve();
+            return;
+        }
+        let settled = false;
+        const finish = () => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timer);
+            if (typing.wake === finish) typing.wake = null;
+            resolve();
+        };
+        const timer = window.setTimeout(finish, milliseconds * typing.speed);
+        typing.wake = finish;
+    });
+
     async function typeParagraph(paragraph, token, pacing) {
         const element = document.createElement("p");
         element.className = "is-active";
         copy.replaceChildren(element);
+        const typing = { token, speed: 1, wake: null };
+        activeTyping = typing;
         for (const character of paragraph) {
-            if (token !== sequence) return;
+            if (token !== sequence) {
+                if (activeTyping === typing) activeTyping = null;
+                return;
+            }
             element.textContent += character;
             let delay = character === " " ? pacing.space : pacing.character;
             if (character === ",") delay += pacing.comma;
             else if (character === "?") delay += pacing.question;
             else if (/[.!]/.test(character)) delay += pacing.sentence;
             else if (/[—;]/.test(character)) delay += pacing.comma + 120;
-            await wait(delay);
+            await waitForTypingDelay(delay, token);
         }
+        if (activeTyping === typing) activeTyping = null;
         return element;
     }
+
+    const accelerateCurrentParagraph = () => {
+        if (replayDestination !== "menu" || !activeTyping || activeTyping.token !== sequence) return;
+        activeTyping.speed = Math.max(0.08, activeTyping.speed * 0.25);
+        activeTyping.wake?.();
+    };
 
     async function playIntroduction({
         allowSkip = hasCompletedIntroduction(),
@@ -197,8 +230,10 @@ export function initOpening() {
             const finalParagraph = copy.querySelector(".is-active");
             finalParagraph?.classList.remove("is-active");
             finalParagraph?.classList.add("is-leaving");
+            copy.setAttribute("aria-busy", "false");
             await wait(700);
             if (replayDestination === "origin") returnToOrigin();
+            else if (replayDestination === "menu") enterSite();
             else showFinalReveal();
         } catch (error) {
             console.error("THE BEGINNING could not be loaded.", error);
@@ -213,10 +248,11 @@ export function initOpening() {
 
     async function enterOpeningPath() {
         replaying = false;
-        replayDestination = "reveal";
+        const returning = hasCompletedIntroduction();
+        replayDestination = returning ? "reveal" : "menu";
         returnFocus = null;
         window.dispatchEvent(new CustomEvent("pog:show-transition"));
-        if (hasCompletedIntroduction()) {
+        if (returning) {
             window.dispatchEvent(new CustomEvent("pog:ambience-prime"));
             window.dispatchEvent(new CustomEvent("pog:opening-complete"));
             await wait(1000);
@@ -268,6 +304,7 @@ export function initOpening() {
     enterMenu.addEventListener("click", enterSite);
     enter.addEventListener("click", enterSite);
     skip.addEventListener("click", skipPoem);
+    introduction.addEventListener("pointerdown", accelerateCurrentParagraph);
     introduction.addEventListener("keydown", (event) => {
         if (event.key === "Escape") event.preventDefault();
         if (event.key === "Enter" && !enter.hidden) { event.preventDefault(); enterSite(); }

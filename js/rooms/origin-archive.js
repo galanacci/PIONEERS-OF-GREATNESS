@@ -192,6 +192,7 @@ export function createOriginArchive() {
                 const node = document.createElement('button');
                 node.type = 'button';
                 node.className = 'origin-memory';
+                node.dataset.originId = item.id;
                 node.setAttribute('aria-label', `View ${item.alt}`);
                 node.setAttribute('aria-pressed', 'false');
                 node.style.zIndex = String(1 + (index % 12));
@@ -218,7 +219,15 @@ export function createOriginArchive() {
                 };
                 place(memory);
                 paint(memory);
-                node.addEventListener('click', () => openFocus(memory));
+                node.addEventListener('click', () => {
+                    if (item.easterEgg === 'greatness-poem') {
+                        window.dispatchEvent(new CustomEvent('pog:poem-replay-requested', {
+                            detail: { trigger: node }
+                        }));
+                        return;
+                    }
+                    openFocus(memory);
+                });
                 memories.push(memory);
                 return node;
             });

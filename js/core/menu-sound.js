@@ -35,6 +35,8 @@ export function initMenuSound() {
     let soundSequence = 0;
     let unlockPromise = null;
     let audioWarmed = false;
+    let pressedBootControl = null;
+    let bootPressTimer = null;
 
     const interactiveFrom = (target) => target instanceof Element && !target.closest('.journey-object')
         ? target.closest("button, a[href], [role='button'], [role='option'], [role='menuitem']")
@@ -103,7 +105,19 @@ export function initMenuSound() {
         unlockAudio().catch(() => {});
         keyboardNavigation = false;
         const control = interactiveFrom(event.target);
+        if (control?.matches(".menu-toggle")) {
+            window.clearTimeout(bootPressTimer);
+            pressedBootControl = control;
+            bootPressTimer = window.setTimeout(() => { pressedBootControl = null; }, 800);
+            emit("boot");
+            return;
+        }
         if (event.pointerType === "touch" && control && !isMainMenuControl(control)) emit("select");
+    }, true);
+
+    document.addEventListener("pointercancel", () => {
+        window.clearTimeout(bootPressTimer);
+        pressedBootControl = null;
     }, true);
 
     document.addEventListener("touchstart", () => {
@@ -132,6 +146,15 @@ export function initMenuSound() {
     document.addEventListener("click", (event) => {
         const control = interactiveFrom(event.target);
         if (!control || isMainMenuControl(control)) return;
-        emit(isLocked(control) ? "locked" : control.matches(".menu-toggle") ? "boot" : "confirm");
+        if (control.matches(".menu-toggle")) {
+            if (pressedBootControl === control) {
+                window.clearTimeout(bootPressTimer);
+                pressedBootControl = null;
+                return;
+            }
+            emit("boot");
+            return;
+        }
+        emit(isLocked(control) ? "locked" : "confirm");
     });
 }

@@ -135,15 +135,31 @@ test("BEGIN and CONTINUE emit the dedicated boot-up sound", async ({ page }) => 
     const captureEntrySound = async () => {
         await page.evaluate(() => {
             window.__entrySoundLog = [];
-            window.addEventListener("pog:menu-sound", (event) => window.__entrySoundLog.push(event.detail.name));
+            window.__entryTimeline = [];
+            window.addEventListener("pog:menu-sound", (event) => {
+                window.__entrySoundLog.push(event.detail.name);
+                if (event.detail.name === "boot") window.__entryTimeline.push("boot");
+            });
+            window.addEventListener("pog:start-requested", () => window.__entryTimeline.push("start"));
         });
     };
 
+    await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ paragraphs: ["A."] })
+    }));
     await page.goto("/");
     await captureEntrySound();
-    await page.getByRole("button", { name: "Begin experience" }).click();
-    expect(await page.evaluate(() => window.__entrySoundLog)).toContain("boot");
+    const begin = page.getByRole("button", { name: "Begin experience" });
+    await begin.dispatchEvent("pointerdown", { pointerType: "touch" });
+    expect(await page.evaluate(() => window.__entrySoundLog)).toEqual(["boot"]);
+    await begin.dispatchEvent("click");
+    expect(await page.evaluate(() => window.__entryTimeline)).toEqual(["boot", "start"]);
+    expect(await page.evaluate(() => window.__entrySoundLog.filter((sound) => sound === "boot"))).toHaveLength(1);
     expect(await page.evaluate(() => window.__entrySoundLog)).not.toContain("confirm");
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 10000 });
+    expect(await page.evaluate(() => window.__entrySoundLog.filter((sound) => sound === "boot"))).toHaveLength(1);
 
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
@@ -261,10 +277,10 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     expect(beforeEnter.target).toBe(page.viewportSize()?.width < 560 ? 0.05 : 0.09);
     const targetLevel = beforeEnter.target;
     expect(await page.locator(".background-video").evaluate((video) => video.muted && video.defaultMuted)).toBe(true);
-    await expect(page.locator("#founder-introduction-enter")).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 10000 });
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
-    await page.locator("#founder-introduction-enter").click();
-    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-introduction-enter")).toBeHidden();
+    await expect(page.locator("#founder-poem-reveal")).toBeHidden();
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), { timeout: 3000 }).toBeGreaterThan(targetLevel - 0.005);
     const audioState = await page.locator("#site-ambience").evaluate((audio) => ({
@@ -358,7 +374,7 @@ test("the poem gates the first visit and returning visitors continue directly", 
     await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ paragraphs: ["A."] })
+        body: JSON.stringify({ paragraphs: ["ABCDEFGHIJKLMNOPQRSTUVWXYZ ABCDEFGHIJKLMNOPQRSTUVWXYZ."] })
     }));
     await page.goto("/");
     await expect(page.locator(".menu-toggle")).toHaveText("BEGIN");
@@ -367,11 +383,16 @@ test("the poem gates the first visit and returning visitors continue directly", 
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeHidden();
-    await expect(page.locator("#founder-introduction-enter")).toBeVisible({ timeout: 10000 });
-    await expect(page.locator("#founder-poem-reveal")).toBeVisible();
+    await expect.poll(() => page.locator("#founder-introduction-copy").textContent()).not.toBe("");
+    const beforeTap = (await page.locator("#founder-introduction-copy").textContent()).length;
+    await page.locator("#founder-introduction").dispatchEvent("pointerdown", { pointerType: "touch" });
+    await page.waitForTimeout(180);
+    const afterTap = (await page.locator("#founder-introduction-copy").textContent()).length;
+    expect(afterTap - beforeTap).toBeGreaterThan(5);
+    await expect(page.locator("#founder-introduction-enter")).toBeHidden();
+    await expect(page.locator("#founder-poem-reveal")).toBeHidden();
     await expect(page.locator('#founder-introduction [aria-label="Replay the animated GREATNESS POEM"]')).toHaveCount(0);
-    await page.locator("#founder-introduction-enter").click();
-    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 10000 });
     await page.reload();
     await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
     const landingType = await page.evaluate(() => {
@@ -476,6 +497,25 @@ test("Founder Origin opens a kinetic pre-PoG visual archive", async ({ page }) =
 
     await page.locator("#founder-room .room-return").click();
     await expect(page.locator("#founder-hub")).toBeVisible();
+});
+
+test("the OG GREATNESS tee mockup replays the poem Easter egg with SKIP", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "founder-room", skipTransition: true }
+    })));
+    await page.locator('[data-founder-section="origin"]').click();
+    await expect(page.locator(".founder-origin-archive")).toHaveClass(/is-ready/, { timeout: 10000 });
+
+    const easterEgg = page.locator('[data-origin-id="pre-pog-080"]');
+    await easterEgg.dispatchEvent("click");
+    await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/);
+    await expect(page.locator("#founder-introduction-skip")).toBeVisible({ timeout: 5000 });
+
+    await page.locator("#founder-introduction-skip").click();
+    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/, { timeout: 3000 });
+    await expect(page.locator(".founder-origin-archive")).toBeVisible();
+    await expect(easterEgg).toBeFocused();
 });
 
 test("Founder Journey presents eight spatial artefacts", async ({ page }) => {
