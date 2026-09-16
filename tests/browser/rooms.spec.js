@@ -715,7 +715,8 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     expect(requests).toBe(1);
 });
 
-test("Documentary selects one year chapter and removes playback on exit", async ({ page }, testInfo) => {
+test("Documentary changes CRT episodes and removes playback on exit", async ({ page }) => {
+    test.setTimeout(90000);
     let requests = 0;
     page.on("request", (request) => {
         if (request.url().endsWith("/data/documentary.json")) requests += 1;
@@ -725,32 +726,13 @@ test("Documentary selects one year chapter and removes playback on exit", async 
     await openMenu(page);
     await page.getByRole("menuitem", { name: "VIDEO JOURNAL" }).click();
     await expect(page.locator("#documentary-room")).toHaveClass(/is-open/, { timeout: 2500 });
-    await expect(page.locator("#documentary-feature iframe")).toHaveCount(1);
-    await expect(page.locator("#documentary-feature .documentary-feature-summary")).not.toBeEmpty();
-    await expect(page.locator(".documentary-year-trigger")).toHaveText("2026");
-    await expect(page.locator(".documentary-year-option")).toHaveCount(3);
-    await expect(page.locator(".documentary-chapter .documentary-episode")).toHaveCount(18);
-    const returnBox = await page.locator("#documentary-room [data-room-close]").first().boundingBox();
-    const yearBox = await page.locator(".documentary-year-trigger").boundingBox();
-    const viewport = page.viewportSize();
-    const expectedEdge = testInfo.project.name === "mobile" ? 24 : 40;
-    expect(returnBox.x + returnBox.width).toBeLessThan(yearBox.x);
-    expect(Math.abs(viewport.width - yearBox.x - yearBox.width - expectedEdge)).toBeLessThanOrEqual(1);
-    expect(Math.abs(returnBox.y - yearBox.y)).toBeLessThanOrEqual(4);
-    await page.locator(".documentary-year-trigger").click();
-    await expect(page.locator(".documentary-year-options")).toBeVisible();
-    await page.getByRole("option", { name: "2025" }).click();
-    await expect(page.locator(".documentary-year-trigger")).toHaveText("2025");
-    await expect(page.locator(".documentary-chapter .documentary-episode")).toHaveCount(47);
-    await expect(page.locator('.documentary-list[aria-label="UNCUT episodes from 2025"]')).toBeVisible();
-    await expect(page.locator("#documentary-feature time")).toHaveAttribute("datetime", /^2025-/);
-    const firstSummary = await page.locator("#documentary-feature .documentary-feature-summary").textContent();
-    const firstEpisode = page.locator(".documentary-episode-button").first();
-    await firstEpisode.focus();
-    await page.keyboard.press("ArrowDown");
-    await expect(page.locator(".documentary-episode-button").nth(1)).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator("#documentary-feature .documentary-feature-summary")).not.toHaveText(firstSummary);
-    await page.locator("#documentary-room [data-room-close]").first().click();
+    await expect(page.locator("#documentary-scene")).toHaveClass(/is-ready/, { timeout: 20000 });
     await expect(page.locator("#documentary-feature iframe")).toHaveCount(0);
+    await expect(page.locator("#documentary-crt-player")).toHaveClass(/is-playing/, { timeout: 10000 });
+    await expect(page.locator("#documentary-crt-state")).toContainText("RAPID PROTOTYPE MODE");
+    await page.locator("#documentary-crt-previous").click();
+    await expect(page.locator("#documentary-crt-state")).toContainText("BUILDING THE POG AI SYSTEM");
+    await page.locator("#documentary-environment [data-room-close]").click();
+    await expect(page.locator("#documentary-crt-player iframe")).toHaveCount(0);
     expect(requests).toBe(1);
 });

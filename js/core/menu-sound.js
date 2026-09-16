@@ -21,7 +21,16 @@ const SOUND_SHAPES = {
         { frequency: 360, endFrequency: 220, duration: 0.18, gain: 0.03, type: "triangle", delay: 0.11 },
         { frequency: 220, endFrequency: 82, duration: 0.34, gain: 0.034, type: "sawtooth", delay: 0.25 },
         { frequency: 110, endFrequency: 48, duration: 0.42, gain: 0.022, type: "sine", delay: 0.34 }
+    ],
+    crtPower: [
+        { frequency: 72, endFrequency: 48, duration: .16, gain: .032, type: "sine" },
+        { frequency: 185, endFrequency: 92, duration: .11, gain: .018, type: "square", delay: .035 }
     ]
+};
+
+const NOISE_SHAPES = {
+    crtStatic: { duration: .92, gain: .019, startFrequency: 7800, endFrequency: 7200 },
+    crtTune: { duration: .24, gain: .015, startFrequency: 5200, endFrequency: 1700 }
 };
 
 export function initMenuSound() {
@@ -37,6 +46,8 @@ export function initMenuSound() {
     let audioWarmed = false;
     let pressedBootControl = null;
     let bootPressTimer = null;
+    let crtHum = null;
+    let crtStaticSource = null;
 
     const interactiveFrom = (target) => target instanceof Element && !target.closest('.journey-object')
         ? target.closest("button, a[href], [role='button'], [role='option'], [role='menuitem']")
@@ -84,13 +95,131 @@ export function initMenuSound() {
         oscillator.stop(start + duration + 0.01);
     };
 
+    const playNoise = ({ duration, gain, startFrequency, endFrequency }, onSource) => {
+        const length = Math.ceil(context.sampleRate * duration);
+        const buffer = context.createBuffer(1, length, context.sampleRate);
+        const samples = buffer.getChannelData(0);
+        for (let index = 0; index < length; index += 1) {
+            const decay = 1 - (index / length) * .24;
+            samples[index] = ((Math.random() * 2) - 1) * decay;
+        }
+        const source = context.createBufferSource();
+        const highpass = context.createBiquadFilter();
+        const lowpass = context.createBiquadFilter();
+        const envelope = context.createGain();
+        const start = context.currentTime;
+        source.buffer = buffer;
+        highpass.type = "highpass";
+        highpass.frequency.setValueAtTime(420, start);
+        lowpass.type = "lowpass";
+        lowpass.frequency.setValueAtTime(startFrequency, start);
+        lowpass.frequency.exponentialRampToValueAtTime(endFrequency, start + duration);
+        envelope.gain.setValueAtTime(.0001, start);
+        envelope.gain.exponentialRampToValueAtTime(gain * effectsGain, start + .012);
+        envelope.gain.setValueAtTime(gain * effectsGain, start + Math.max(.018, duration - .06));
+        envelope.gain.exponentialRampToValueAtTime(.0001, start + duration);
+        source.connect(highpass).connect(lowpass).connect(envelope).connect(context.destination);
+        source.start(start);
+        source.stop(start + duration + .01);
+        onSource?.(source);
+        return source;
+    };
+
+    const stopCrtStatic = () => {
+        if (!crtStaticSource) return;
+        try { crtStaticSource.stop(); } catch {}
+        crtStaticSource = null;
+    };
+
+    const startCrtHum = () => {
+        if (crtHum) return;
+        const master = context.createGain();
+        const fundamental = context.createOscillator();
+        const harmonic = context.createOscillator();
+        const hiss = context.createBufferSource();
+        const hissFilter = context.createBiquadFilter();
+        const hissGain = context.createGain();
+        const hissBuffer = context.createBuffer(1, context.sampleRate, context.sampleRate);
+        const samples = hissBuffer.getChannelData(0);
+        for (let index = 0; index < samples.length; index += 1) samples[index] = (Math.random() * 2) - 1;
+        const start = context.currentTime;
+        const humLevel = mobileAudioMix ? .011 : .0065;
+        master.gain.setValueAtTime(.0001, start);
+        master.gain.exponentialRampToValueAtTime(humLevel, start + .32);
+        fundamental.type = "sine";
+        fundamental.frequency.value = 50;
+        harmonic.type = "triangle";
+        harmonic.frequency.value = 100;
+        const harmonicGain = context.createGain();
+        harmonicGain.gain.value = .28;
+        hiss.buffer = hissBuffer;
+        hiss.loop = true;
+        hissFilter.type = "bandpass";
+        hissFilter.frequency.value = 3400;
+        hissFilter.Q.value = .42;
+        hissGain.gain.value = .055;
+        fundamental.connect(master);
+        harmonic.connect(harmonicGain).connect(master);
+        hiss.connect(hissFilter).connect(hissGain).connect(master);
+        master.connect(context.destination);
+        fundamental.start(start);
+        harmonic.start(start);
+        hiss.start(start);
+        crtHum = { master, fundamental, harmonic, hiss };
+    };
+
+    const stopCrtHum = () => {
+        if (!crtHum) return;
+        const active = crtHum;
+        crtHum = null;
+        const now = context.currentTime;
+        active.master.gain.cancelScheduledValues(now);
+        active.master.gain.setValueAtTime(Math.max(.0001, active.master.gain.value), now);
+        active.master.gain.exponentialRampToValueAtTime(.0001, now + .24);
+        window.setTimeout(() => {
+            [active.fundamental, active.harmonic, active.hiss].forEach((source) => {
+                try { source.stop(); } catch {}
+            });
+            active.master.disconnect();
+        }, 280);
+    };
+
     window.addEventListener("pog:menu-sound", async (event) => {
         const shape = SOUND_SHAPES[event.detail?.name];
-        if (!shape) return;
+        const noise = NOISE_SHAPES[event.detail?.name];
+        if (!shape && !noise) return;
         const request = ++soundSequence;
         await unlockAudio();
         if (request !== soundSequence || context.state !== "running") return;
-        shape.forEach(playTone);
+        if (shape) shape.forEach(playTone);
+        if (noise) playNoise(noise);
+    });
+
+    window.addEventListener("pog:crt-audio", async (event) => {
+        const action = event.detail?.action;
+        if (!action) return;
+        await unlockAudio();
+        if (context.state !== "running") return;
+        if (action === "power") {
+            stopCrtStatic();
+            SOUND_SHAPES.crtPower.forEach(playTone);
+            startCrtHum();
+        } else if (action === "static-start") {
+            stopCrtStatic();
+            const requestedDuration = Number(event.detail?.duration) / 1000;
+            const shape = { ...NOISE_SHAPES.crtStatic, duration: Number.isFinite(requestedDuration) ? requestedDuration : NOISE_SHAPES.crtStatic.duration };
+            playNoise(shape, (source) => {
+                crtStaticSource = source;
+                source.addEventListener("ended", () => {
+                    if (crtStaticSource === source) crtStaticSource = null;
+                }, { once: true });
+            });
+        } else if (action === "static-stop") {
+            stopCrtStatic();
+        } else if (action === "stop") {
+            stopCrtStatic();
+            stopCrtHum();
+        }
     });
 
     document.addEventListener("keydown", (event) => {
@@ -146,6 +275,7 @@ export function initMenuSound() {
     document.addEventListener("click", (event) => {
         const control = interactiveFrom(event.target);
         if (!control || isMainMenuControl(control)) return;
+        if (control.matches("[data-crt-sound]")) return;
         if (control.matches(".menu-toggle")) {
             if (pressedBootControl === control) {
                 window.clearTimeout(bootPressTimer);

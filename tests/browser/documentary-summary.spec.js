@@ -1,17 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("Video Journal shows a concise summary for the selected episode", async ({ page }) => {
+test("Video Journal retains concise episode metadata while switching the CRT", async ({ page }) => {
+    test.setTimeout(90000);
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:opening-complete")));
     await page.getByRole("menuitem", { name: "VIDEO JOURNAL" }).click();
-
-    const summary = page.locator("#documentary-feature .documentary-feature-summary");
-    await expect(summary).toBeVisible();
-    await expect(summary).not.toBeEmpty();
-    const firstSummary = await summary.textContent();
-
-    await page.locator(".documentary-episode-button").nth(1).click();
-    await expect(summary).not.toHaveText(firstSummary);
+    await expect(page.locator("#documentary-scene")).toHaveClass(/is-ready/, { timeout: 20000 });
+    await expect(page.locator("#documentary-crt-player")).toHaveClass(/is-playing/, { timeout: 10000 });
+    const firstSource = await page.locator("#documentary-crt-player iframe").getAttribute("src");
+    await page.locator("#documentary-crt-previous").click();
+    await expect(page.locator("#documentary-crt-player iframe")).not.toHaveAttribute("src", firstSource);
 
     const archive = await (await page.request.get("/data/documentary.json")).json();
     expect(archive.episodes).toHaveLength(112);

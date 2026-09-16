@@ -1,7 +1,237 @@
 /* UNCUT — a self-updating screening room generated from the YouTube playlist. */
 .documentary-room {
-    overflow-y: auto;
+    overflow: hidden;
+    background: #17120e;
 }
+
+.documentary-room.is-archive-open { overflow-y: auto; }
+
+.documentary-environment {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 700ms ease, visibility 0s linear 0s;
+}
+
+.world-room .documentary-environment.page-template { display: block; grid-template: none; gap: 0; width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+
+.documentary-room.is-archive-open .documentary-environment {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 700ms ease, visibility 0s linear 700ms;
+    pointer-events: none;
+}
+
+.documentary-scene,
+.documentary-renderer { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.documentary-scene { z-index: 0; opacity: 0; transition: opacity 900ms ease; }
+.documentary-scene.is-ready { opacity: 1; }
+.documentary-renderer { touch-action: manipulation; filter: brightness(.94) contrast(1.06) saturate(.84) sepia(.08); }
+
+.documentary-crt-player {
+    position: absolute;
+    z-index: 2;
+    left: var(--crt-left, 50%);
+    top: var(--crt-top, 50%);
+    width: var(--crt-width, 0px);
+    height: var(--crt-height, 0px);
+    overflow: hidden;
+    border-radius: 3% / 4.5%;
+    background: #010202;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    clip-path: inset(0 round 3% 3% 4.5% 4.5%);
+    transform: none;
+    transition: opacity 360ms ease, visibility 0s linear 360ms;
+    filter: brightness(.7) contrast(1.2) saturate(.72) sepia(.1);
+}
+.documentary-crt-glass {
+    position: absolute;
+    z-index: 3;
+    left: var(--crt-left, 50%);
+    top: var(--crt-top, 50%);
+    width: var(--crt-width, 0px);
+    height: var(--crt-height, 0px);
+    overflow: hidden;
+    border-radius: 3% / 4.5%;
+    pointer-events: none;
+    box-shadow: inset 0 0 50px 19px rgba(0,0,0,.5);
+}
+.documentary-crt-player.is-playing {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: opacity 360ms ease, visibility 0s linear 0s;
+}
+.documentary-crt-player iframe { position: relative; z-index: 1; display: block; width: 100%; height: 100%; border: 0; background: #000; opacity: 0; transition: opacity 760ms ease; }
+.documentary-crt-player iframe.is-signal-ready { opacity: .9; }
+.documentary-crt-glass::before,
+.documentary-crt-glass::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.documentary-crt-glass::before {
+    z-index: 1;
+    opacity: .23;
+    background:
+        linear-gradient(180deg,transparent 0%,transparent 39%,rgba(220,225,218,.08) 48%,rgba(0,0,0,.12) 53%,transparent 62%,transparent 100%) 0 -120% / 100% 220% no-repeat,
+        repeating-linear-gradient(0deg,rgba(8,8,8,.52) 0,rgba(8,8,8,.52) 1px,rgba(255,255,255,.025) 2px,transparent 4px) 0 0 / 100% 4px,
+        repeating-linear-gradient(90deg,rgba(255,40,40,.025) 0 1px,rgba(70,255,120,.018) 1px 2px,rgba(80,120,255,.022) 2px 3px) 0 0 / 3px 100%;
+    mix-blend-mode: soft-light;
+    animation: documentary-crt-scan 5.2s linear infinite,documentary-crt-flicker 4.6s steps(2,end) infinite;
+}
+.documentary-crt-glass::after {
+    z-index: 2;
+    border-radius: inherit;
+    box-shadow: inset 0 0 45px 18px rgba(0,0,0,.39);
+    background:
+        radial-gradient(ellipse at 42% 0%,rgba(224,226,218,.075),transparent 39%),
+        radial-gradient(ellipse at 0% 0%,rgba(0,0,0,.72) 0%,rgba(0,0,0,.46) 11%,transparent 33%),
+        radial-gradient(ellipse at 100% 0%,rgba(0,0,0,.72) 0%,rgba(0,0,0,.46) 11%,transparent 33%),
+        radial-gradient(ellipse at 0% 100%,rgba(0,0,0,.72) 0%,rgba(0,0,0,.46) 11%,transparent 33%),
+        radial-gradient(ellipse at 100% 100%,rgba(0,0,0,.72) 0%,rgba(0,0,0,.46) 11%,transparent 33%),
+        radial-gradient(ellipse at center,transparent 47%,rgba(0,0,0,.14) 70%,rgba(0,0,0,.54) 100%);
+    animation: documentary-crt-glass-pulse 3.8s ease-in-out infinite;
+}
+@keyframes documentary-crt-scan {
+    0% { background-position: 0 -120%,0 0,0 0; }
+    100% { background-position: 0 220%,0 4px,3px 0; }
+}
+@keyframes documentary-crt-flicker {
+    0%, 93%, 100% { opacity: .31; }
+    94% { opacity: .4; }
+    96% { opacity: .28; }
+}
+@keyframes documentary-crt-glass-pulse {
+    0%,100% { opacity: .96; filter: brightness(.98); }
+    42% { opacity: 1; filter: brightness(1.025); }
+    68% { opacity: .975; filter: brightness(1); }
+}
+
+.documentary-environment::before,
+.documentary-environment::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.documentary-environment::before { background: radial-gradient(circle at 50% 43%, rgba(0,0,0,.02) 18%, rgba(17,9,3,.25) 58%, rgba(0,0,0,.88) 125%); }
+.documentary-environment::after { opacity: .18; background: repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 4px); mix-blend-mode: screen; }
+
+.documentary-environment > .room-return { z-index: 8; }
+.documentary-environment-header { position: absolute; top: 40px; right: 40px; z-index: 3; color: #fff; text-align: right; pointer-events: none; }
+.documentary-environment-header p,
+.documentary-environment-header h2 { margin: 0; font-family: var(--font-brand); letter-spacing: .16em; }
+.documentary-environment-header p { color: rgba(255,255,255,.42); font-size: 9px; }
+.documentary-environment-header h2 { margin-top: 9px; font-size: clamp(15px,1.4vw,20px); }
+
+.documentary-scene-status { position: absolute; left: 50%; top: 50%; z-index: 3; margin: 0; color: rgba(255,255,255,.48); font-family: var(--font-brand); font-size: 9px; letter-spacing: .18em; transform: translate(-50%,-50%); transition: opacity 280ms ease; }
+.documentary-scene.is-ready + .documentary-scene-status { opacity: 0; pointer-events: none; }
+
+.documentary-crt-interface { position: absolute; left: 50%; bottom: max(25px,env(safe-area-inset-bottom)); z-index: 5; display: grid; justify-items: center; gap: 10px; transform: translateX(-50%); }
+.documentary-crt-state { width: min(720px,calc(100vw - 40px)); margin: 0; overflow: hidden; color: rgba(255,255,255,.58); font-family: var(--font-brand); font-size: 8px; letter-spacing: .18em; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.documentary-tv-trigger { box-sizing: border-box; min-width: 238px; height: 48px; padding: 0 24px; border: 1px solid rgba(255,255,255,.74); background: #000; color: #fff; font-family: var(--font-brand); letter-spacing: .16em; }
+.documentary-tv-trigger span,
+.documentary-tv-trigger small { display: block; }
+.documentary-tv-trigger span { font-size: 11px; font-weight: 700; }
+.documentary-tv-trigger small { margin-top: 3px; color: rgba(255,255,255,.42); font-size: 7px; letter-spacing: .13em; }
+.documentary-tv-trigger:is(:hover,:focus-visible):not(:disabled) { border-color: #673caf; outline: 0; color: #8f66d0; }
+.documentary-tv-trigger:disabled { border-color: rgba(255,255,255,.16); color: rgba(255,255,255,.24); }
+.documentary-tv-trigger.is-booting { border-color: #673caf; color: #8f66d0; pointer-events: none; }
+.documentary-crt-controls {
+    width: min(720px,calc(100vw - 40px));
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    column-gap: clamp(8px,1.5vw,14px);
+    row-gap: 15px;
+    align-items: stretch;
+}
+.documentary-crt-controls:not([hidden]) { display: grid; }
+.documentary-crt-controls > button,
+.documentary-crt-archive-toggle {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 72px;
+    height: 42px;
+    min-height: 42px;
+    margin: 0;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fff;
+    background: #000;
+    color: #fff;
+    font-family: var(--font-brand);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    cursor: pointer;
+    transition: color 160ms ease,border-color 160ms ease;
+}
+.documentary-crt-controls > button:is(:hover,:focus-visible),
+.documentary-crt-archive-toggle:is(:hover,:focus-visible,[aria-expanded="true"]) { border-color: #673caf; outline: 0; color: #673caf; }
+#documentary-room .documentary-crt-controls > button,
+#documentary-room .documentary-crt-archive-toggle,
+#documentary-room .documentary-crt-controls > button:is(:hover,:focus,:focus-visible,:active),
+#documentary-room .documentary-crt-archive-toggle:is(:hover,:focus,:focus-visible,:active,[aria-expanded="true"]) {
+    background: #000 !important;
+}
+.documentary-crt-controls > button:disabled { opacity: .3; cursor: default; }
+.documentary-crt-controls > button { gap: 8px; }
+.documentary-crt-controls > button.is-previous::before,
+.documentary-crt-controls > button.is-next::after {
+    content: '➔'; display: inline-block; flex: 0 0 auto;
+    font-family: Arial,sans-serif; font-size: 15px; line-height: 1; letter-spacing: 0;
+}
+.documentary-crt-controls > button.is-previous::before { transform: rotate(180deg); }
+.documentary-crt-archive-control { position: relative; min-width: 0; }
+.documentary-crt-archive-toggle { flex-direction: column; gap: 3px; }
+.documentary-crt-controls > .room-navigation-credit { grid-column: 1 / -1; justify-self: center; margin: 0; color: #fff; font-size: 8px; font-weight: 700; line-height: normal; letter-spacing: 0; text-align: center; white-space: nowrap; }
+.documentary-crt-archive-menu {
+    position: fixed; left: 50%; bottom: 108px; z-index: 9;
+    box-sizing: border-box; width: min(720px,calc(100vw - 80px)); max-height: min(260px,36vh);
+    padding: 24px 28px; border: 1px solid rgba(255,255,255,.5); background: rgba(0,0,0,.98);
+    color: #fff; overflow: hidden; opacity: 0; visibility: hidden;
+    transform: translate(-50%,16px);
+    transition: opacity 180ms ease,transform 240ms ease,visibility 0s linear 240ms;
+    pointer-events: none;
+}
+.documentary-crt-archive-menu.is-open { opacity: 1; visibility: visible; transform: translate(-50%,0); transition-delay: 0s; pointer-events: auto; }
+.documentary-crt-archive-menu header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 4px 12px; border-bottom: 1px solid rgba(255,255,255,.18); }
+.documentary-crt-archive-menu header p { margin: 0; font-family: var(--font-brand); font-size: 9px; font-weight: 600; letter-spacing: .18em; }
+.documentary-crt-year-filter { min-width: 82px; padding: 7px 24px 7px 9px; border: 1px solid rgba(255,255,255,.3); border-radius: 0; background: #000; color: #fff; font-family: var(--font-brand); font-size: 9px; letter-spacing: .12em; }
+.documentary-crt-year-filter:focus-visible { border-color: #673caf; outline: 0; }
+.documentary-crt-episode-list { max-height: min(190px,27vh); overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #673caf #080808; }
+.documentary-crt-episode-option { width: 100%; min-height: 44px; display: grid; grid-template-columns: 44px minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 10px 4px; border: 0; border-bottom: 1px solid rgba(255,255,255,.12); background: #000; color: rgba(255,255,255,.68); text-align: left; cursor: pointer; }
+.documentary-crt-episode-option span,
+.documentary-crt-episode-option time { font-family: var(--font-brand); font-size: 7px; letter-spacing: .12em; }
+.documentary-crt-episode-option strong { overflow: hidden; font-family: var(--font-brand); font-size: 8px; font-weight: 600; letter-spacing: .1em; text-overflow: ellipsis; white-space: nowrap; }
+.documentary-crt-episode-option time { color: rgba(255,255,255,.4); }
+.documentary-crt-episode-option:is(:hover,:focus-visible,.is-current) { outline: 0; color: #fff; }
+.documentary-crt-episode-option.is-current span { color: #9b70df; }
+
+.documentary-content {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 700ms ease, visibility 0s linear 700ms;
+}
+
+.documentary-room.is-archive-open .documentary-content {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 700ms ease, visibility 0s linear 0s;
+}
+
+.documentary-room:not(.is-archive-open) > .archive-bottom-navigation { opacity: 0; visibility: hidden; pointer-events: none; }
 
 .documentary-content {
     width: min(86vw, 920px);
@@ -236,6 +466,17 @@
 }
 
 @media (max-width: 680px) {
+    .documentary-environment-header { top: 24px; right: 24px; }
+    .documentary-crt-interface { bottom: max(25px,env(safe-area-inset-bottom)); }
+    .documentary-tv-trigger { min-width: min(238px,calc(100vw - 72px)); }
+    .documentary-crt-controls { width: calc(100vw - 40px); grid-template-columns: repeat(3,minmax(0,1fr)); column-gap: 8px; row-gap: 15px; }
+    .documentary-crt-controls > button,
+    .documentary-crt-archive-toggle { padding: 0 7px; font-size: 9px; }
+    .documentary-crt-archive-menu { bottom: 110px; width: calc(100vw - 36px); max-height: 42svh; padding: 22px 18px; }
+    .documentary-crt-episode-list { max-height: calc(42svh - 68px); }
+    .documentary-crt-episode-option { grid-template-columns: 38px minmax(0,1fr); gap: 5px 8px; }
+    .documentary-crt-episode-option time { grid-column: 2; }
+
     .documentary-content {
         width: calc(100% - 36px);
     }

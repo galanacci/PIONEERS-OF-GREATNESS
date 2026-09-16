@@ -89,6 +89,7 @@ export function initPageTemplate() {
         if(event.key==='Escape'&&quickMenu){const button=anchor;event.preventDefault();event.stopImmediatePropagation();dismiss();button.focus();}
     },true);
     window.addEventListener('pog:room-closing',dismiss);
+    window.addEventListener('pog:dismiss-quick-menu',dismiss);
     window.addEventListener('resize',dismiss);
     document.querySelectorAll('.world-room > .world-room-content').forEach(content => {
         const back = content.querySelector('.room-return');
