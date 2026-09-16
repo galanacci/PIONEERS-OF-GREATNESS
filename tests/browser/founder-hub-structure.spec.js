@@ -17,7 +17,7 @@ test("K2G back emblems align with the page edge and rotate on interaction", asyn
     }));
     const expectedEdge = Math.min(40, Math.max(18, page.viewportSize().width * 0.03));
 
-    expect(arrows).toHaveLength(3);
+    expect(arrows).toHaveLength(4);
     arrows.forEach((arrow) => {
         expect(Math.abs(arrow.left - expectedEdge)).toBeLessThanOrEqual(1);
         expect(arrow.justifyItems).toBe("start");

@@ -1,4 +1,4 @@
-import { isKnownRoom } from "../room-registry.js";
+import { COLLECTIONS_PREVIEW_ENABLED, isKnownRoom } from "../room-registry.js";
 
 export function initMenu() {
     const toggle = document.querySelector(".menu-toggle");
@@ -8,11 +8,17 @@ export function initMenu() {
     const waitlist = panel?.querySelector(".menu-waitlist");
     const audio = panel?.querySelector(".audio-toggle");
     const items = [...(panel?.querySelectorAll(".menu-item") || [])];
+    const collections = panel?.querySelector('[data-preview-room="collections-room"]');
     const form = document.getElementById("email-form");
     const status = document.getElementById("status");
     const waitlistHome = form?.parentElement;
     const regions = document.querySelectorAll("nav, #container, .container, .copyright");
     if (!toggle || !overlay || !panel || !list || !waitlist || !form || !status || !waitlistHome || !items.length) return;
+    if (COLLECTIONS_PREVIEW_ENABLED && collections) {
+        collections.dataset.menuAction = "room";
+        collections.dataset.roomTarget = "collections-room";
+        collections.removeAttribute("aria-disabled");
+    }
     let selected = Math.max(0, items.findIndex((item) => item.classList.contains("is-selected")));
     let waitlistOpen = false;
     let pageWaitlist = null;

@@ -67,11 +67,11 @@
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="founder">FOUNDER</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="documentary-room">VIDEO JOURNAL</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="room" data-room-target="field-notes-room">BEHIND THE SCENES</button></li>
-                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" aria-disabled="true">COLLECTIONS</button></li>
+                <li><button type="button" class="menu-item" role="menuitem" data-menu-action="placeholder" data-preview-room="collections-room" aria-disabled="true">COLLECTIONS</button></li>
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="exit">EXIT</button></li>
             </ul>
             <div class="menu-waitlist" aria-label="Join the waitlist" hidden></div>
-            <p class="menu-version">VERSION_027</p>
+            <p class="menu-version">VERSION_028</p>
             <div class="menu-audio">
             <span class="audio-track"><span aria-hidden="true">♪</span> MUHAMMAD ALI TRAINING</span>
             <button type="button" class="audio-toggle" aria-label="Turn training ambience on" aria-pressed="false">
@@ -146,6 +146,105 @@
             </header>
             <div class="room-divider" aria-hidden="true"></div>
             <div id="field-notes-list" class="field-notes-list" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <section id="collections-room" class="world-room collections-room" aria-hidden="true" aria-labelledby="collections-title">
+        <div class="world-room-content collections-content">
+            <button type="button" class="room-return" data-room-close>&larr; RETURN TO MENU</button>
+            <header class="collections-header">
+                <p class="room-kicker">PRIVATE PREVIEW</p>
+                <h1 id="collections-title">COLLECTIONS</h1>
+            </header>
+            <div id="collections-stage" class="collections-stage" aria-label="Interactive Collections showroom" aria-busy="true">
+                <div id="collections-canvas" class="collections-canvas" aria-hidden="true"></div>
+                <p id="collections-status" class="collections-status" role="status" aria-live="polite">PREPARING COLLECTION…</p>
+                <div id="collections-room-cart-drawer" class="collections-product-drawer collections-room-cart-drawer" aria-hidden="true">
+                    <section class="collections-product-panel">
+                        <p class="collections-panel-label">CART</p>
+                        <p id="collections-room-cart-empty" class="collections-cart-empty">YOUR CART IS EMPTY</p>
+                        <ul id="collections-room-cart-list" class="collections-cart-list"></ul>
+                    </section>
+                </div>
+                <div class="collections-rail">
+                    <div class="collections-room-actions" role="navigation" aria-label="Collection actions">
+                        <button type="button" class="collections-room-action" aria-disabled="true">DETAILS</button>
+                        <button type="button" class="collections-room-action collections-cart-action" data-collections-room-cart aria-expanded="false" aria-label="Cart, 0 items">
+                            <span>CART</span>
+                            <span id="collections-room-cart-count">0</span>
+                        </button>
+                        <button type="button" class="collections-room-action" aria-disabled="true">SIZE</button>
+                    </div>
+                    <p class="room-navigation-credit">© 2026 A GALANACCI® COMPANY</p>
+                </div>
+            </div>
+            <section id="collections-product-sheet" class="collections-product-page" aria-hidden="true" aria-labelledby="collections-product-title" inert>
+                <div class="collections-product-layout">
+                    <div class="collections-product-gallery" aria-label="Product image gallery">
+                        <button type="button" class="collections-image-step collections-image-previous" aria-label="Previous product image">‹</button>
+                        <div class="collections-product-images">
+                        <figure class="collections-product-image is-active" data-collections-product-image>
+                            <div class="collections-product-placeholder" aria-hidden="true">
+                                <span class="collections-placeholder-view">FRONT</span>
+                                <span class="collections-placeholder-title" data-collections-image-title>COLLECTION PIECE 01</span>
+                                <span class="collections-placeholder-copy">PRODUCT IMAGE PLACEHOLDER</span>
+                            </div>
+                        </figure>
+                        <figure class="collections-product-image" data-collections-product-image>
+                            <div class="collections-product-placeholder" aria-hidden="true">
+                                <span class="collections-placeholder-view">BACK</span>
+                                <span class="collections-placeholder-title" data-collections-image-title>COLLECTION PIECE 01</span>
+                                <span class="collections-placeholder-copy">PRODUCT IMAGE PLACEHOLDER</span>
+                            </div>
+                        </figure>
+                        <figure class="collections-product-image" data-collections-product-image>
+                            <div class="collections-product-placeholder" aria-hidden="true">
+                                <span class="collections-placeholder-view">DETAIL</span>
+                                <span class="collections-placeholder-title" data-collections-image-title>COLLECTION PIECE 01</span>
+                                <span class="collections-placeholder-copy">PRODUCT IMAGE PLACEHOLDER</span>
+                            </div>
+                        </figure>
+                        </div>
+                        <button type="button" class="collections-image-step collections-image-next" aria-label="Next product image">›</button>
+                        <div class="collections-image-indicators" aria-hidden="true">
+                            <span class="is-active"></span><span></span><span></span>
+                        </div>
+                        <div class="collections-product-identity">
+                            <p id="collections-product-type" class="collections-product-type">OUTERWEAR STUDY</p>
+                            <h2 id="collections-product-title">COLLECTION PIECE 01</h2>
+                            <p id="collections-product-price" class="collections-product-price">PRIVATE PREVIEW</p>
+                        </div>
+                    </div>
+                    <div id="collections-product-drawer" class="collections-product-drawer" aria-hidden="true">
+                        <section class="collections-product-panel" data-collections-panel="details" hidden>
+                            <p class="collections-panel-label">PRODUCT DETAILS</p>
+                            <p id="collections-product-description" class="collections-product-description"></p>
+                            <p id="collections-product-spec" class="collections-product-spec"></p>
+                        </section>
+                        <section class="collections-product-panel" data-collections-panel="cart" hidden>
+                            <p class="collections-panel-label">CART</p>
+                            <p id="collections-cart-empty" class="collections-cart-empty">YOUR CART IS EMPTY</p>
+                            <ul id="collections-cart-list" class="collections-cart-list"></ul>
+                        </section>
+                        <section class="collections-product-panel" data-collections-panel="size" hidden>
+                            <p class="collections-panel-label">SELECT SIZE</p>
+                            <div id="collections-size-options" class="collections-size-options" role="group" aria-label="Product sizes"></div>
+                            <p id="collections-size-feedback" class="collections-size-feedback" aria-live="polite"></p>
+                        </section>
+                    </div>
+                    <footer class="collections-product-footer">
+                        <div class="collections-product-actions" role="navigation" aria-label="Product actions">
+                            <button type="button" class="collections-product-action" data-collections-action="details" aria-expanded="false">DETAILS</button>
+                            <button type="button" class="collections-product-action collections-cart-action" data-collections-action="cart" aria-expanded="false" aria-label="Cart, 0 items">
+                                <span>CART</span>
+                                <span id="collections-cart-count">0</span>
+                            </button>
+                            <button type="button" class="collections-product-action" data-collections-action="size" aria-expanded="false">SIZE</button>
+                        </div>
+                        <p class="collections-product-credit room-navigation-credit">© 2026 A GALANACCI® COMPANY</p>
+                    </footer>
+                </div>
+            </section>
         </div>
     </section>
 

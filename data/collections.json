@@ -1,0 +1,64 @@
+{
+  "products": [
+    {
+      "id": "preview-piece-01",
+      "title": "COLLECTION PIECE 01",
+      "type": "OUTERWEAR STUDY",
+      "price": "PRIVATE PREVIEW",
+      "model": "src/collections/placeholders/GLN_DENIM_JACKET.glb",
+      "description": "A temporary garment study used to establish the PIONEERS OF GREATNESS collection showroom. Final product story, materials and release details will replace this preview copy.",
+      "colours": ["BLACK"],
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "preview-piece-02",
+      "title": "COLLECTION PIECE 02",
+      "type": "LEATHER STUDY",
+      "price": "PRIVATE PREVIEW",
+      "model": "src/collections/placeholders/GLN_LEATHER_JACKET.glb",
+      "description": "A temporary garment study defining how a selected P°G piece steps out of the collection and becomes the centre of the room.",
+      "colours": ["BLACK"],
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "preview-piece-03",
+      "title": "COLLECTION PIECE 03",
+      "type": "CROPPED OUTERWEAR STUDY",
+      "price": "PRIVATE PREVIEW",
+      "model": "src/collections/placeholders/GLN_LEATHER_JACKET_2.glb",
+      "description": "A temporary silhouette used to test scale, lighting and product information before the final P°G collection assets are introduced.",
+      "colours": ["BLACK"],
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "preview-piece-04",
+      "title": "COLLECTION PIECE 04",
+      "type": "VEST STUDY",
+      "price": "PRIVATE PREVIEW",
+      "model": "src/collections/placeholders/GLN_LEATHER_VEST.glb",
+      "description": "A temporary garment study for the mobile and desktop product-viewing system. It will be replaced by a final P°G piece and its real story.",
+      "colours": ["BLACK"],
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "preview-piece-05",
+      "title": "COLLECTION PIECE 05",
+      "type": "HAND-FINISHED STUDY",
+      "price": "PRIVATE PREVIEW",
+      "model": "src/collections/placeholders/GLN_LEATHER_JACKET_3.glb",
+      "description": "A temporary archive object demonstrating how craft-led product information can remain secondary to the garment itself.",
+      "colours": ["BLACK"],
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": "preview-piece-06",
+      "title": "COLLECTION PIECE 06",
+      "type": "ONE-OF-ONE STUDY",
+      "price": "PRIVATE PREVIEW",
+      "model": "src/collections/placeholders/GLN_LEATHER_JACKET_4.glb",
+      "description": "A temporary one-of-one study completing the private showroom. Final availability and release information will remain locked until launch.",
+      "colours": ["BLACK"],
+      "sizes": ["S", "M", "L", "XL"]
+    }
+  ]
+}

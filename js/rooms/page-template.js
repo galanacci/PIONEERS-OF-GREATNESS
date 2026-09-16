@@ -19,19 +19,24 @@ export function pageControls(previous, next) {
     return { bar, center, previous: prev, next: forward };
 }
 export function initPageTemplate() {
-    let quickMenu=null, anchor=null, closeTimer;
+    let quickMenu=null, anchor=null, closeTimer, openedBy=null;
     const dismiss=()=>{
         clearTimeout(closeTimer);
         anchor?.setAttribute('aria-expanded','false');
-        quickMenu?.remove();quickMenu=null;anchor=null;
+        quickMenu?.remove();quickMenu=null;anchor=null;openedBy=null;
     };
     const menuButton=target=>{
         const button=target.closest?.('.world-room button');
         return button?.textContent.trim()==='MENU'?button:null;
     };
-    const show=button=>{
-        if(anchor===button){clearTimeout(closeTimer);return;}
+    const show=(button,source='click')=>{
+        if(anchor===button){
+            clearTimeout(closeTimer);
+            if(source==='click'&&openedBy==='hover')openedBy='click';
+            return;
+        }
         dismiss();anchor=button;
+        openedBy=source;
         button.setAttribute('aria-expanded','true');
         button.setAttribute('aria-haspopup','true');
         quickMenu=document.createElement('div');quickMenu.setAttribute('role','navigation');
@@ -66,7 +71,7 @@ export function initPageTemplate() {
     };
     document.addEventListener('pointerover',event=>{
         const button=menuButton(event.target);
-        if(button&&event.pointerType!=='touch')show(button);
+        if(button&&event.pointerType!=='touch')show(button,'hover');
     });
     document.addEventListener('pointerout',event=>{
         if(anchor?.contains(event.target)&&!anchor.contains(event.relatedTarget))closeTimer=setTimeout(dismiss,220);
@@ -75,7 +80,7 @@ export function initPageTemplate() {
         const button=menuButton(event.target);
         if(!button)return;
         event.preventDefault();event.stopImmediatePropagation();
-        if(anchor===button&&quickMenu)dismiss();else show(button);
+        if(anchor===button&&quickMenu&&openedBy==='click')dismiss();else show(button,'click');
     },true);
     document.addEventListener('pointerdown',event=>{
         if(quickMenu&&!quickMenu.contains(event.target)&&!anchor.contains(event.target))dismiss();

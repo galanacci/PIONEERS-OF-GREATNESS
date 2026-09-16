@@ -11,7 +11,7 @@
     position: absolute; top: max(20px, env(safe-area-inset-top)); left: var(--page-edge);
     width: 44px; height: 44px; padding: 0; z-index: 5; font-size: 25px; background: transparent;
 }
-.page-template :is(.documentary-header,.field-notes-header,.founder-hub-header,.founder-origin-frame-header,.founder-journey-entry-header,.founder-code-header,.founder-mission-entry-header) {
+.page-template :is(.documentary-header,.field-notes-header,.collections-header,.founder-hub-header,.founder-origin-frame-header,.founder-journey-entry-header,.founder-code-header,.founder-mission-entry-header) {
     position: static; grid-area: auto; width: auto; max-width: none; margin: 0 0 0 56px;
     padding: 0; text-align: right; justify-self: stretch; align-self: start;
     max-height: 30dvh; overflow-y: auto;

@@ -5,6 +5,92 @@ async function openMenu(page) {
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 }
 
+test("Collections stays locked publicly and unlocks through its preview query", async ({ page }, testInfo) => {
+    test.setTimeout(150000);
+    await page.goto("/");
+    const publicCollections = page.locator('[data-preview-room="collections-room"]');
+    await expect(publicCollections).toHaveAttribute("aria-disabled", "true");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "collections-room", skipTransition: true }
+    })));
+    await expect(page.locator("#collections-room")).not.toHaveClass(/is-open/);
+
+    await page.goto("/?preview=collections");
+    await openMenu(page);
+    const previewCollections = page.getByRole("menuitem", { name: "COLLECTIONS" });
+    await expect(previewCollections).not.toHaveAttribute("aria-disabled", "true");
+    await expect(previewCollections).toHaveAttribute("data-room-target", "collections-room");
+    await previewCollections.click();
+    await expect(page.locator("#collections-room")).toHaveClass(/is-open/);
+    await expect(page.locator("#collections-title")).toHaveText("COLLECTIONS");
+    await expect(page.locator("#collections-stage")).toHaveClass(/is-ready/, { timeout: 20000 });
+    await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 30000 });
+    await expect(page.locator(".collections-product-chip")).toHaveCount(0);
+    await expect(page.locator("#collections-model-labels")).toHaveCount(0);
+    await expect(page.locator(".collections-room-actions .collections-room-action")).toHaveCount(3);
+    await expect(page.locator(".collections-discovery")).toHaveCount(0);
+    await expect(page.locator(".collections-rail .room-navigation-credit")).toBeVisible();
+    await expect(page.locator(".collections-room-actions .collections-room-action").first()).toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator(".collections-room-actions .collections-room-action").last()).toHaveAttribute("aria-disabled", "true");
+    await page.evaluate(() => {
+        window.__collectionSounds = [];
+        window.addEventListener("pog:menu-sound", (event) => window.__collectionSounds.push(event.detail?.name));
+    });
+    await page.locator(".collections-room-actions .collections-room-action").first().click({ force: true });
+    expect(await page.evaluate(() => window.__collectionSounds)).toContain("locked");
+    await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
+    const roomCartButton = page.locator("[data-collections-room-cart]");
+    await expect(roomCartButton).toBeEnabled();
+    await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
+    await roomCartButton.click();
+    await expect(page.locator("#collections-room-cart-drawer")).toHaveClass(/is-open/);
+    await expect(page.locator("#collections-room-cart-empty")).toBeVisible();
+    await roomCartButton.click();
+    await expect(page.locator("#collections-room-cart-drawer")).not.toHaveClass(/is-open/);
+    const roomControlsBox = await page.locator(".collections-room-actions").boundingBox();
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:collections-open-product", {
+        detail: { index: 1 }
+    })));
+    await expect(page.locator("#collections-product-sheet")).toHaveClass(/is-visible/);
+    await expect(page.locator("#collections-product-title")).toHaveText("COLLECTION PIECE 02");
+    await expect(page.locator(".collections-product-image")).toHaveCount(3);
+    await expect(page.locator("#collections-room .room-return")).toHaveAttribute("aria-label", "Back to collection");
+    const productControlsBox = await page.locator(".collections-product-actions").boundingBox();
+    const productCreditBox = await page.locator(".collections-product-credit").boundingBox();
+    const viewport = page.viewportSize();
+    const expectedWidth = testInfo.project.name === "mobile"
+        ? viewport.width - 36
+        : Math.min(720, viewport.width - 80);
+    expect(Math.abs(roomControlsBox.width - expectedWidth)).toBeLessThan(2);
+    expect(Math.abs(productControlsBox.width - expectedWidth)).toBeLessThan(2);
+    expect(Math.abs(productControlsBox.height - 42)).toBeLessThan(2);
+    expect(Math.abs(productCreditBox.y - productControlsBox.y - productControlsBox.height - 15)).toBeLessThan(2);
+    expect(await page.locator("#collections-canvas canvas").evaluate((canvas) => canvas.dispatchEvent(new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        deltaY: 120
+    })))).toBe(true);
+    await page.locator('[data-collections-action="details"]').click();
+    await expect(page.locator("#collections-product-drawer")).toHaveClass(/is-open/);
+    await expect(page.locator("#collections-product-description")).not.toBeEmpty();
+    await page.locator('[data-collections-action="size"]').click();
+    await expect(page.locator("#collections-size-options button")).toHaveCount(4);
+    await page.locator("#collections-size-options button").first().click();
+    await expect(page.locator("#collections-cart-count")).toHaveText("1");
+    await page.locator('[data-collections-action="cart"]').click();
+    await expect(page.locator("#collections-cart-list li")).toHaveCount(1);
+    await page.locator(".collections-image-next").click();
+    await expect(page.locator("[data-collections-product-image]").nth(1)).toHaveClass(/is-active/);
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
+    await expect(page.locator("#collections-room-cart-count")).toHaveText("1");
+    await roomCartButton.click();
+    await expect(page.locator("#collections-room-cart-list li")).toHaveCount(1);
+    await roomCartButton.click();
+    await page.locator("#collections-room .room-return").click();
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+});
+
 test("presentation controls match the viewing device", async ({ page }, testInfo) => {
     await page.goto("/");
     await expect(page.locator(".room-transition-label")).toHaveText("LOADING");
