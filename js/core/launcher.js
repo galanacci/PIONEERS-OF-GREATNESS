@@ -1,7 +1,7 @@
 const POSITION_KEY = "pog:desktop-shortcut-position:v1";
 const GRID = 16;
 const EDGE = 20;
-const LAUNCH_LOADING_DURATION = 1500;
+const LAUNCH_LOADING_DURATION = 2000;
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
 const snap = (value) => Math.round(value / GRID) * GRID;
@@ -83,6 +83,7 @@ export function initLauncher() {
             const loadingStartedAt = performance.now();
             loading.hidden = false;
             loading.setAttribute("aria-hidden", "false");
+            loading.classList.remove("is-exiting");
             requestAnimationFrame(() => loading.classList.add("is-open"));
             if (loadingVideo.readyState < HTMLMediaElement.HAVE_METADATA) {
                 await Promise.race([
@@ -101,10 +102,12 @@ export function initLauncher() {
             // desktop for a single frame while the menu was still fading in.
             window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
             await waitForDestination();
+            loading.classList.add("is-exiting");
             loading.classList.remove("is-open");
             loading.setAttribute("aria-hidden", "true");
             loadingVideo.pause();
             loading.hidden = true;
+            loading.classList.remove("is-exiting");
         } else {
             window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
         }

@@ -59,10 +59,11 @@ body:has(.pog-desktop) .container { display: none; }
     background: #000;
     color: #fff;
     opacity: 0;
-    transition: none;
+    transition: opacity 300ms ease;
 }
 .pog-launch-loading[hidden] { display: none; }
 .pog-launch-loading.is-open { opacity: 1; }
+.pog-launch-loading.is-exiting { transition: none; }
 .pog-launch-video-background {
     position: absolute;
     inset: 0;
