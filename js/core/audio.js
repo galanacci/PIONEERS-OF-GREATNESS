@@ -12,6 +12,7 @@ export function initAudio() {
     let visitorMuted = false;
     let suspendedByPage = false;
     let documentaryDucked = false;
+    let poemDucked = false;
     let hasStarted = false;
     let playbackSequence = 0;
     let fadeWhenReady = false;
@@ -138,7 +139,13 @@ export function initAudio() {
             await ambience.play();
             if (token !== playbackSequence || !hasStarted) return;
             seekToStart();
-            if (!visitorMuted && fadeWhenReady) fadeTo(ambienceVolume, entryFadeDuration);
+            if (!visitorMuted && !documentaryDucked && !poemDucked && fadeWhenReady) {
+                fadeTo(ambienceVolume, entryFadeDuration);
+            } else if (poemDucked || documentaryDucked) {
+                cancelFade();
+                setOutputLevel(0);
+                ambience.muted = true;
+            }
         } catch (error) {
             hasStarted = false;
             console.error("Training ambience could not begin.", error);
@@ -185,7 +192,7 @@ export function initAudio() {
         try {
             await ambience.play();
             if (token !== playbackSequence || !hasStarted || suspendedByPage) return;
-            if (!visitorMuted && !documentaryDucked) {
+            if (!visitorMuted && !documentaryDucked && !poemDucked) {
                 ambience.muted = false;
                 fadeTo(ambienceVolume, stateFadeDuration);
             }
@@ -215,7 +222,9 @@ export function initAudio() {
             });
         } else {
             ambience.muted = false;
-            if (!suspendedByPage && !ambience.paused) fadeTo(ambienceVolume, stateFadeDuration);
+            if (!suspendedByPage && !documentaryDucked && !poemDucked && !ambience.paused) {
+                fadeTo(ambienceVolume, stateFadeDuration);
+            }
         }
     });
 
@@ -236,6 +245,28 @@ export function initAudio() {
     const restoreAfterDocumentary = () => {
         documentaryDucked = false;
         if (!hasStarted || suspendedByPage) return;
+        if (poemDucked) {
+            setOutputLevel(0);
+            ambience.muted = true;
+            return;
+        }
+        ambience.muted = visitorMuted;
+        if (!visitorMuted && !ambience.paused) {
+            ambience.muted = false;
+            fadeTo(ambienceVolume, stateFadeDuration);
+        }
+    };
+
+    const muteForPoem = () => {
+        poemDucked = true;
+        cancelFade();
+        setOutputLevel(0);
+        if (hasStarted) ambience.muted = true;
+    };
+
+    const restoreAfterPoem = () => {
+        poemDucked = false;
+        if (!hasStarted || suspendedByPage || documentaryDucked) return;
         ambience.muted = visitorMuted;
         if (!visitorMuted && !ambience.paused) {
             ambience.muted = false;
@@ -257,6 +288,8 @@ export function initAudio() {
     });
     window.addEventListener("pog:ambience-start", () => beginPlayback(true));
     window.addEventListener("pog:ambience-stop", stopWithFade);
+    window.addEventListener("pog:ambience-poem-mute", muteForPoem);
+    window.addEventListener("pog:ambience-poem-restore", restoreAfterPoem);
     window.addEventListener("pog:room-opened", (event) => {
         if (event.detail?.roomId === "documentary-room") duckForDocumentary();
     });

@@ -62,13 +62,18 @@ function createEntryViewer(room) {
     const gallery = document.createElement("div");
     gallery.className = "field-note-viewer-gallery";
     gallery.setAttribute("aria-label", "Entry images. Select an image to enlarge it.");
+    const galleryWrap = document.createElement("div");
+    galleryWrap.className = "field-note-viewer-gallery-wrap";
     const textScrollHint = document.createElement("span");
     textScrollHint.className = "field-note-viewer-scroll-hint is-text";
     textScrollHint.setAttribute("aria-hidden", "true");
     const galleryScrollHint = document.createElement("span");
     galleryScrollHint.className = "field-note-viewer-scroll-hint is-gallery";
     galleryScrollHint.setAttribute("aria-hidden", "true");
-    windowElement.append(details, gallery, textScrollHint);
+    galleryWrap.append(gallery);
+    // Keep the carousel cue as a sibling of the scrolling track: mobile
+    // browsers composite overflow content above descendants of that track.
+    windowElement.append(details, galleryWrap, textScrollHint, galleryScrollHint);
     viewer.append(header, windowElement);
     room.append(viewer);
 
@@ -90,6 +95,7 @@ function createEntryViewer(room) {
 
     let activeNote = null;
     let returnFocus = null;
+    let returnAnimationTimer;
     const updateScrollHints = () => {
         const textScrollable = details.scrollHeight > details.clientHeight + 2;
         textScrollHint.hidden = !textScrollable;
@@ -99,7 +105,15 @@ function createEntryViewer(room) {
         const galleryScrollable = gallery.scrollWidth > gallery.clientWidth + 2;
         galleryScrollHint.hidden = !galleryScrollable;
         if (galleryScrollable) {
-            galleryScrollHint.dataset.direction = gallery.scrollLeft + gallery.clientWidth >= gallery.scrollWidth - 2 ? "left" : "right";
+            const direction = gallery.scrollLeft + gallery.clientWidth >= gallery.scrollWidth - 2 ? "left" : "right";
+            galleryScrollHint.dataset.direction = direction;
+            galleryWrap.dataset.scrollDirection = direction;
+            // The cue is a sibling overlay. Measure against the thumbnail
+            // frame itself so it remains exactly vertically centred.
+            galleryScrollHint.style.top = `${galleryWrap.offsetTop + galleryWrap.clientHeight / 2}px`;
+        } else {
+            delete galleryWrap.dataset.scrollDirection;
+            galleryScrollHint.style.removeProperty("top");
         }
     };
     const closeLightbox = () => { lightbox.hidden = true; };
@@ -115,6 +129,16 @@ function createEntryViewer(room) {
         closeLightbox();
         room.classList.remove("is-entry-open");
         returnFocus?.focus({ preventScroll: true });
+    };
+    const animateReturn = () => {
+        window.clearTimeout(returnAnimationTimer);
+        close.classList.add("is-emblem-pressed");
+        returnAnimationTimer = window.setTimeout(() => close.classList.remove("is-emblem-pressed"), 260);
+    };
+    const returnToArchive = () => {
+        animateReturn();
+        // Give the emblem rotation one deliberate beat before the entry exits.
+        window.setTimeout(closeViewer, 180);
     };
     const openViewer = (note, trigger) => {
         activeNote = note;
@@ -137,7 +161,7 @@ function createEntryViewer(room) {
             imageButton.append(galleryImage);
             imageButton.addEventListener("click", () => openLightbox(src, galleryImage.alt));
             return imageButton;
-        }), galleryScrollHint);
+        }));
         viewer.hidden = false;
         room.classList.add("is-entry-open");
         details.scrollTop = 0;
@@ -154,7 +178,9 @@ function createEntryViewer(room) {
     window.addEventListener("resize", updateScrollHints);
     new ResizeObserver(updateScrollHints).observe(gallery);
     new ResizeObserver(updateScrollHints).observe(details);
-    close.addEventListener("click", closeViewer);
+    close.addEventListener("pointerdown", animateReturn);
+    close.addEventListener("pointercancel", () => close.classList.remove("is-emblem-pressed"));
+    close.addEventListener("click", returnToArchive);
     lightboxClose.addEventListener("click", closeLightbox);
     lightbox.addEventListener("pointerdown", (event) => { if (event.target === lightbox) closeLightbox(); });
     viewer.addEventListener("pointerdown", (event) => {

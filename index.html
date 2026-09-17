@@ -51,6 +51,13 @@
         <p id="pog-exe-instruction" class="visually-hidden">Select the shortcut, then double click or press Enter to enter PIONEERS OF GREATNESS.</p>
     </main>
 
+    <section id="pog-launch-loading" class="pog-launch-loading" hidden aria-hidden="true" aria-label="Loading PIONEERS OF GREATNESS">
+        <video id="pog-launch-loading-video" class="pog-launch-video-background" muted playsinline preload="metadata" aria-hidden="true">
+            <source src="src/pog-launch-loading.mp4" type="video/mp4">
+        </video>
+        <img class="pog-launch-full-logo" src="src/POG_FULL_LOGO_WHITE.png" alt="PIONEERS OF GREATNESS">
+    </section>
+
     <div class="container" aria-hidden="true">
         <form id="email-form">
             <div class="input-container">
@@ -92,6 +99,9 @@
     </div>
 
     <section id="founder-introduction" class="founder-introduction" aria-hidden="true" aria-labelledby="founder-introduction-title">
+        <audio id="founder-poem-narration" preload="metadata">
+            <source src="src/founder/greatness-poem-narration.m4a" type="audio/mp4">
+        </audio>
         <div class="founder-introduction-inner">
             <h1 id="founder-introduction-title" class="visually-hidden">GREATNESS POEM</h1>
             <div id="founder-introduction-copy" class="founder-introduction-copy" aria-live="polite"></div>

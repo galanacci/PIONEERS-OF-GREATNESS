@@ -1,6 +1,7 @@
 const POSITION_KEY = "pog:desktop-shortcut-position:v1";
 const GRID = 16;
 const EDGE = 20;
+const LAUNCH_LOADING_DURATION = 1500;
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
 const snap = (value) => Math.round(value / GRID) * GRID;
@@ -15,6 +16,8 @@ function positionBounds(shortcut) {
 export function initLauncher() {
     const desktop = document.getElementById("pog-desktop");
     const shortcut = document.getElementById("pog-exe-shortcut");
+    const loading = document.getElementById("pog-launch-loading");
+    const loadingVideo = document.getElementById("pog-launch-loading-video");
     if (!desktop || !shortcut) return;
 
     let position = null;
@@ -23,6 +26,7 @@ export function initLauncher() {
     let origin = null;
     let moved = false;
     let mobileLaunchTimer = null;
+    let launching = false;
     const isTouchLauncher = window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
     const save = () => {
@@ -50,12 +54,61 @@ export function initLauncher() {
         requestAnimationFrame(() => requestAnimationFrame(() => shortcut.classList.add("is-ready")));
     };
     const select = () => shortcut.classList.add("is-selected");
-    const launch = () => {
+    const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+    const waitForDestination = () => new Promise((resolve) => {
+        const startedAt = performance.now();
+        const check = () => {
+            const menu = document.getElementById("menu-overlay");
+            const poem = document.getElementById("founder-introduction");
+            const menuReady = menu?.classList.contains("is-open")
+                && Number.parseFloat(getComputedStyle(menu).opacity) >= 0.99;
+            const poemReady = poem?.classList.contains("is-open")
+                && getComputedStyle(poem).visibility === "visible";
+            if (menuReady || poemReady || performance.now() - startedAt >= 1000) {
+                resolve();
+                return;
+            }
+            requestAnimationFrame(check);
+        };
+        check();
+    });
+    const launch = async () => {
+        if (launching) return;
+        launching = true;
         window.clearTimeout(mobileLaunchTimer);
         mobileLaunchTimer = null;
         shortcut.classList.remove("is-selected");
         window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name: "boot" } }));
-        window.dispatchEvent(new CustomEvent("pog:start-requested"));
+        if (loading && loadingVideo) {
+            const loadingStartedAt = performance.now();
+            loading.hidden = false;
+            loading.setAttribute("aria-hidden", "false");
+            requestAnimationFrame(() => loading.classList.add("is-open"));
+            if (loadingVideo.readyState < HTMLMediaElement.HAVE_METADATA) {
+                await Promise.race([
+                    new Promise((resolve) => loadingVideo.addEventListener("loadedmetadata", resolve, { once: true })),
+                    wait(1000)
+                ]);
+            }
+            const loadingDurationSeconds = LAUNCH_LOADING_DURATION / 1000;
+            const playableDuration = Math.max(0, (Number.isFinite(loadingVideo.duration) ? loadingVideo.duration : loadingDurationSeconds) - loadingDurationSeconds);
+            loadingVideo.currentTime = Math.random() * playableDuration;
+            loadingVideo.play().catch(() => { /* Muted playback may still be restricted on some browsers. */ });
+            // The loading screen is intentional pacing, not merely a network wait.
+            await wait(Math.max(0, LAUNCH_LOADING_DURATION - (performance.now() - loadingStartedAt)));
+            // Keep the loading layer mounted until the destination is fully
+            // visible. Removing it after an arbitrary frame count exposed the
+            // desktop for a single frame while the menu was still fading in.
+            window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
+            await waitForDestination();
+            loading.classList.remove("is-open");
+            loading.setAttribute("aria-hidden", "true");
+            loadingVideo.pause();
+            loading.hidden = true;
+        } else {
+            window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
+        }
+        launching = false;
     };
 
     shortcut.addEventListener("pointerdown", (event) => {

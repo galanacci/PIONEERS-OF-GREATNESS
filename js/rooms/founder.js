@@ -30,6 +30,30 @@ const POEM_PACING = [
     { character: 49, space: 29, comma: 300, sentence: 900, question: 900, hold: 1000 }
 ];
 
+// Word-level cues aligned directly against the supplied narration. These are
+// absolute media times; each array maps one-to-one to its poem paragraph.
+const NARRATION_WORD_CUES = [
+    [0, 0.2, 0.2, 0.5, 0.84, 1.96, 2, 2.34, 2.64, 2.72, 2.94, 3.2, 3.42, 4.42, 4.72, 4.82, 5.18, 5.46, 5.76, 5.96, 6.1, 6.24],
+    [6.58, 7.1, 7.44, 7.64, 7.84, 8.08, 8.3, 9.2, 9.26, 9.54, 9.72, 10.32, 10.58, 10.68, 11, 11.32, 11.4, 11.7, 11.94],
+    [13.04, 13.22, 13.34, 13.6, 13.94, 14.74, 15, 15.24, 15.44, 15.68, 16.02, 16.1, 16.36, 16.68, 17.38, 17.42, 17.74, 18.04, 18.4, 18.56, 18.96, 19.06, 19.34, 19.58, 19.68],
+    [20.62, 20.72, 20.86, 21.02, 21.18, 21.48, 21.88, 22.14, 22.3, 22.54, 22.98, 23.06, 23.32, 24.3, 24.36, 24.66, 24.94, 25.28, 25.68, 25.84, 26.12, 26.52, 26.88, 27.1, 27.38, 27.44, 27.64, 27.88, 28.5, 28.88],
+    [29.84, 30.36, 30.6, 30.92, 31.18, 31.38, 32.18, 32.24, 32.56, 32.86, 33.04, 33.72, 34, 34.24, 34.34, 34.52, 34.72, 34.94, 35.2, 35.46, 35.6, 36, 36.66, 36.74, 36.8, 37.1, 37.44, 37.66, 37.76, 38.04, 38.34, 38.54, 38.86, 39.1, 39.36, 39.7],
+    [40.96, 41.02, 41.22, 41.44, 41.66, 42.8, 42.84, 43.12, 43.32, 43.5, 43.8, 44.02, 44.28, 44.52, 44.84, 45.02, 45.2, 45.54, 45.72, 45.84, 46.02, 46.16, 47.32, 47.34, 47.54, 47.94, 48.22, 48.42, 49.54, 49.56, 49.94, 50.34, 50.62, 50.8]
+];
+const NARRATION_CUES = [...NARRATION_WORD_CUES.map((paragraph) => paragraph[0]), 51.2];
+const POEM_PUNCHLINE_WORDS = new Set([
+    "greatness", "knowing", "world",
+    "sail", "ablaze", "flame", "prevail",
+    "turmoil", "chaos", "knife",
+    "roaring", "faint", "glow", "darkened", "soul", "reignite",
+    "brave", "bold", "fight", "light", "shine", "starry", "night", "inspire", "dark", "sight",
+    "child", "fan", "dying", "burn", "bright", "sun", "mid-july", "awaits", "you", "i"
+]);
+
+function normalisePoemWord(word) {
+    return word.toLowerCase().replace(/[^a-z0-9-]/g, "");
+}
+
 function pacingFor(index) {
     return POEM_PACING[index] ?? POEM_PACING.at(-1);
 }
@@ -46,6 +70,7 @@ export function initOpening() {
     const replay = introduction?.querySelector("[data-opening-replay]");
     const enterMenu = introduction?.querySelector("[data-opening-enter]");
     const transition = document.getElementById("room-transition");
+    const narration = document.getElementById("founder-poem-narration");
     if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
 
     const background = [...document.body.children].filter((element) => (
@@ -59,6 +84,7 @@ export function initOpening() {
     let returnFocus = null;
     let backgroundState = new Map();
     let activeTyping = null;
+    let narrationClockStartedAt = 0;
 
     function renderEntryState() {
         entryLabel.textContent = "ENTER";
@@ -109,6 +135,10 @@ export function initOpening() {
         document.body.classList.remove("founder-introduction-active");
         background.forEach((element) => { element.inert = backgroundState.get(element) ?? false; });
         backgroundState.clear();
+        if (narration) {
+            narration.pause();
+            narration.currentTime = 0;
+        }
     }
 
     function enterSite() {
@@ -138,6 +168,7 @@ export function initOpening() {
         replayDestination = "reveal";
         returnFocus = null;
         closeIntroduction();
+        window.dispatchEvent(new CustomEvent("pog:ambience-poem-restore"));
         target?.focus();
         window.setTimeout(() => {
             if (!introduction.classList.contains("is-open")) {
@@ -188,10 +219,49 @@ export function initOpening() {
         return element;
     }
 
-    const accelerateCurrentParagraph = () => {
-        if (replayDestination !== "menu" || !activeTyping || activeTyping.token !== sequence) return;
-        activeTyping.speed = Math.max(0.08, activeTyping.speed * 0.25);
-        activeTyping.wake?.();
+    const narrationTime = () => {
+        if (narration && !narration.paused) return narration.currentTime;
+        return (performance.now() - narrationClockStartedAt) / 1000;
+    };
+
+    const waitForNarrationTime = (target, token) => new Promise((resolve) => {
+        const tick = () => {
+            if (token !== sequence || narrationTime() >= target) return resolve();
+            requestAnimationFrame(tick);
+        };
+        tick();
+    });
+
+    async function revealNarratedParagraph(paragraph, index, token) {
+        const element = document.createElement("p");
+        element.className = "is-active is-narrated";
+        copy.replaceChildren(element);
+        const words = paragraph.match(/\S+\s*/g) ?? [];
+        // Reserve the final line breaks before the first word appears. This
+        // prevents every spoken word from reflowing the paragraph beneath it.
+        const start = NARRATION_CUES[index];
+        const end = NARRATION_CUES[index + 1];
+        const wordCues = NARRATION_WORD_CUES[index] ?? [];
+        const wordNodes = words.map((word) => {
+            const node = document.createElement("span");
+            node.className = "founder-narrated-word";
+            if (POEM_PUNCHLINE_WORDS.has(normalisePoemWord(word))) {
+                node.classList.add("is-punchline");
+            }
+            node.textContent = word;
+            element.append(node);
+            return node;
+        });
+        await waitForNarrationTime(start, token);
+        if (token !== sequence) return null;
+        for (let wordIndex = 0; wordIndex < wordNodes.length; wordIndex += 1) {
+            await waitForNarrationTime(wordCues[wordIndex] ?? start, token);
+            if (token !== sequence) return null;
+            wordNodes[wordIndex].classList.add("is-visible");
+        }
+        await waitForNarrationTime(end, token);
+        if (token !== sequence) return null;
+        return element;
     };
 
     async function playIntroduction({
@@ -212,15 +282,31 @@ export function initOpening() {
                 loadPoem(),
                 openingDelay > 0 ? wait(openingDelay) : Promise.resolve()
             ]);
+            if (narration) {
+                narration.pause();
+                narration.currentTime = 0;
+                narrationClockStartedAt = performance.now();
+                try {
+                    // Do not begin the text clock until the recording is
+                    // genuinely playing; buffering here would desynchronise
+                    // every word that follows.
+                    await narration.play();
+                } catch {
+                    // Autoplay restrictions still receive the same timeline.
+                }
+                narrationClockStartedAt = performance.now() - (narration.currentTime * 1000);
+            }
             skip.hidden = !allowSkip;
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
                 const pacing = pacingFor(index);
-                const element = await typeParagraph(paragraph, token, pacing);
+                const element = narration
+                    ? await revealNarratedParagraph(paragraph, index, token)
+                    : await typeParagraph(paragraph, token, pacing);
                 if (!element || token !== sequence) return;
-                await wait(pacing.hold);
+                await wait(narration ? 0 : pacing.hold);
                 const isFinalParagraph = index === content.paragraphs.length - 1;
-                if (!isFinalParagraph) {
+                if (!isFinalParagraph && !narration) {
                     element.classList.add("is-leaving");
                     await wait(700);
                 }
@@ -245,24 +331,25 @@ export function initOpening() {
         }
     }
 
-    async function enterOpeningPath() {
+    async function enterOpeningPath(event) {
         replaying = false;
         const returning = hasCompletedIntroduction();
+        const launchedFromDesktop = event?.detail?.source === "launcher";
         replayDestination = returning ? "reveal" : "menu";
         returnFocus = null;
-        window.dispatchEvent(new CustomEvent("pog:show-transition"));
+        if (!launchedFromDesktop) window.dispatchEvent(new CustomEvent("pog:show-transition"));
         if (returning) {
             window.dispatchEvent(new CustomEvent("pog:ambience-prime"));
             window.dispatchEvent(new CustomEvent("pog:opening-complete"));
             await wait(1000);
             window.dispatchEvent(new CustomEvent("pog:ambience-reveal"));
-            window.dispatchEvent(new CustomEvent("pog:hide-transition"));
+            if (!launchedFromDesktop) window.dispatchEvent(new CustomEvent("pog:hide-transition"));
             return;
         }
         const poemReady = loadPoem().catch(() => null);
         playIntroduction({ allowSkip: false });
         await Promise.all([wait(1000), poemReady]);
-        window.dispatchEvent(new CustomEvent("pog:hide-transition"));
+        if (!launchedFromDesktop) window.dispatchEvent(new CustomEvent("pog:hide-transition"));
     }
 
     function replayPoem() {
@@ -275,6 +362,7 @@ export function initOpening() {
         replaying = true;
         replayDestination = "origin";
         returnFocus = event.detail?.trigger || null;
+        window.dispatchEvent(new CustomEvent("pog:ambience-poem-mute"));
         playIntroduction({ allowSkip: true, openingDelay: 600 });
     }
 
@@ -303,7 +391,6 @@ export function initOpening() {
     enterMenu.addEventListener("click", enterSite);
     enter.addEventListener("click", enterSite);
     skip.addEventListener("click", skipPoem);
-    introduction.addEventListener("pointerdown", accelerateCurrentParagraph);
     introduction.addEventListener("keydown", (event) => {
         if (event.key === "Escape") event.preventDefault();
         if (event.key === "Enter" && !enter.hidden) { event.preventDefault(); enterSite(); }

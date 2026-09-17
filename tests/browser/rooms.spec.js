@@ -470,11 +470,10 @@ test("the poem gates the first visit and returning visitors continue directly", 
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
     await expect(page.locator("#founder-introduction-skip")).toBeHidden();
     await expect.poll(() => page.locator("#founder-introduction-copy").textContent()).not.toBe("");
-    const beforeTap = (await page.locator("#founder-introduction-copy").textContent()).length;
+    // Narrated passages stay locked to the voice; touching the poem does not
+    // artificially fast-forward its words.
     await page.locator("#founder-introduction").dispatchEvent("pointerdown", { pointerType: "touch" });
     await page.waitForTimeout(180);
-    const afterTap = (await page.locator("#founder-introduction-copy").textContent()).length;
-    expect(afterTap - beforeTap).toBeGreaterThan(5);
     await expect(page.locator("#founder-introduction-enter")).toBeHidden();
     await expect(page.locator("#founder-poem-reveal")).toBeHidden();
     await expect(page.locator('#founder-introduction [aria-label="Replay the animated GREATNESS POEM"]')).toHaveCount(0);
@@ -593,15 +592,23 @@ test("the OG GREATNESS tee mockup replays the poem Easter egg with SKIP", async 
     await page.locator('[data-founder-section="origin"]').click();
     await expect(page.locator(".founder-origin-archive")).toHaveClass(/is-ready/, { timeout: 10000 });
 
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:ambience-start")));
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.paused)).toBe(false);
+
     const easterEgg = page.locator('[data-origin-id="pre-pog-080"]');
     await easterEgg.dispatchEvent("click");
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/);
     await expect(page.locator("#founder-introduction-skip")).toBeVisible({ timeout: 5000 });
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => ({
+        muted: audio.muted,
+        level: Number(audio.dataset.outputLevel)
+    }))).toEqual({ muted: true, level: 0 });
 
     await page.locator("#founder-introduction-skip").click();
     await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/, { timeout: 3000 });
     await expect(page.locator(".founder-origin-archive")).toBeVisible();
     await expect(easterEgg).toBeFocused();
+    await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => audio.muted)).toBe(false);
 });
 
 test("Founder Journey presents eight spatial artefacts", async ({ page }) => {
@@ -722,7 +729,7 @@ test("Behind the Scenes opens a diary viewer with expandable entry images", asyn
     expect(await galleryImages.count()).toBeGreaterThan(0);
     if ((await page.viewportSize()).width <= 680) {
         await expect(viewer.locator(".field-note-viewer-details")).toHaveCSS("scrollbar-color", "rgb(103, 60, 175) rgba(0, 0, 0, 0)");
-        await expect(viewer.locator(".field-note-viewer-scroll-hint.is-gallery")).toBeVisible();
+        await expect(viewer.locator(".field-note-viewer-gallery-wrap")).toHaveAttribute("data-scroll-direction", /left|right/);
     }
     await galleryImages.first().click();
     const lightbox = page.locator(".field-note-image-lightbox");

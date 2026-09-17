@@ -49,6 +49,42 @@ body:has(.pog-desktop) .container { display: none; }
 }
 .pog-exe-shortcut:active { border-color: #a981e8; }
 
+.pog-launch-loading {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    opacity: 0;
+    transition: none;
+}
+.pog-launch-loading[hidden] { display: none; }
+.pog-launch-loading.is-open { opacity: 1; }
+.pog-launch-video-background {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: .28;
+}
+.pog-launch-full-logo {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: min(516px, 52vw);
+    height: auto;
+    object-fit: contain;
+}
+
+@media (max-width: 680px) {
+    .pog-launch-full-logo { width: min(56vw, 336px); }
+}
+
 .menu-overlay .background-video {
     position: absolute;
     inset: 0;
@@ -63,6 +99,7 @@ body:has(.pog-desktop) .container { display: none; }
 .menu-audio,
 .menu-version { position: relative; z-index: 2; }
 body:has(.menu-overlay.is-open) .pog-desktop { visibility: hidden; pointer-events: none; }
+body:has(.pog-launch-loading.is-open) .pog-desktop { visibility: hidden; pointer-events: none; }
 body:has(.menu-overlay.is-open) nav { display: flex; }
 
 @media (max-width: 680px) {
