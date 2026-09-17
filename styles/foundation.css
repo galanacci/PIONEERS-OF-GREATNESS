@@ -384,3 +384,20 @@ button:hover {
     background-color: currentColor;
 }
 
+/* Touch browsers can retain :hover after a tap. Keep feedback intentional: a
+   brief brand-purple flash, then restore the shared white control state. */
+@media (hover: none), (pointer: coarse) {
+    :is(button, a[href], [role="button"], [role="menuitem"], [role="option"]).is-touch-feedback {
+        color: #9b70df !important;
+        border-color: #9b70df !important;
+        transition: color 170ms ease, border-color 170ms ease, background-color 170ms ease !important;
+    }
+    :is(button, a[href], [role="button"], [role="menuitem"], [role="option"]).is-touch-resting:not(.is-selected):not(.is-current):not(.is-active):not([aria-current="true"]):not([aria-expanded="true"]):not([aria-disabled="true"]) {
+        color: #fff !important;
+        border-color: rgba(255,255,255,.72) !important;
+        background-color: transparent !important;
+        transition: color 260ms ease, border-color 260ms ease, background-color 260ms ease !important;
+    }
+    .room-return.is-touch-resting { color: #fff !important; text-decoration: none !important; }
+}
+

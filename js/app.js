@@ -12,6 +12,7 @@ import { initFounderHub } from "./rooms/founder-hub.js";
 import { initFounderMission } from "./rooms/founder-mission.js";
 import { initWaitlist } from "./services/waitlist.js";
 import { initLauncher } from "./core/launcher.js";
+import { initTouchFeedback } from "./core/touch-feedback.js";
 
 initWaitlist();
 initPageTemplate();
@@ -19,6 +20,7 @@ initAudio();
 initMenuSound();
 initMenu();
 initLauncher();
+initTouchFeedback();
 initPresentationLock();
 initRoomController();
 initOpening();

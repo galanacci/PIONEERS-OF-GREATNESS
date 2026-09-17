@@ -32,29 +32,17 @@ function createEntryViewer(room) {
     viewer.hidden = true;
     viewer.setAttribute("role", "dialog");
     viewer.setAttribute("aria-modal", "true");
-    viewer.setAttribute("aria-label", "Instagram post viewer");
+    viewer.setAttribute("aria-label", "Behind The Scenes diary entry");
     const windowElement = document.createElement("div");
     windowElement.className = "field-note-viewer-window";
     const close = document.createElement("button");
     close.type = "button";
-    close.className = "field-note-viewer-close";
-    close.setAttribute("aria-label", "Close Instagram post");
-    close.textContent = "×";
-    const media = document.createElement("div");
-    media.className = "field-note-viewer-media";
-    const image = document.createElement("img");
-    image.alt = "";
-    const previous = document.createElement("button");
-    const next = document.createElement("button");
-    previous.type = next.type = "button";
-    previous.className = "field-note-viewer-nav is-previous";
-    next.className = "field-note-viewer-nav is-next";
-    previous.setAttribute("aria-label", "Previous carousel image");
-    next.setAttribute("aria-label", "Next carousel image");
-    previous.textContent = next.textContent = "➔";
-    const count = document.createElement("span");
-    count.className = "field-note-viewer-count";
-    media.append(image, previous, next, count);
+    close.className = "room-return field-note-viewer-back";
+    close.setAttribute("aria-label", "Return to Behind The Scenes entries");
+    const header = document.createElement("header");
+    // Uses the archive header wrapper so the return emblem retains its exact
+    // room-level position and interaction treatment.
+    header.className = "field-note-viewer-header archive-heading-right";
     const details = document.createElement("div");
     details.className = "field-note-viewer-details";
     const meta = document.createElement("div");
@@ -69,49 +57,106 @@ function createEntryViewer(room) {
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     link.textContent = "OPEN ENTRY";
-    details.append(meta, caption, link);
-    windowElement.append(close, media, details);
-    viewer.append(windowElement);
+    details.append(caption, link);
+    header.append(close, meta);
+    const gallery = document.createElement("div");
+    gallery.className = "field-note-viewer-gallery";
+    gallery.setAttribute("aria-label", "Entry images. Select an image to enlarge it.");
+    const textScrollHint = document.createElement("span");
+    textScrollHint.className = "field-note-viewer-scroll-hint is-text";
+    textScrollHint.setAttribute("aria-hidden", "true");
+    const galleryScrollHint = document.createElement("span");
+    galleryScrollHint.className = "field-note-viewer-scroll-hint is-gallery";
+    galleryScrollHint.setAttribute("aria-hidden", "true");
+    windowElement.append(details, gallery, textScrollHint);
+    viewer.append(header, windowElement);
     room.append(viewer);
 
+    const lightbox = document.createElement("section");
+    lightbox.className = "field-note-image-lightbox";
+    lightbox.hidden = true;
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-label", "Enlarged diary image");
+    const lightboxClose = document.createElement("button");
+    lightboxClose.type = "button";
+    lightboxClose.className = "field-note-image-lightbox-close";
+    lightboxClose.setAttribute("aria-label", "Close enlarged image");
+    lightboxClose.textContent = "×";
+    const lightboxImage = document.createElement("img");
+    lightboxImage.alt = "";
+    lightbox.append(lightboxClose, lightboxImage);
+    room.append(lightbox);
+
     let activeNote = null;
-    let current = 0;
     let returnFocus = null;
-    const render = () => {
-        if (!activeNote) return;
-        image.src = activeNote.images[current];
-        image.alt = `${activeNote.entry}, image ${current + 1} of ${activeNote.images.length}`;
-        count.textContent = `${current + 1} / ${activeNote.images.length}`;
-        previous.hidden = next.hidden = activeNote.images.length < 2;
+    const updateScrollHints = () => {
+        const textScrollable = details.scrollHeight > details.clientHeight + 2;
+        textScrollHint.hidden = !textScrollable;
+        if (textScrollable) {
+            textScrollHint.dataset.direction = details.scrollTop + details.clientHeight >= details.scrollHeight - 2 ? "up" : "down";
+        }
+        const galleryScrollable = gallery.scrollWidth > gallery.clientWidth + 2;
+        galleryScrollHint.hidden = !galleryScrollable;
+        if (galleryScrollable) {
+            galleryScrollHint.dataset.direction = gallery.scrollLeft + gallery.clientWidth >= gallery.scrollWidth - 2 ? "left" : "right";
+        }
     };
-    const move = (step) => {
-        if (!activeNote?.images.length) return;
-        current = (current + step + activeNote.images.length) % activeNote.images.length;
-        render();
+    const closeLightbox = () => { lightbox.hidden = true; };
+    const openLightbox = (src, alt) => {
+        lightboxImage.src = src;
+        lightboxImage.alt = alt;
+        lightbox.hidden = false;
+        lightboxClose.focus({ preventScroll: true });
     };
     const closeViewer = () => {
         if (viewer.hidden) return;
         viewer.hidden = true;
+        closeLightbox();
         room.classList.remove("is-entry-open");
         returnFocus?.focus({ preventScroll: true });
     };
     const openViewer = (note, trigger) => {
         activeNote = note;
-        current = 0;
         returnFocus = trigger;
         entry.textContent = note.entry;
         date.dateTime = note.timestamp;
         date.textContent = formatDate(note.timestamp);
         caption.textContent = note.caption || "UNTITLED ENTRY";
         link.href = note.instagramUrl;
-        render();
+        gallery.replaceChildren(...note.images.map((src, index) => {
+            const imageButton = document.createElement("button");
+            imageButton.type = "button";
+            imageButton.className = "field-note-viewer-gallery-image";
+            imageButton.setAttribute("aria-label", `Enlarge image ${index + 1} of ${note.images.length}`);
+            const galleryImage = document.createElement("img");
+            galleryImage.src = src;
+            galleryImage.alt = `${note.entry}, image ${index + 1} of ${note.images.length}`;
+            galleryImage.loading = index > 2 ? "lazy" : "eager";
+            galleryImage.decoding = "async";
+            imageButton.append(galleryImage);
+            imageButton.addEventListener("click", () => openLightbox(src, galleryImage.alt));
+            return imageButton;
+        }), galleryScrollHint);
         viewer.hidden = false;
         room.classList.add("is-entry-open");
+        details.scrollTop = 0;
+        gallery.scrollLeft = 0;
+        requestAnimationFrame(() => {
+            updateScrollHints();
+            // Mobile browsers can settle horizontal flex dimensions one paint later.
+            requestAnimationFrame(updateScrollHints);
+        });
         close.focus({ preventScroll: true });
     };
-    previous.addEventListener("click", () => move(-1));
-    next.addEventListener("click", () => move(1));
+    details.addEventListener("scroll", updateScrollHints, { passive: true });
+    gallery.addEventListener("scroll", updateScrollHints, { passive: true });
+    window.addEventListener("resize", updateScrollHints);
+    new ResizeObserver(updateScrollHints).observe(gallery);
+    new ResizeObserver(updateScrollHints).observe(details);
     close.addEventListener("click", closeViewer);
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("pointerdown", (event) => { if (event.target === lightbox) closeLightbox(); });
     viewer.addEventListener("pointerdown", (event) => {
         if (event.target === viewer) closeViewer();
     });
@@ -119,11 +164,9 @@ function createEntryViewer(room) {
         if (event.key === "Escape") {
             event.preventDefault();
             closeViewer();
-        } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-            event.preventDefault();
-            move(event.key === "ArrowRight" ? 1 : -1);
         }
     });
+    lightbox.addEventListener("keydown", (event) => { if (event.key === "Escape") { event.preventDefault(); closeLightbox(); } });
     window.addEventListener("pog:room-closing", (event) => {
         if (event.detail?.roomId === "field-notes-room") closeViewer();
     });
@@ -157,87 +200,11 @@ export async function initFieldNotes() {
             if (!response.ok) throw new Error(`Field Notes request failed: ${response.status}`);
             const payload = await response.json();
             if (!Array.isArray(payload.notes) || !payload.notes.length) { showState("ARCHIVE SYNC PENDING"); return; }
-            const years = new Map();
-            payload.notes.forEach((note) => {
-                const year = String(new Date(note.timestamp).getFullYear());
-                if (!years.has(year)) years.set(year, []);
-                years.get(year).push(note);
-            });
-            const yearEntries = [...years.entries()].sort(([a], [b]) => Number(b) - Number(a));
-            const controls = document.createElement("nav");
-            controls.className = "field-notes-years";
-            controls.setAttribute("aria-label", "Field Notes chapters by year");
-            const trigger = document.createElement("button");
-            trigger.type = "button";
-            trigger.className = "field-notes-year-trigger";
-            trigger.setAttribute("aria-label", "Select Field Notes year");
-            trigger.setAttribute("aria-haspopup", "listbox");
-            trigger.setAttribute("aria-expanded", "false");
-            const options = document.createElement("div");
-            options.className = "field-notes-year-options";
-            options.setAttribute("role", "listbox");
-            options.setAttribute("aria-label", "Field Notes years");
-            options.hidden = true;
             const chapter = document.createElement("div");
             chapter.className = "field-notes-chapter";
-            const notesByYear = new Map(yearEntries);
-            let selectedYear = yearEntries[0][0];
-            let optionButtons = [];
-            const setOpen = (open) => {
-                controls.classList.toggle("is-open", open);
-                trigger.setAttribute("aria-expanded", String(open));
-                options.hidden = !open;
-            };
-            const selectYear = (year) => {
-                selectedYear = year;
-                trigger.textContent = year;
-                optionButtons.forEach((button) => {
-                    const selected = button.dataset.year === year;
-                    button.classList.toggle("is-selected", selected);
-                    button.setAttribute("aria-selected", String(selected));
-                });
-                chapter.replaceChildren(...notesByYear.get(year).map((note) => createNote(note, viewer.open)));
-                chapter.scrollTop = 0;
-            };
-            optionButtons = yearEntries.map(([year]) => {
-                const option = document.createElement("button");
-                option.type = "button";
-                option.className = "field-notes-year-option";
-                option.dataset.year = year;
-                option.setAttribute("role", "option");
-                option.textContent = year;
-                option.addEventListener("click", () => {
-                    selectYear(year);
-                    setOpen(false);
-                    trigger.focus();
-                });
-                options.append(option);
-                return option;
-            });
-            trigger.addEventListener("click", () => {
-                const open = trigger.getAttribute("aria-expanded") !== "true";
-                setOpen(open);
-                if (open) optionButtons.find((button) => button.dataset.year === selectedYear)?.focus();
-            });
-            options.addEventListener("keydown", (event) => {
-                const current = optionButtons.indexOf(document.activeElement);
-                if (["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) {
-                    event.preventDefault();
-                    let next = event.key === "Home" ? 0 : event.key === "End" ? optionButtons.length - 1 : current + (event.key === "ArrowDown" ? 1 : -1);
-                    optionButtons[(next + optionButtons.length) % optionButtons.length].focus();
-                } else if (event.key === "Escape") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setOpen(false);
-                    trigger.focus();
-                }
-            });
-            document.addEventListener("pointerdown", (event) => {
-                if (!controls.contains(event.target)) setOpen(false);
-            });
-            controls.append(trigger, options);
-            list.replaceChildren(controls, chapter);
-            selectYear(selectedYear);
+            const notes = [...payload.notes].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            chapter.replaceChildren(...notes.map((note) => createNote(note, viewer.open)));
+            list.replaceChildren(chapter);
         } catch (error) {
             initialized = false;
             console.error("Field Notes could not be loaded.", error);

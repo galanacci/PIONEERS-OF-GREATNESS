@@ -672,7 +672,7 @@ test("Behind the Scenes images do not zoom on hover", async ({ page }) => {
     await expect(firstEntry.locator(".field-note-media img")).toHaveCSS("transform", "none");
 });
 
-test("Field Notes waits for entry and renders one year chapter", async ({ page }, testInfo) => {
+test("Behind the Scenes loads the complete diary archive", async ({ page }) => {
     let requests = 0;
     page.on("request", (request) => {
         if (request.url().endsWith("/data/field-notes.json")) requests += 1;
@@ -683,36 +683,7 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     await page.getByRole("menuitem", { name: "BEHIND THE SCENES" }).click();
     await expect(page.locator("#field-notes-room")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#field-notes-room .room-kicker")).toHaveText("INSTAGRAM POSTS");
-    await expect(page.locator(".field-notes-year-trigger")).toBeVisible();
-    await expect(page.locator(".field-notes-year-trigger")).toHaveText("2026");
-    const returnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
-    const yearBox = await page.locator(".field-notes-year-trigger").boundingBox();
-    const headerBox = await page.locator("#field-notes-room .field-notes-header").boundingBox();
-    expect(returnBox.x + returnBox.width).toBeLessThan(yearBox.x);
-    const viewport = page.viewportSize();
-    const expectedEdge = testInfo.project.name === "mobile" ? 24 : 40;
-    expect(Math.abs(viewport.width - yearBox.x - yearBox.width - expectedEdge)).toBeLessThanOrEqual(1);
-    expect(yearBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
-    expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
-    expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("0px");
-    await page.locator(".field-notes-year-trigger").hover();
-    expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).borderTopWidth)).toBe("0px");
-    await page.locator(".field-notes-year-trigger").click();
-    expect(await page.locator(".field-notes-years").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
-    await expect(page.locator(".field-notes-year-options")).toBeVisible();
-    expect(await page.locator(".field-notes-year-options").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
-    expect(await page.locator(".field-notes-year-option.is-selected").evaluate((element) => getComputedStyle(element).color)).toBe("rgb(103, 60, 175)");
-    const unselectedYear = page.locator(".field-notes-year-option:not(.is-selected)").first();
-    expect(await unselectedYear.evaluate((element) => getComputedStyle(element).color)).toBe("rgba(255, 255, 255, 0.45)");
-    await unselectedYear.hover();
-    expect(await unselectedYear.evaluate((element) => getComputedStyle(element).borderTopWidth)).toBe("0px");
-    await page.keyboard.press("Escape");
-    if (testInfo.project.name === "desktop") {
-        await page.setViewportSize({ width: 625, height: 900 });
-        const mediumYearBox = await page.locator(".field-notes-year-trigger").boundingBox();
-        const mediumHeaderBox = await page.locator("#field-notes-room .field-notes-header").boundingBox();
-        expect(mediumYearBox.y).toBeGreaterThanOrEqual(mediumHeaderBox.y + mediumHeaderBox.height);
-    }
+    await expect(page.locator(".field-notes-years")).toHaveCount(0);
     await expect(page.locator(".field-notes-chapter .field-note").first()).toBeVisible();
     expect(await page.locator(".field-notes-chapter .field-note").count()).toBeGreaterThan(1);
     await expect(page.locator("#field-notes-room .archive-bottom-menu")).toBeHidden();
@@ -732,7 +703,7 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     expect(requests).toBe(1);
 });
 
-test("Behind the Scenes opens a carousel viewer with the full Instagram entry", async ({ page }) => {
+test("Behind the Scenes opens a diary viewer with expandable entry images", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
         detail: { roomId: "field-notes-room", skipTransition: true }
@@ -743,25 +714,31 @@ test("Behind the Scenes opens a carousel viewer with the full Instagram entry", 
     const viewer = page.locator(".field-note-viewer");
     await expect(viewer).toBeVisible();
     await expect(viewer.locator(".field-note-viewer-caption")).not.toBeEmpty();
+    await expect(viewer.locator(".field-note-viewer-meta")).toContainText("ENTRY");
     await expect(viewer.getByRole("link", { name: "OPEN ENTRY" })).toHaveAttribute("href", /instagram\.com/);
-    const viewerImage = viewer.locator(".field-note-viewer-media img");
-    await viewerImage.evaluate((image) => image.complete ? Promise.resolve() : new Promise((resolve) => image.addEventListener("load", resolve, { once: true })));
-    const mediaBox = await viewer.locator(".field-note-viewer-media").boundingBox();
-    const imageBox = await viewerImage.boundingBox();
-    expect(Math.abs((mediaBox.x + mediaBox.width / 2) - (imageBox.x + imageBox.width / 2))).toBeLessThanOrEqual(1);
-    expect(Math.abs((mediaBox.y + mediaBox.height / 2) - (imageBox.y + imageBox.height / 2))).toBeLessThanOrEqual(1);
-    await expect(viewer.getByRole("button", { name: "Previous carousel image" })).toHaveCSS("border-top-width", "0px");
-    await expect(viewer.getByRole("button", { name: "Next carousel image" })).toHaveCSS("border-top-width", "0px");
+    const gallery = viewer.locator(".field-note-viewer-gallery");
+    const galleryImages = gallery.getByRole("button");
+    await expect(galleryImages.first()).toBeVisible();
+    expect(await galleryImages.count()).toBeGreaterThan(0);
     if ((await page.viewportSize()).width <= 680) {
-        await expect(viewerImage).toHaveCSS("object-fit", "cover");
         await expect(viewer.locator(".field-note-viewer-details")).toHaveCSS("scrollbar-color", "rgb(103, 60, 175) rgba(0, 0, 0, 0)");
-        expect(Math.abs(mediaBox.width - imageBox.width)).toBeLessThanOrEqual(1);
-        expect(Math.abs(mediaBox.height - imageBox.height)).toBeLessThanOrEqual(1);
+        await expect(viewer.locator(".field-note-viewer-scroll-hint.is-gallery")).toBeVisible();
     }
-    const firstImage = await viewerImage.getAttribute("src");
-    await viewer.getByRole("button", { name: "Next carousel image" }).click();
-    await expect(viewerImage).not.toHaveAttribute("src", firstImage);
-    const closeViewer = viewer.getByRole("button", { name: "Close Instagram post" });
+    await galleryImages.first().click();
+    const lightbox = page.locator(".field-note-image-lightbox");
+    await expect(lightbox).toBeVisible();
+    const enlargedImage = lightbox.locator("img");
+    await expect(enlargedImage).toBeVisible();
+    if ((await page.viewportSize()).width > 680) {
+        const box = await enlargedImage.boundingBox();
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.y).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual((await page.viewportSize()).width);
+        expect(box.y + box.height).toBeLessThanOrEqual((await page.viewportSize()).height);
+    }
+    await lightbox.getByRole("button", { name: "Close enlarged image" }).click();
+    await expect(lightbox).toBeHidden();
+    const closeViewer = viewer.getByRole("button", { name: "Return to Behind The Scenes entries" });
     await closeViewer.hover();
     await closeViewer.focus();
     await expect(closeViewer).toHaveCSS("outline-style", "none");
