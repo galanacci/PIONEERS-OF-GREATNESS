@@ -12,7 +12,7 @@ export function initMenu() {
     const form = document.getElementById("email-form");
     const status = document.getElementById("status");
     const waitlistHome = form?.parentElement;
-    const regions = document.querySelectorAll("nav, #container, .container, .copyright");
+    const regions = document.querySelectorAll("nav, #container, .container, .copyright, #pog-desktop");
     if (!toggle || !overlay || !panel || !list || !waitlist || !form || !status || !waitlistHome || !items.length) return;
     if (COLLECTIONS_PREVIEW_ENABLED && collections) {
         collections.dataset.menuAction = "room";

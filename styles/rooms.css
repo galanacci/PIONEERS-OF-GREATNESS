@@ -167,8 +167,8 @@
 
 .room-transition img {
     display: block;
-    width: min(40vw, 260px);
-    height: 190px;
+    width: min(52vw, 338px);
+    height: 247px;
     object-fit: contain;
     pointer-events: none;
     user-select: none;
@@ -220,8 +220,8 @@
     }
 
     .room-transition img {
-        width: min(58vw, 230px);
-        height: 160px;
+        width: min(75.4vw, 299px);
+        height: 208px;
     }
 
 }

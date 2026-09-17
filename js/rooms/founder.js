@@ -61,9 +61,8 @@ export function initOpening() {
     let activeTyping = null;
 
     function renderEntryState() {
-        const returning = hasCompletedIntroduction();
-        entryLabel.textContent = returning ? "CONTINUE" : "BEGIN";
-        entryButton.setAttribute("aria-label", returning ? "Continue experience" : "Begin experience");
+        entryLabel.textContent = "ENTER";
+        entryButton.setAttribute("aria-label", "Enter experience");
     }
 
     async function loadPoem() {

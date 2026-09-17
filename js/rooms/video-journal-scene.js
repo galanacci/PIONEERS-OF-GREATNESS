@@ -8,7 +8,11 @@ const ASSETS = Object.freeze({
 // Spatial calibration remains isolated here so the room can evolve without rebuilding its interaction layer.
 export const VIDEO_JOURNAL_LAYOUT = Object.freeze({
     workspaceWidth: 6.2,
-    camera: Object.freeze({ position: Object.freeze([0, 0.08, 3.4]), target: Object.freeze([0, 0.08, 0]) })
+    camera: Object.freeze({
+        position: Object.freeze([0, 0.08, 3.4]),
+        target: Object.freeze([0, 0.08, 0]),
+        entrance: Object.freeze({ duration: 3400, x: -0.3, y: 0.12, z: 1.45 })
+    })
 });
 
 let retainedScene;
@@ -22,20 +26,21 @@ export function mountVideoJournalScene(host, hooks = {}) {
 class VideoJournalScene {
     constructor() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x17120e);
-        this.scene.fog = new THREE.FogExp2(0x17120e, 0.04);
+        this.scene.background = new THREE.Color(0x090604);
+        this.scene.fog = new THREE.FogExp2(0x090604, 0.048);
         this.camera = new THREE.PerspectiveCamera(39, 1, 0.05, 40);
         this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         this.renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 760 ? 1.25 : 1.5));
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 0.92;
+        this.renderer.toneMappingExposure = 0.79;
         this.renderer.domElement.className = "documentary-renderer";
+        this.renderer.domElement.dataset.cameraMode = "entrance-pan";
         this.renderer.domElement.tabIndex = -1;
         this.renderer.domElement.setAttribute("aria-hidden", "true");
         this.loader = new GLTFLoader();
         this.scene.environment = this.createStudioEnvironment();
-        this.scene.environmentIntensity = 1.1;
+        this.scene.environmentIntensity = 0.78;
         this.raycaster = new THREE.Raycaster();
         this.pointer = new THREE.Vector2();
         this.clock = new THREE.Clock();
@@ -46,9 +51,10 @@ class VideoJournalScene {
         this.bootPromise = null;
         this.screenMode = "off";
         this.staticFrame = 0;
-        this.mouse = new THREE.Vector2();
         this.televisionMeshes = [];
         this.cameraTarget = new THREE.Vector3(...VIDEO_JOURNAL_LAYOUT.camera.target);
+        this.entranceTarget = this.cameraTarget.clone();
+        this.cameraEntranceStart = null;
         this.lastScreenRect = "";
 
         this.screenCanvas = document.createElement("canvas");
@@ -61,10 +67,22 @@ class VideoJournalScene {
         this.screenTexture.flipY = false;
         this.drawScreen("off");
 
-        this.scene.add(new THREE.HemisphereLight(0xc8b79e, 0x100d0b, .8));
-        this.screenGlow = new THREE.PointLight(0xa9c8d7, 0, 3.2, 2);
+        this.scene.add(new THREE.HemisphereLight(0xd6a06a, 0x090504, .48));
+        // The original scan was lit by a practical above and to the camera's right.
+        // Keeping the source camera-relative preserves that authentic highlight during the entrance pan.
+        this.cameraLight = new THREE.PointLight(0xffc78f, 1.05, 7.5, 1.8);
+        this.cameraLight.position.set(1.15, 0.92, 0.38);
+        this.camera.add(this.cameraLight);
+        this.scene.add(this.camera);
+        this.screenGlow = new THREE.PointLight(0x8fcfe5, 0, 2.6, 2);
         this.screenGlow.position.set(0.08, 0.18, 1.55);
         this.scene.add(this.screenGlow);
+        this.screenSpill = new THREE.SpotLight(0xa9cfca, 0, 3.8, Math.PI * .24, .78, 2);
+        this.scene.add(this.screenSpill, this.screenSpill.target);
+        this.screenPool = this.createScreenPool();
+        this.scene.add(this.screenPool);
+        this.baseShadow = this.createBaseShadow();
+        this.scene.add(this.baseShadow);
 
         this.tick = this.tick.bind(this);
         this.onPointerMove = this.onPointerMove.bind(this);
@@ -76,7 +94,7 @@ class VideoJournalScene {
 
     createStudioEnvironment() {
         const studio = new THREE.Scene();
-        studio.background = new THREE.Color(0x17120e);
+        studio.background = new THREE.Color(0x0d0907);
         const panel = (colour, size, position) => {
             const mesh = new THREE.Mesh(
                 new THREE.PlaneGeometry(...size),
@@ -87,9 +105,9 @@ class VideoJournalScene {
             studio.add(mesh);
             return mesh;
         };
-        panel(0xffdfb7, [5.5, 3.2], [-3.8, 4.5, 4.2]);
-        panel(0x66727a, [3.4, 4.8], [4.6, 1.2, 3.2]);
-        panel(0x7a4c2d, [5.8, 2.5], [-2.4, -3.5, 1.5]);
+        panel(0xffc078, [5.5, 3.2], [3.8, 4.5, 4.2]);
+        panel(0x6c5140, [3.4, 4.8], [-4.6, 1.2, 3.2]);
+        panel(0x8a421f, [5.8, 2.5], [-2.4, -3.5, 1.5]);
         const generator = new THREE.PMREMGenerator(this.renderer);
         const target = generator.fromScene(studio, .08);
         generator.dispose();
@@ -98,6 +116,61 @@ class VideoJournalScene {
             node.material?.dispose?.();
         });
         return target.texture;
+    }
+
+    createScreenPool() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 256;
+        canvas.height = 128;
+        const context = canvas.getContext("2d");
+        const glow = context.createRadialGradient(128, 64, 4, 128, 64, 126);
+        glow.addColorStop(0, "rgba(205,238,234,.72)");
+        glow.addColorStop(.36, "rgba(159,207,202,.32)");
+        glow.addColorStop(1, "rgba(92,142,138,0)");
+        context.fillStyle = glow;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const material = new THREE.SpriteMaterial({
+            map: texture,
+            color: 0xa9cfca,
+            transparent: true,
+            opacity: 0,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            toneMapped: false
+        });
+        const pool = new THREE.Sprite(material);
+        pool.scale.set(2.8, .68, 1);
+        pool.renderOrder = 1;
+        return pool;
+    }
+
+    createBaseShadow() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 256;
+        canvas.height = 64;
+        const context = canvas.getContext("2d");
+        const shadow = context.createRadialGradient(128, 32, 8, 128, 32, 126);
+        shadow.addColorStop(0, "rgba(0,0,0,.98)");
+        shadow.addColorStop(.58, "rgba(0,0,0,.86)");
+        shadow.addColorStop(1, "rgba(0,0,0,0)");
+        context.fillStyle = shadow;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        const texture = new THREE.CanvasTexture(canvas);
+        const material = new THREE.SpriteMaterial({
+            map: texture,
+            color: 0x000000,
+            transparent: true,
+            opacity: .82,
+            depthTest: false,
+            depthWrite: false,
+            toneMapped: false
+        });
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(2.05, .32, 1);
+        sprite.renderOrder = 3;
+        return sprite;
     }
 
     async load() {
@@ -161,7 +234,7 @@ class VideoJournalScene {
                 return new THREE.MeshBasicMaterial({
                     name: materialName,
                     map: material.map,
-                    color: /^Unnamed$/i.test(materialName) ? 0xffd0a3 : 0xffffff,
+                    color: /^Unnamed$/i.test(materialName) ? 0xc18a60 : 0xc4a88e,
                     side: material.side
                 });
             });
@@ -177,8 +250,21 @@ class VideoJournalScene {
         if (televisionBox && !televisionBox.isEmpty()) {
             const televisionCentre = televisionBox.getCenter(new THREE.Vector3());
             this.cameraTarget.copy(televisionCentre);
+            this.entranceTarget.copy(televisionCentre);
             this.screenGlow.position.copy(televisionCentre);
-            this.screenGlow.position.z += 0.18;
+            this.screenGlow.position.y += 0.12;
+            this.screenGlow.position.z += 0.32;
+            this.screenSpill.position.copy(televisionCentre);
+            this.screenSpill.position.z += 0.2;
+            this.screenSpill.target.position.copy(televisionCentre);
+            this.screenSpill.target.position.y -= 0.72;
+            this.screenSpill.target.position.z += 1.35;
+            this.screenPool.position.copy(televisionCentre);
+            this.screenPool.position.y -= 1.28;
+            this.screenPool.position.z += 0.92;
+            this.baseShadow.position.copy(televisionCentre);
+            this.baseShadow.position.y -= 0.76;
+            this.baseShadow.position.z += 0.42;
             this.placeTelevisionLights(televisionCentre);
         }
     }
@@ -192,9 +278,9 @@ class VideoJournalScene {
             light.target.position.copy(centre);
             rig.add(light, light.target);
         };
-        addDirectional(0xffdfb7, 3.1, [-2.8, 3.4, 4.8]);
-        addDirectional(0xc8d2d7, 1.05, [3.1, 1.2, 3.5]);
-        addDirectional(0xffa65c, .9, [-3.4, 1.8, -2.2]);
+        addDirectional(0xffbd72, 2.7, [2.8, 3.4, 4.8]);
+        addDirectional(0x826552, .42, [-3.1, 1.2, 3.5]);
+        addDirectional(0xff7937, .72, [-3.4, 1.8, -2.2]);
         this.televisionLights = rig;
         this.scene.add(rig);
     }
@@ -210,8 +296,20 @@ class VideoJournalScene {
         this.renderer.domElement.addEventListener("pointerdown", this.onPointerDown);
         this.renderer.domElement.addEventListener("pointerleave", this.onPointerLeave);
         this.onResize();
-        if (this.loaded) hooks.onReady?.();
+        if (this.loaded) {
+            hooks.onReady?.();
+        }
         else if (this.failed) hooks.onError?.();
+        this.start();
+    }
+
+    beginCameraEntrance() {
+        this.cameraEntranceStart = performance.now();
+        this.lastScreenRect = "";
+    }
+
+    beginEntrance() {
+        this.beginCameraEntrance();
         this.start();
     }
 
@@ -275,8 +373,6 @@ class VideoJournalScene {
     }
 
     onPointerMove(event) {
-        const rect = this.host.getBoundingClientRect();
-        this.mouse.set((event.clientX - rect.left) / rect.width * 2 - 1, (event.clientY - rect.top) / rect.height * 2 - 1);
         const hovered = this.pick(event);
         if (hovered === this.hovered) return;
         this.hovered = hovered;
@@ -291,7 +387,6 @@ class VideoJournalScene {
 
     onPointerLeave() {
         this.hovered = false;
-        this.mouse.set(0, 0);
         this.renderer.domElement.style.cursor = "default";
         this.hooks?.onHover?.(false);
     }
@@ -300,6 +395,8 @@ class VideoJournalScene {
         this.bootPromise = null;
         this.screenMode = "off";
         this.screenGlow.intensity = 0;
+        this.screenSpill.intensity = 0;
+        this.screenPool.material.opacity = 0;
         this.drawScreen("off");
         this.start();
     }
@@ -309,28 +406,76 @@ class VideoJournalScene {
         this.bootPromise = (async () => {
             this.hooks?.onCrtPower?.();
             this.screenMode = "line";
-            this.screenGlow.intensity = 0.45;
+            this.screenGlow.intensity = 1.15;
+            this.screenSpill.intensity = .16;
+            this.screenPool.material.opacity = .045;
             this.drawScreen("line");
-            await this.wait(420);
+            await this.wait(260);
             this.screenMode = "static";
-            this.screenGlow.intensity = 1.1;
-            this.hooks?.onCrtStaticStart?.(920);
-            await this.wait(920);
+            this.screenGlow.intensity = 3.1;
+            this.screenSpill.intensity = .7;
+            this.screenPool.material.opacity = .15;
+            this.hooks?.onCrtStaticStart?.(550);
+            await this.wait(550);
             this.hooks?.onCrtStaticEnd?.();
             this.screenMode = "tracking";
+            this.screenGlow.intensity = 2.45;
+            this.screenSpill.intensity = .46;
+            this.screenPool.material.opacity = .1;
             this.drawScreen("tracking");
-            await this.wait(760);
+            await this.wait(450);
             this.screenMode = "ready";
+            this.screenGlow.intensity = 2.15;
+            this.screenSpill.intensity = .36;
+            this.screenPool.material.opacity = .085;
             this.drawScreen("ready");
-            await this.wait(620);
+            await this.wait(440);
         })();
         return this.bootPromise;
     }
 
     beginPlayback() {
         this.screenMode = "playback";
-        this.screenGlow.intensity = .22;
+        this.screenGlow.intensity = 1.35;
+        this.screenSpill.intensity = .28;
+        this.screenPool.material.opacity = .065;
         this.drawScreen("playback");
+        this.start();
+    }
+
+    beginChannelBlackout() {
+        this.screenMode = "off";
+        this.screenGlow.intensity = 0;
+        this.screenSpill.intensity = 0;
+        this.screenPool.material.opacity = 0;
+        this.drawScreen("off");
+        this.start();
+    }
+
+    beginChannelLine() {
+        this.screenMode = "line";
+        this.screenGlow.intensity = 1.15;
+        this.screenSpill.intensity = .12;
+        this.screenPool.material.opacity = .035;
+        this.drawScreen("line");
+        this.start();
+    }
+
+    beginChannelStatic() {
+        this.screenMode = "static";
+        this.screenGlow.intensity = 2.65;
+        this.screenSpill.intensity = .58;
+        this.screenPool.material.opacity = .12;
+        this.drawScreen("static");
+        this.start();
+    }
+
+    beginChannelTracking() {
+        this.screenMode = "tracking";
+        this.screenGlow.intensity = 1.8;
+        this.screenSpill.intensity = .3;
+        this.screenPool.material.opacity = .06;
+        this.drawScreen("tracking");
         this.start();
     }
 
@@ -341,6 +486,7 @@ class VideoJournalScene {
     drawScreen(mode) {
         const context = this.screenContext;
         const { width, height } = this.screenCanvas;
+        this.renderer.domElement.dataset.screenMode = mode;
         context.fillStyle = mode === "off" ? "#070807" : "#020303";
         context.fillRect(0, 0, width, height);
         if (mode === "line") {
@@ -384,9 +530,9 @@ class VideoJournalScene {
         context.save();
         context.globalCompositeOperation = "screen";
 
-        const roomGlow = context.createRadialGradient(width * .24, height * .05, 4, width * .32, height * .24, width * .72);
-        roomGlow.addColorStop(0, `rgba(224,226,218,${.15 * strength})`);
-        roomGlow.addColorStop(.34, `rgba(168,172,166,${.06 * strength})`);
+        const roomGlow = context.createRadialGradient(width * .78, height * .02, 4, width * .67, height * .25, width * .72);
+        roomGlow.addColorStop(0, `rgba(255,218,174,${.19 * strength})`);
+        roomGlow.addColorStop(.34, `rgba(191,157,122,${.075 * strength})`);
         roomGlow.addColorStop(1, "rgba(0,0,0,0)");
         context.fillStyle = roomGlow;
         context.fillRect(0, 0, width, height);
@@ -426,14 +572,26 @@ class VideoJournalScene {
         if (!this.host?.isConnected || document.hidden) return;
         const elapsed = this.clock.getElapsedTime();
         const cameraConfig = VIDEO_JOURNAL_LAYOUT.camera;
+        const entrance = cameraConfig.entrance;
         const mobile = innerWidth < 760;
         const baseZ = mobile ? 4.8 : cameraConfig.position[2];
+        const progress = this.cameraEntranceStart === null
+            ? 1
+            : Math.min(1, (performance.now() - this.cameraEntranceStart) / entrance.duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const mobileScale = mobile ? .72 : 1;
         this.camera.position.set(
-            this.cameraTarget.x + cameraConfig.position[0] + this.mouse.x * .055,
-            this.cameraTarget.y + cameraConfig.position[1] - this.mouse.y * .035,
-            this.cameraTarget.z + baseZ
+            this.cameraTarget.x + cameraConfig.position[0] + THREE.MathUtils.lerp(entrance.x * mobileScale, 0, eased),
+            this.cameraTarget.y + cameraConfig.position[1] + THREE.MathUtils.lerp(entrance.y * mobileScale, 0, eased),
+            this.cameraTarget.z + baseZ + THREE.MathUtils.lerp(entrance.z * mobileScale, 0, eased)
         );
-        this.camera.lookAt(this.cameraTarget);
+        this.entranceTarget.set(
+            this.cameraTarget.x + THREE.MathUtils.lerp(.12 * mobileScale, 0, eased),
+            this.cameraTarget.y + THREE.MathUtils.lerp(-.045 * mobileScale, 0, eased),
+            this.cameraTarget.z
+        );
+        this.camera.lookAt(this.entranceTarget);
+        if (progress === 1) this.cameraEntranceStart = null;
         if (this.screenMode === "static" && elapsed - this.staticFrame > .055) {
             this.staticFrame = elapsed;
             this.drawScreen("static");

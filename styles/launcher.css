@@ -1,0 +1,71 @@
+body:has(.pog-desktop) nav,
+body:has(.pog-desktop) .container { display: none; }
+
+.pog-desktop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    overflow: hidden;
+    background-color: #000;
+    background-image:
+        linear-gradient(rgba(103, 60, 175, .11) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(103, 60, 175, .11) 1px, transparent 1px);
+    background-size: 16px 16px;
+}
+
+.pog-exe-shortcut {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100px;
+    min-height: 112px;
+    display: grid;
+    place-items: center;
+    align-content: start;
+    gap: 7px;
+    padding: 8px 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #fff;
+    font-family: var(--font-brand);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    line-height: 1;
+    text-transform: none;
+    touch-action: none;
+    cursor: default;
+    visibility: hidden;
+    transition: background-color 100ms ease, border-color 100ms ease;
+}
+.pog-exe-shortcut.is-ready { visibility: visible; }
+.pog-exe-shortcut img { width: 74px; height: 74px; object-fit: contain; pointer-events: none; }
+.pog-exe-shortcut.is-selected,
+.pog-exe-shortcut:focus-visible {
+    border-color: rgba(169, 129, 232, .86);
+    background: rgba(103, 60, 175, .32);
+    outline: 0;
+}
+.pog-exe-shortcut:active { border-color: #a981e8; }
+
+.menu-overlay .background-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    object-fit: cover;
+    opacity: .52;
+}
+.menu-background-shade { position: absolute; inset: 0; z-index: 1; background: rgba(0,0,0,.48); }
+.menu-panel,
+.menu-audio,
+.menu-version { position: relative; z-index: 2; }
+body:has(.menu-overlay.is-open) .pog-desktop { visibility: hidden; pointer-events: none; }
+body:has(.menu-overlay.is-open) nav { display: flex; }
+
+@media (max-width: 680px) {
+    .pog-exe-shortcut { width: 90px; min-height: 98px; font-size: 11px; }
+    .pog-exe-shortcut img { width: 66px; height: 66px; }
+}

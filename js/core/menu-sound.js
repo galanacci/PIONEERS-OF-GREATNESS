@@ -23,14 +23,14 @@ const SOUND_SHAPES = {
         { frequency: 110, endFrequency: 48, duration: 0.42, gain: 0.022, type: "sine", delay: 0.34 }
     ],
     crtPower: [
-        { frequency: 72, endFrequency: 48, duration: .16, gain: .032, type: "sine" },
-        { frequency: 185, endFrequency: 92, duration: .11, gain: .018, type: "square", delay: .035 }
+        { frequency: 72, endFrequency: 48, duration: .16, gain: .05, type: "sine" },
+        { frequency: 185, endFrequency: 92, duration: .11, gain: .03, type: "square", delay: .035 }
     ]
 };
 
 const NOISE_SHAPES = {
-    crtStatic: { duration: .92, gain: .019, startFrequency: 7800, endFrequency: 7200 },
-    crtTune: { duration: .24, gain: .015, startFrequency: 5200, endFrequency: 1700 }
+    crtStatic: { duration: .92, gain: .032, startFrequency: 7800, endFrequency: 7200 },
+    crtTune: { duration: .24, gain: .034, startFrequency: 5200, endFrequency: 1700 }
 };
 
 export function initMenuSound() {
@@ -143,7 +143,7 @@ export function initMenuSound() {
         const samples = hissBuffer.getChannelData(0);
         for (let index = 0; index < samples.length; index += 1) samples[index] = (Math.random() * 2) - 1;
         const start = context.currentTime;
-        const humLevel = mobileAudioMix ? .011 : .0065;
+        const humLevel = mobileAudioMix ? .014 : .009;
         master.gain.setValueAtTime(.0001, start);
         master.gain.exponentialRampToValueAtTime(humLevel, start + .32);
         fundamental.type = "sine";
@@ -216,6 +216,8 @@ export function initMenuSound() {
             });
         } else if (action === "static-stop") {
             stopCrtStatic();
+        } else if (action === "tune") {
+            playNoise(NOISE_SHAPES.crtTune);
         } else if (action === "stop") {
             stopCrtStatic();
             stopCrtHum();
@@ -276,6 +278,7 @@ export function initMenuSound() {
         const control = interactiveFrom(event.target);
         if (!control || isMainMenuControl(control)) return;
         if (control.matches("[data-crt-sound]")) return;
+        if (control.matches("#pog-exe-shortcut")) return;
         if (control.matches(".menu-toggle")) {
             if (pressedBootControl === control) {
                 window.clearTimeout(bootPressTimer);

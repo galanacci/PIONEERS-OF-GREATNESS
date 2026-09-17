@@ -184,7 +184,7 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
         window.__menuSoundLog = [];
         window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
     });
-    const continueButton = page.getByRole("button", { name: "Continue experience" });
+    const continueButton = page.getByRole("button", { name: "Enter experience" });
     await continueButton.dispatchEvent("pointerover", { pointerType: "mouse" });
     await continueButton.click();
     const entrySounds = await page.evaluate(() => window.__menuSoundLog.slice());
@@ -217,7 +217,7 @@ test("EXIT emits a dedicated shutdown sound instead of the standard confirmation
     expect(sounds).not.toContain("confirm");
 });
 
-test("BEGIN and CONTINUE emit the dedicated boot-up sound", async ({ page }) => {
+test("ENTER emits the dedicated boot-up sound for first and returning visits", async ({ page }) => {
     const captureEntrySound = async () => {
         await page.evaluate(() => {
             window.__entrySoundLog = [];
@@ -237,7 +237,7 @@ test("BEGIN and CONTINUE emit the dedicated boot-up sound", async ({ page }) => 
     }));
     await page.goto("/");
     await captureEntrySound();
-    const begin = page.getByRole("button", { name: "Begin experience" });
+    const begin = page.getByRole("button", { name: "Enter experience" });
     await begin.dispatchEvent("pointerdown", { pointerType: "touch" });
     expect(await page.evaluate(() => window.__entrySoundLog)).toEqual(["boot"]);
     await begin.dispatchEvent("click");
@@ -250,7 +250,7 @@ test("BEGIN and CONTINUE emit the dedicated boot-up sound", async ({ page }) => 
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
     await captureEntrySound();
-    await page.getByRole("button", { name: "Continue experience" }).click();
+    await page.getByRole("button", { name: "Enter experience" }).click();
     expect(await page.evaluate(() => window.__entrySoundLog)).toContain("boot");
     expect(await page.evaluate(() => window.__entrySoundLog)).not.toContain("confirm");
 });
@@ -301,7 +301,7 @@ test("a direct mobile touch unlocks and warms the SFX engine", async ({ page }) 
         };
     });
     await page.goto("/");
-    await page.getByRole("button", { name: "Begin experience" }).dispatchEvent("pointerdown", {
+    await page.getByRole("button", { name: "Enter experience" }).dispatchEvent("pointerdown", {
         pointerType: "touch"
     });
     await expect.poll(() => page.evaluate(() => window.__sfxAudit)).toMatchObject({
@@ -352,7 +352,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
             window.__ambienceVolumes.push(event.detail.level);
         });
     });
-    await page.getByRole("button", { name: "Begin experience" }).click();
+    await page.getByRole("button", { name: "Enter experience" }).click();
     const beforeEnter = await page.locator("#site-ambience").evaluate((audio) => ({
         paused: audio.paused,
         level: Number(audio.dataset.outputLevel),
@@ -427,7 +427,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
         currentTime: 0
     });
     await page.reload();
-    await page.getByRole("button", { name: "Continue experience" }).click();
+    await page.getByRole("button", { name: "Enter experience" }).click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect.poll(() => page.locator("#site-ambience").evaluate((audio) => Number(audio.dataset.outputLevel)), {
         timeout: 3000
@@ -463,8 +463,8 @@ test("the poem gates the first visit and returning visitors continue directly", 
         body: JSON.stringify({ paragraphs: ["ABCDEFGHIJKLMNOPQRSTUVWXYZ ABCDEFGHIJKLMNOPQRSTUVWXYZ."] })
     }));
     await page.goto("/");
-    await expect(page.locator(".menu-toggle")).toHaveText("BEGIN");
-    await page.getByRole("button", { name: "Begin experience" }).click();
+    await expect(page.locator(".menu-toggle")).toHaveText("ENTER");
+    await page.getByRole("button", { name: "Enter experience" }).click();
     await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
     await expect(page.locator("#founder-introduction")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#founder-introduction-copy")).toHaveAttribute("aria-busy", "true");
@@ -480,7 +480,7 @@ test("the poem gates the first visit and returning visitors continue directly", 
     await expect(page.locator('#founder-introduction [aria-label="Replay the animated GREATNESS POEM"]')).toHaveCount(0);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 10000 });
     await page.reload();
-    await expect(page.locator(".menu-toggle")).toHaveText("CONTINUE");
+    await expect(page.locator(".menu-toggle")).toHaveText("ENTER");
     const landingType = await page.evaluate(() => {
         const styles = (selector) => {
             const computed = getComputedStyle(document.querySelector(selector));
@@ -514,7 +514,7 @@ test("the poem gates the first visit and returning visitors continue directly", 
         expect(buttonBounds.right).toBeLessThanOrEqual(buttonBounds.viewportWidth);
         expect(buttonBounds.rightBorder).toBe("1px");
     }
-    await page.getByRole("button", { name: "Continue experience" }).click();
+    await page.getByRole("button", { name: "Enter experience" }).click();
     await expect(page.locator("#room-transition")).toHaveClass(/is-active/);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 7000 });
@@ -680,17 +680,19 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     await page.goto("/");
     expect(requests).toBe(0);
     await openMenu(page);
-    await page.getByRole("menuitem", { name: "FIELD NOTES" }).click();
+    await page.getByRole("menuitem", { name: "BEHIND THE SCENES" }).click();
     await expect(page.locator("#field-notes-room")).toHaveClass(/is-open/, { timeout: 2500 });
+    await expect(page.locator("#field-notes-room .room-kicker")).toHaveText("INSTAGRAM POSTS");
     await expect(page.locator(".field-notes-year-trigger")).toBeVisible();
     await expect(page.locator(".field-notes-year-trigger")).toHaveText("2026");
     const returnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
     const yearBox = await page.locator(".field-notes-year-trigger").boundingBox();
+    const headerBox = await page.locator("#field-notes-room .field-notes-header").boundingBox();
     expect(returnBox.x + returnBox.width).toBeLessThan(yearBox.x);
     const viewport = page.viewportSize();
     const expectedEdge = testInfo.project.name === "mobile" ? 24 : 40;
     expect(Math.abs(viewport.width - yearBox.x - yearBox.width - expectedEdge)).toBeLessThanOrEqual(1);
-    expect(Math.abs(returnBox.y - yearBox.y)).toBeLessThanOrEqual(4);
+    expect(yearBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
     expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
     expect(await page.locator(".field-notes-year-trigger").evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("0px");
     await page.locator(".field-notes-year-trigger").hover();
@@ -707,12 +709,66 @@ test("Field Notes waits for entry and renders one year chapter", async ({ page }
     await page.keyboard.press("Escape");
     if (testInfo.project.name === "desktop") {
         await page.setViewportSize({ width: 625, height: 900 });
-        const mediumReturnBox = await page.locator("#field-notes-room [data-room-close]").boundingBox();
         const mediumYearBox = await page.locator(".field-notes-year-trigger").boundingBox();
-        expect(Math.abs(mediumReturnBox.y - mediumYearBox.y)).toBeLessThanOrEqual(4);
+        const mediumHeaderBox = await page.locator("#field-notes-room .field-notes-header").boundingBox();
+        expect(mediumYearBox.y).toBeGreaterThanOrEqual(mediumHeaderBox.y + mediumHeaderBox.height);
     }
     await expect(page.locator(".field-notes-chapter .field-note").first()).toBeVisible();
+    expect(await page.locator(".field-notes-chapter .field-note").count()).toBeGreaterThan(1);
+    await expect(page.locator("#field-notes-room .archive-bottom-menu")).toBeHidden();
+    await expect(page.locator("#field-notes-room .room-navigation-credit")).toBeVisible();
+    await expect(page.locator(".field-note-grid-count")).toHaveCount(0);
+    await expect(page.locator(".field-notes-chapter")).toHaveCSS("scrollbar-width", "none");
+    const currentViewport = page.viewportSize();
+    const expectedSpacer = currentViewport.width <= 680 ? 12 : 20;
+    expect(await page.locator(".field-notes-chapter").evaluate((element) => parseFloat(getComputedStyle(element, "::after").height))).toBe(expectedSpacer);
+    await page.locator(".field-notes-chapter").evaluate((element) => { element.scrollTop = element.scrollHeight; });
+    const gridBox = await page.locator(".field-notes-list").boundingBox();
+    const lastCardBox = await page.locator(".field-note-card").last().boundingBox();
+    const creditBox = await page.locator("#field-notes-room .room-navigation-credit").boundingBox();
+    expect(Math.abs(currentViewport.height - (gridBox.y + gridBox.height))).toBeLessThanOrEqual(1);
+    expect((gridBox.y + gridBox.height) - (lastCardBox.y + lastCardBox.height)).toBeGreaterThanOrEqual(expectedSpacer);
+    expect(creditBox.y + creditBox.height).toBeLessThanOrEqual(gridBox.y + gridBox.height);
     expect(requests).toBe(1);
+});
+
+test("Behind the Scenes opens a carousel viewer with the full Instagram entry", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+        detail: { roomId: "field-notes-room", skipTransition: true }
+    })));
+    const firstCard = page.locator(".field-note-card").first();
+    await expect(firstCard).toBeVisible();
+    await firstCard.click();
+    const viewer = page.locator(".field-note-viewer");
+    await expect(viewer).toBeVisible();
+    await expect(viewer.locator(".field-note-viewer-caption")).not.toBeEmpty();
+    await expect(viewer.getByRole("link", { name: "OPEN ENTRY" })).toHaveAttribute("href", /instagram\.com/);
+    const viewerImage = viewer.locator(".field-note-viewer-media img");
+    await viewerImage.evaluate((image) => image.complete ? Promise.resolve() : new Promise((resolve) => image.addEventListener("load", resolve, { once: true })));
+    const mediaBox = await viewer.locator(".field-note-viewer-media").boundingBox();
+    const imageBox = await viewerImage.boundingBox();
+    expect(Math.abs((mediaBox.x + mediaBox.width / 2) - (imageBox.x + imageBox.width / 2))).toBeLessThanOrEqual(1);
+    expect(Math.abs((mediaBox.y + mediaBox.height / 2) - (imageBox.y + imageBox.height / 2))).toBeLessThanOrEqual(1);
+    await expect(viewer.getByRole("button", { name: "Previous carousel image" })).toHaveCSS("border-top-width", "0px");
+    await expect(viewer.getByRole("button", { name: "Next carousel image" })).toHaveCSS("border-top-width", "0px");
+    if ((await page.viewportSize()).width <= 680) {
+        await expect(viewerImage).toHaveCSS("object-fit", "cover");
+        await expect(viewer.locator(".field-note-viewer-details")).toHaveCSS("scrollbar-color", "rgb(103, 60, 175) rgba(0, 0, 0, 0)");
+        expect(Math.abs(mediaBox.width - imageBox.width)).toBeLessThanOrEqual(1);
+        expect(Math.abs(mediaBox.height - imageBox.height)).toBeLessThanOrEqual(1);
+    }
+    const firstImage = await viewerImage.getAttribute("src");
+    await viewer.getByRole("button", { name: "Next carousel image" }).click();
+    await expect(viewerImage).not.toHaveAttribute("src", firstImage);
+    const closeViewer = viewer.getByRole("button", { name: "Close Instagram post" });
+    await closeViewer.hover();
+    await closeViewer.focus();
+    await expect(closeViewer).toHaveCSS("outline-style", "none");
+    await expect(closeViewer).toHaveCSS("border-top-width", "0px");
+    await expect(closeViewer).toHaveCSS("box-shadow", "none");
+    await closeViewer.click();
+    await expect(viewer).toBeHidden();
 });
 
 test("Documentary changes CRT episodes and removes playback on exit", async ({ page }) => {
@@ -729,9 +785,10 @@ test("Documentary changes CRT episodes and removes playback on exit", async ({ p
     await expect(page.locator("#documentary-scene")).toHaveClass(/is-ready/, { timeout: 20000 });
     await expect(page.locator("#documentary-feature iframe")).toHaveCount(0);
     await expect(page.locator("#documentary-crt-player")).toHaveClass(/is-playing/, { timeout: 10000 });
-    await expect(page.locator("#documentary-crt-state")).toContainText("RAPID PROTOTYPE MODE");
+    await expect(page.locator("#documentary-crt-state")).toBeHidden();
+    await expect(page.locator(".documentary-crt-now-playing h3")).toContainText("RAPID PROTOTYPE MODE");
     await page.locator("#documentary-crt-previous").click();
-    await expect(page.locator("#documentary-crt-state")).toContainText("BUILDING THE POG AI SYSTEM");
+    await expect(page.locator(".documentary-crt-now-playing h3")).toContainText("BUILDING THE POG AI SYSTEM");
     await page.locator("#documentary-environment [data-room-close]").click();
     await expect(page.locator("#documentary-crt-player iframe")).toHaveCount(0);
     expect(requests).toBe(1);

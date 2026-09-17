@@ -15,6 +15,7 @@ export async function initDocumentary() {
     const crtNext = document.getElementById("documentary-crt-next");
     const crtArchiveToggle = document.getElementById("documentary-crt-archive-toggle");
     const crtArchiveMenu = document.getElementById("documentary-crt-archive-menu");
+    const roomTransition = document.getElementById("room-transition");
     const content = room?.querySelector(".documentary-content");
     const feature = document.getElementById("documentary-feature");
     const archive = document.getElementById("documentary-list");
@@ -30,6 +31,21 @@ export async function initDocumentary() {
     let scene;
     let sceneLoading;
     let crtArchiveYear = "";
+    let tuning = false;
+    let tuneSequence = 0;
+    let entranceSequence = 0;
+    const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+    const waitForRoomReveal = () => {
+        if (!roomTransition?.classList.contains("is-active")) return Promise.resolve();
+        return new Promise((resolve) => {
+            const observer = new MutationObserver(() => {
+                if (roomTransition.classList.contains("is-active")) return;
+                observer.disconnect();
+                resolve();
+            });
+            observer.observe(roomTransition, { attributes: true, attributeFilter: ["class"] });
+        });
+    };
 
     const waitForFeature = async () => {
         const iframe = feature.querySelector("iframe");
@@ -50,15 +66,33 @@ export async function initDocumentary() {
         const parsed = Number(String(episode?.episode || "").match(/\d+/)?.[0]);
         return Number.isFinite(parsed) && parsed > 0 ? parsed : episodes.length - index;
     };
+    const updateCrtArchiveNowPlaying = () => {
+        const episode = episodes[selected] || episodes[0];
+        const panel = crtArchiveMenu.querySelector(".documentary-crt-now-playing");
+        if (!episode || !panel) return;
+        panel.querySelector("span").textContent = `NOW PLAYING · EPISODE ${String(episodeNumber(episode, selected)).padStart(3, "0")}`;
+        panel.querySelector("h3").textContent = episode.title;
+        panel.querySelector("p").textContent = episode.summary || "An uncut entry from the ongoing PIONEERS OF GREATNESS journey.";
+    };
+    const updateCrtArchiveSelection = () => {
+        crtArchiveMenu.querySelectorAll(".documentary-crt-episode-option").forEach((button) => {
+            const current = Number(button.dataset.episodeIndex) === selected;
+            button.classList.toggle("is-current", current);
+            button.setAttribute("aria-pressed", String(current));
+        });
+    };
     const updateCrtMetadata = () => {
         const episode = episodes[selected] || episodes[0];
         if (!episode) return;
         const currentNumber = episodeNumber(episode, selected);
         crtArchiveToggle.setAttribute("aria-label", `Episodes, current episode ${currentNumber}`);
-        crtState.textContent = `NOW PLAYING — ${episode.title}`;
-        crtState.hidden = false;
-        crtPrevious.disabled = selected >= episodes.length - 1;
-        crtNext.disabled = selected <= 0;
+        crtState.textContent = "";
+        crtState.hidden = true;
+        crtPrevious.disabled = tuning || selected >= episodes.length - 1;
+        crtNext.disabled = tuning || selected <= 0;
+        crtArchiveToggle.disabled = tuning;
+        updateCrtArchiveNowPlaying();
+        updateCrtArchiveSelection();
     };
     const closeCrtArchive = (restoreFocus = false) => {
         crtArchiveMenu.classList.remove("is-open");
@@ -68,10 +102,7 @@ export async function initDocumentary() {
         if (restoreFocus) crtArchiveToggle.focus();
     };
     const chooseCrtEpisode = (index) => {
-        selected = index;
-        sound("crtTune");
-        startCrtPlayback(true);
-        closeCrtArchive(true);
+        changeCrtEpisode(index);
     };
     const renderCrtArchiveEpisodes = () => {
         const list = crtArchiveMenu.querySelector(".documentary-crt-episode-list");
@@ -118,10 +149,18 @@ export async function initDocumentary() {
             crtArchiveYear = year.value;
             renderCrtArchiveEpisodes();
         });
-        header.append(label, year);
+        const yearControl = document.createElement("div");
+        yearControl.className = "documentary-crt-year-control";
+        yearControl.append(year);
+        header.append(label, yearControl);
+        const nowPlaying = document.createElement("section");
+        nowPlaying.className = "documentary-crt-now-playing";
+        nowPlaying.setAttribute("aria-live", "polite");
+        nowPlaying.append(document.createElement("span"), document.createElement("h3"), document.createElement("p"));
         const list = document.createElement("div");
         list.className = "documentary-crt-episode-list";
-        crtArchiveMenu.replaceChildren(header, list);
+        crtArchiveMenu.replaceChildren(header, nowPlaying, list);
+        updateCrtArchiveNowPlaying();
         renderCrtArchiveEpisodes();
     };
     const startCrtPlayback = (autoplay = false) => {
@@ -138,14 +177,46 @@ export async function initDocumentary() {
         }, { once: true });
         crtPlayer.replaceChildren(iframe);
         updateCrtMetadata();
+        return iframe;
+    };
+    const changeCrtEpisode = async (index) => {
+        if (!episodes.length || !crtPlaying || tuning || index === selected) return;
+        tuning = true;
+        const token = ++tuneSequence;
+        updateCrtMetadata();
+        crtAudio("tune");
+        crtPlayer.classList.add("is-tuning");
+        scene?.beginChannelBlackout();
+        await wait(150);
+        if (token !== tuneSequence) return;
+        scene?.beginChannelLine();
+        await wait(360);
+        if (token !== tuneSequence) return;
+        selected = index;
+        scene?.beginChannelStatic();
+        crtAudio("static-start", { duration: 1200 });
+        const iframe = startCrtPlayback(true);
+        const loaded = iframe
+            ? new Promise((resolve) => iframe.addEventListener("load", resolve, { once: true }))
+            : Promise.resolve();
+        await Promise.all([
+            wait(520),
+            Promise.race([loaded, wait(1200)])
+        ]);
+        if (token !== tuneSequence) return;
+        crtAudio("static-stop");
+        scene?.beginChannelTracking();
+        await wait(340);
+        if (token !== tuneSequence) return;
+        scene?.beginPlayback();
+        crtPlayer.classList.remove("is-tuning");
+        tuning = false;
+        updateCrtMetadata();
     };
     const moveCrtEpisode = (step) => {
-        if (!episodes.length || !crtPlaying) return;
+        if (!episodes.length || !crtPlaying || tuning) return;
         const next = Math.max(0, Math.min(episodes.length - 1, selected + step));
-        if (next === selected) return;
-        selected = next;
-        sound("crtTune");
-        startCrtPlayback(true);
+        changeCrtEpisode(next);
     };
     const selectEpisode = (index, focus = false) => {
         selected = index;
@@ -365,7 +436,6 @@ export async function initDocumentary() {
         updateCrtMetadata();
         startCrtPlayback();
         crtState.hidden = true;
-        crtControls.hidden = false;
         try {
             await scene?.boot();
             scene?.beginPlayback();
@@ -380,6 +450,15 @@ export async function initDocumentary() {
         }
     };
 
+    const beginVisibleCrtExperience = async () => {
+        if (!scene?.loaded || crtPlaying || booting) return;
+        const token = ++entranceSequence;
+        await waitForRoomReveal();
+        if (token !== entranceSequence || !room.classList.contains("is-open")) return;
+        scene.beginEntrance?.();
+        powerOn();
+    };
+
     const sceneHooks = {
         onReady() {
             sceneHost.classList.add("is-ready");
@@ -387,12 +466,13 @@ export async function initDocumentary() {
             tvTrigger.disabled = false;
             crtState.textContent = "POWER · STATIC · TRACKING";
             window.dispatchEvent(new CustomEvent("pog:room-ready", { detail: { roomId: "documentary-room" } }));
-            if (room.classList.contains("is-open")) powerOn();
+            if (room.classList.contains("is-open")) beginVisibleCrtExperience();
         },
         onHover(hovered) {
             if (!booting && !crtPlaying) crtState.textContent = hovered ? "PRESS TO POWER ON" : "CRT OFFLINE";
         },
         onCrtPower() {
+            crtControls.hidden = false;
             crtAudio("power");
         },
         onCrtStaticStart(duration) {
@@ -402,12 +482,14 @@ export async function initDocumentary() {
             crtAudio("static-stop");
         },
         onScreenRect(rect) {
-            const insetX = rect.width * .062;
-            const insetY = rect.height * .042;
-            environment.style.setProperty("--crt-left", `${rect.left + insetX}px`);
-            environment.style.setProperty("--crt-top", `${rect.top + insetY}px`);
-            environment.style.setProperty("--crt-width", `${Math.max(0, rect.width - insetX * 2)}px`);
-            environment.style.setProperty("--crt-height", `${Math.max(0, rect.height - insetY * 2)}px`);
+            const insetLeft = rect.width * .048;
+            const insetRight = rect.width * .044;
+            const insetTop = rect.height * .03;
+            const insetBottom = rect.height * .032;
+            environment.style.setProperty("--crt-left", `${rect.left + insetLeft}px`);
+            environment.style.setProperty("--crt-top", `${rect.top + insetTop}px`);
+            environment.style.setProperty("--crt-width", `${Math.max(0, rect.width - insetLeft - insetRight)}px`);
+            environment.style.setProperty("--crt-height", `${Math.max(0, rect.height - insetTop - insetBottom)}px`);
         },
         onActivate: powerOn,
         onError() {
@@ -455,6 +537,10 @@ export async function initDocumentary() {
     });
     window.addEventListener("pog:room-closing", (event) => {
         if (event.detail?.roomId !== "documentary-room") return;
+        entranceSequence += 1;
+        tuneSequence += 1;
+        tuning = false;
+        crtPlayer.classList.remove("is-tuning");
         stopPlayback();
         stopCrtPlayback();
         crtAudio("stop");
@@ -465,6 +551,6 @@ export async function initDocumentary() {
         showEnvironment();
         if (!initialized) await load();
         await mountScene();
-        if (scene?.loaded && !crtPlaying) powerOn();
+        if (scene?.loaded && !crtPlaying) beginVisibleCrtExperience();
     });
 }

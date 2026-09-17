@@ -11,12 +11,14 @@ import { initOpening } from "./rooms/founder.js";
 import { initFounderHub } from "./rooms/founder-hub.js";
 import { initFounderMission } from "./rooms/founder-mission.js";
 import { initWaitlist } from "./services/waitlist.js";
+import { initLauncher } from "./core/launcher.js";
 
 initWaitlist();
 initPageTemplate();
 initAudio();
 initMenuSound();
 initMenu();
+initLauncher();
 initPresentationLock();
 initRoomController();
 initOpening();

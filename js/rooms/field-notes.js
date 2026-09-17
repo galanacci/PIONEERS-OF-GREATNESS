@@ -2,57 +2,139 @@ function formatDate(timestamp) {
     return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(timestamp)).toUpperCase();
 }
 
-function createNote(note) {
+function createNote(note, openEntry) {
     const article = document.createElement("article");
     article.className = "field-note";
-    const media = document.createElement("div");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "field-note-card";
+    button.setAttribute("aria-label", `Open ${note.entry}`);
+    const media = document.createElement("span");
     media.className = "field-note-media";
-    media.tabIndex = note.images.length > 1 ? 0 : -1;
     const image = document.createElement("img");
-    image.alt = note.caption ? `Image from ${note.entry}` : note.entry;
+    image.src = note.images[0];
+    image.alt = `Cover image for ${note.entry}`;
     image.loading = "lazy";
     image.decoding = "async";
-    let current = 0;
-    const counter = document.createElement("span");
-    counter.className = "field-note-count";
-    const renderImage = () => {
-        image.src = note.images[current];
-        counter.textContent = `${current + 1} / ${note.images.length}`;
-        counter.setAttribute("aria-label", `Image ${current + 1} of ${note.images.length}`);
-    };
-    media.append(image);
-    if (note.images.length > 1) {
-        const previous = document.createElement("button");
-        const next = document.createElement("button");
-        previous.type = next.type = "button";
-        previous.className = "field-note-nav field-note-nav--previous";
-        next.className = "field-note-nav field-note-nav--next";
-        previous.setAttribute("aria-label", `Previous image in ${note.entry}`);
-        next.setAttribute("aria-label", `Next image in ${note.entry}`);
-        const move = (step) => { current = (current + step + note.images.length) % note.images.length; renderImage(); };
-        previous.addEventListener("click", () => move(-1));
-        next.addEventListener("click", () => move(1));
-        media.addEventListener("keydown", (event) => {
-            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-            event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1);
-        });
-        media.append(previous, next, counter);
-    }
-    renderImage();
-    const meta = document.createElement("div");
-    meta.className = "field-note-meta";
-    const entry = document.createElement("span"); entry.textContent = note.entry;
-    const date = document.createElement("time"); date.dateTime = note.timestamp; date.textContent = formatDate(note.timestamp);
-    meta.append(entry, date);
-    const caption = document.createElement("p"); caption.className = "field-note-caption"; caption.textContent = note.caption || "UNTITLED FIELD NOTE";
-    const link = document.createElement("a"); link.className = "field-note-link"; link.href = note.instagramUrl; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "OPEN ENTRY";
-    article.append(media, meta, caption, link);
+    const entry = document.createElement("span");
+    entry.className = "field-note-grid-entry";
+    entry.textContent = note.entry;
+    media.append(image, entry);
+    button.append(media);
+    button.addEventListener("click", () => openEntry(note, button));
+    article.append(button);
     return article;
 }
 
+function createEntryViewer(room) {
+    const viewer = document.createElement("section");
+    viewer.className = "field-note-viewer";
+    viewer.hidden = true;
+    viewer.setAttribute("role", "dialog");
+    viewer.setAttribute("aria-modal", "true");
+    viewer.setAttribute("aria-label", "Instagram post viewer");
+    const windowElement = document.createElement("div");
+    windowElement.className = "field-note-viewer-window";
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "field-note-viewer-close";
+    close.setAttribute("aria-label", "Close Instagram post");
+    close.textContent = "×";
+    const media = document.createElement("div");
+    media.className = "field-note-viewer-media";
+    const image = document.createElement("img");
+    image.alt = "";
+    const previous = document.createElement("button");
+    const next = document.createElement("button");
+    previous.type = next.type = "button";
+    previous.className = "field-note-viewer-nav is-previous";
+    next.className = "field-note-viewer-nav is-next";
+    previous.setAttribute("aria-label", "Previous carousel image");
+    next.setAttribute("aria-label", "Next carousel image");
+    previous.textContent = next.textContent = "➔";
+    const count = document.createElement("span");
+    count.className = "field-note-viewer-count";
+    media.append(image, previous, next, count);
+    const details = document.createElement("div");
+    details.className = "field-note-viewer-details";
+    const meta = document.createElement("div");
+    meta.className = "field-note-viewer-meta";
+    const entry = document.createElement("span");
+    const date = document.createElement("time");
+    meta.append(entry, date);
+    const caption = document.createElement("p");
+    caption.className = "field-note-viewer-caption";
+    const link = document.createElement("a");
+    link.className = "field-note-viewer-link";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "OPEN ENTRY";
+    details.append(meta, caption, link);
+    windowElement.append(close, media, details);
+    viewer.append(windowElement);
+    room.append(viewer);
+
+    let activeNote = null;
+    let current = 0;
+    let returnFocus = null;
+    const render = () => {
+        if (!activeNote) return;
+        image.src = activeNote.images[current];
+        image.alt = `${activeNote.entry}, image ${current + 1} of ${activeNote.images.length}`;
+        count.textContent = `${current + 1} / ${activeNote.images.length}`;
+        previous.hidden = next.hidden = activeNote.images.length < 2;
+    };
+    const move = (step) => {
+        if (!activeNote?.images.length) return;
+        current = (current + step + activeNote.images.length) % activeNote.images.length;
+        render();
+    };
+    const closeViewer = () => {
+        if (viewer.hidden) return;
+        viewer.hidden = true;
+        room.classList.remove("is-entry-open");
+        returnFocus?.focus({ preventScroll: true });
+    };
+    const openViewer = (note, trigger) => {
+        activeNote = note;
+        current = 0;
+        returnFocus = trigger;
+        entry.textContent = note.entry;
+        date.dateTime = note.timestamp;
+        date.textContent = formatDate(note.timestamp);
+        caption.textContent = note.caption || "UNTITLED ENTRY";
+        link.href = note.instagramUrl;
+        render();
+        viewer.hidden = false;
+        room.classList.add("is-entry-open");
+        close.focus({ preventScroll: true });
+    };
+    previous.addEventListener("click", () => move(-1));
+    next.addEventListener("click", () => move(1));
+    close.addEventListener("click", closeViewer);
+    viewer.addEventListener("pointerdown", (event) => {
+        if (event.target === viewer) closeViewer();
+    });
+    viewer.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeViewer();
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            move(event.key === "ArrowRight" ? 1 : -1);
+        }
+    });
+    window.addEventListener("pog:room-closing", (event) => {
+        if (event.detail?.roomId === "field-notes-room") closeViewer();
+    });
+    return { open: openViewer };
+}
+
 export async function initFieldNotes() {
+    const room = document.getElementById("field-notes-room");
     const list = document.getElementById("field-notes-list");
-    if (!list) return;
+    if (!room || !list) return;
+    const viewer = createEntryViewer(room);
     let initialized = false;
     const waitForFirstImage = async () => {
         const image = list.querySelector(".field-note-media img");
@@ -114,7 +196,8 @@ export async function initFieldNotes() {
                     button.classList.toggle("is-selected", selected);
                     button.setAttribute("aria-selected", String(selected));
                 });
-                chapter.replaceChildren(...notesByYear.get(year).map(createNote));
+                chapter.replaceChildren(...notesByYear.get(year).map((note) => createNote(note, viewer.open)));
+                chapter.scrollTop = 0;
             };
             optionButtons = yearEntries.map(([year]) => {
                 const option = document.createElement("button");
