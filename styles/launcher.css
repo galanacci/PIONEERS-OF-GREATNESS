@@ -1,5 +1,4 @@
-body:has(.pog-desktop) nav,
-body:has(.pog-desktop) .container { display: none; }
+.menu-infrastructure { display: none; }
 
 .pog-desktop {
     position: fixed;
@@ -59,7 +58,7 @@ body:has(.pog-desktop) .container { display: none; }
     background: #000;
     color: #fff;
     opacity: 0;
-    transition: opacity 300ms ease;
+    transition: opacity 200ms ease;
 }
 .pog-launch-loading[hidden] { display: none; }
 .pog-launch-loading.is-open { opacity: 1; }
@@ -72,6 +71,7 @@ body:has(.pog-desktop) .container { display: none; }
     height: 100%;
     object-fit: cover;
     opacity: .28;
+    transition: opacity 250ms ease;
 }
 .pog-launch-full-logo {
     position: relative;
@@ -80,7 +80,10 @@ body:has(.pog-desktop) .container { display: none; }
     width: min(516px, 52vw);
     height: auto;
     object-fit: contain;
+    transition: opacity 250ms ease;
 }
+.pog-launch-loading.is-blackout .pog-launch-video-background,
+.pog-launch-loading.is-blackout .pog-launch-full-logo { opacity: 0; }
 
 @media (max-width: 680px) {
     .pog-launch-full-logo { width: min(56vw, 336px); }
@@ -101,7 +104,6 @@ body:has(.pog-desktop) .container { display: none; }
 .menu-version { position: relative; z-index: 2; }
 body:has(.menu-overlay.is-open) .pog-desktop { visibility: hidden; pointer-events: none; }
 body:has(.pog-launch-loading.is-open) .pog-desktop { visibility: hidden; pointer-events: none; }
-body:has(.menu-overlay.is-open) nav { display: flex; }
 
 @media (max-width: 680px) {
     .pog-exe-shortcut { width: 90px; min-height: 98px; font-size: 11px; }

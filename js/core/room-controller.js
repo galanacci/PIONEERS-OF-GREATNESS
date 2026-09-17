@@ -3,7 +3,7 @@ import { isKnownRoom } from "../room-registry.js";
 export function initRoomController() {
     const rooms = [...document.querySelectorAll(".world-room")];
     const transition = document.getElementById("room-transition");
-    const background = document.querySelectorAll("nav, #container, .container, .copyright, #menu-overlay");
+    const background = document.querySelectorAll(".menu-infrastructure, .copyright, #menu-overlay");
     if (!rooms.length || !transition) return;
     let activeRoom = null;
     let timers = [];

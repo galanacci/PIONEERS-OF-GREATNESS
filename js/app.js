@@ -13,7 +13,9 @@ import { initFounderMission } from "./rooms/founder-mission.js";
 import { initWaitlist } from "./services/waitlist.js";
 import { initLauncher } from "./core/launcher.js";
 import { initTouchFeedback } from "./core/touch-feedback.js";
+import { initPerformanceTier } from "./core/performance-tier.js";
 
+initPerformanceTier();
 initWaitlist();
 initPageTemplate();
 initAudio();

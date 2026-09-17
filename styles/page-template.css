@@ -11,13 +11,13 @@
     position: absolute; top: max(20px, env(safe-area-inset-top)); left: var(--page-edge);
     width: 44px; height: 44px; padding: 0; z-index: 5; font-size: 25px; background: transparent;
 }
-.page-template :is(.documentary-header,.field-notes-header,.collections-header,.founder-hub-header,.founder-origin-frame-header,.founder-journey-entry-header,.founder-code-header,.founder-mission-entry-header) {
+.page-template :is(.field-notes-header,.collections-header,.founder-hub-header,.founder-origin-frame-header,.founder-journey-entry-header,.founder-code-header,.founder-mission-entry-header) {
     position: static; grid-area: auto; width: auto; max-width: none; margin: 0 0 0 56px;
     padding: 0; text-align: right; justify-self: stretch; align-self: start;
     max-height: 30dvh; overflow-y: auto;
 }
 .page-template :is(h1,h2) { max-width: none; margin: 6px 0; font-family: var(--font-brand); font-size: clamp(12px, 1.2vw, 16px); line-height: 1.4; letter-spacing: .14em; }
-.page-template :is(.documentary-intro,.field-notes-intro,.founder-hub-identity,.founder-origin-copy,.founder-journey-copy) {
+.page-template :is(.field-notes-intro,.founder-hub-identity,.founder-origin-copy,.founder-journey-copy) {
     width: auto; max-width: 620px; margin: 6px 0 0 auto; padding: 0; text-align: right;
     font-size: 12px; line-height: 1.5; color: #aaa;
 }
@@ -35,7 +35,7 @@
     text-align: justify;
     text-align-last: left;
 }
-.page-template :is(.room-kicker,.page-details,.field-note-meta,.field-note-caption,.documentary-feature-meta) { font-size: 11px; line-height: 1.5; margin: 4px 0; }
+.page-template :is(.room-kicker,.page-details,.field-note-meta,.field-note-caption) { font-size: 11px; line-height: 1.5; margin: 4px 0; }
 .page-template .page-details p { margin: 4px 0; }
 .page-template .page-details { max-width: 620px; margin-left: auto; }
 .page-template :is(.room-divider,.room-season,.founder-hub-instructions) { display: none; }
@@ -116,12 +116,6 @@
     background: #000; border-color: #673CAF; color: #673CAF;
 }
 .page-template .journey-space .journey-object.is-hovered { color: #a981e8; }
-.page-template :is(.field-notes-years,.documentary-years) { position: relative; inset: auto; margin: 0; width: auto; z-index: 6; }
-.page-template :is(.field-notes-year-options,.documentary-year-options) { top: auto; bottom: 100%; background: #080808; padding: 8px; max-height: 40dvh; overflow-y: auto; }
-.page-template .documentary-feature { min-height: 0; display: flex; align-items: center; justify-content: center; margin: 0; }
-.page-template .documentary-player { width: min(100%, calc((100dvh - 245px) * 16 / 9)); max-height: 100%; aspect-ratio: 16 / 9; }
-.page-template .documentary-archive { max-height: 15dvh; overflow: auto; margin: 0; }
-.page-template.documentary-content { grid-template-rows: auto minmax(0,1fr) auto auto auto; }
 .page-template .room-watch { justify-self: center; font-size: 10px; margin: 0; }
 .page-template :is(.field-notes-list,.field-notes-chapter,.field-note) { height: 100%; min-height: 0; margin: 0; padding: 0; display: block; }
 .page-template .field-note { display: grid; grid-template-rows: minmax(0,1fr) auto; gap: 8px; border: 0; }
@@ -139,7 +133,7 @@
     .page-template :is(.founder-origin-copy,.founder-journey-copy) p {
         width: 100%; max-width: none; text-align: right;
     }
-    .page-template :is(.documentary-intro,.field-notes-intro) { font-size: 11px; }
+    .page-template .field-notes-intro { font-size: 11px; }
     .page-controls-center { gap: 12px; }
     .page-template :is(.founder-origin-controls,.founder-journey-controls,.page-controls) {
         column-gap: 8px; row-gap: 15px;
@@ -199,6 +193,16 @@
     background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 12'%3E%3Cpath d='M2.25 5V3.25a2.75 2.75 0 0 1 5.5 0V5M1 5h8v6H1z' fill='none' stroke='%23fff' stroke-opacity='.4' stroke-width='1.25' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
+@media (max-width: 760px) {
+    .page-quick-menu { padding: 12px; max-height: 70dvh; }
+    .page-quick-menu button {
+        min-height: 52px;
+        padding: 12px 12px 12px 34px;
+        font-size: 14px;
+        line-height: 1.35;
+    }
+}
+
 /* Archives retain their original scrolling layout; only the page heading moves. */
 .world-room-content.archive-heading-right { padding-top: 40px; }
 .archive-heading-right .room-return {
@@ -210,38 +214,16 @@
 .world-room :is(.page-template,.archive-heading-right) > .room-return {
     font-size: 0; display: grid; align-items: center; justify-items: start; text-decoration: none;
 }
-/* Documentary: shared top alignment, centred introduction, inline archive controls. */
-#documentary-room .documentary-content,
 #field-notes-room .field-notes-content {
     padding-top: max(20px, env(safe-area-inset-top));
 }
-#documentary-room .documentary-header,
 #field-notes-room .field-notes-header {
     min-height: 44px; box-sizing: border-box;
     display: flex; flex-direction: column; justify-content: center;
     width: min(620px, calc(100vw - 100px));
     margin: 0 calc((100% - 100vw) / 2 + clamp(18px, 3vw, 40px)) 0 0;
 }
-#documentary-room .documentary-header h1,
 #field-notes-room .field-notes-header h1 { margin: 4px 0 0; }
-#documentary-room .documentary-feature {
-    margin-top: clamp(56px, 12vh, 128px);
-}
-#documentary-room .documentary-intro {
-    width: 100%; max-width: 570px; align-self: center;
-    margin: clamp(28px, 5vh, 54px) auto;
-    text-align: center; font-size: 12px; line-height: 1.7;
-}
-#documentary-room .documentary-archive-heading {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 20px; margin: 0 0 20px;
-}
-#documentary-room .documentary-archive-heading .room-season { margin: 0; }
-#documentary-room .documentary-archive-heading .documentary-years {
-    position: relative; inset: auto; margin: 0; align-self: center;
-}
-#documentary-room .documentary-year-options { background: #000; padding: 8px; }
-#documentary-room .room-watch { margin-top: 32px; }
 .world-room :is(.page-template,.archive-heading-right) > .room-return::before {
     content: ''; display: block; width: 18px; height: 28px;
     background-color: currentColor;
@@ -259,26 +241,21 @@
         transform: rotate(90deg);
     }
 }
-.archive-heading-right :is(.documentary-header,.field-notes-header) {
+.archive-heading-right .field-notes-header {
     position: relative; align-self: flex-end; text-align: right;
     width: min(620px, calc(100vw - 190px)); max-width: none;
     margin: 0 calc((100% - 100vw) / 2 + 40px) 0 0;
 }
-.archive-heading-right :is(.documentary-header,.field-notes-header) h1 {
+.archive-heading-right .field-notes-header h1 {
     margin: 6px 0; max-width: none; font-family: var(--font-brand);
     font-size: clamp(12px, 1.2vw, 16px); line-height: 1.4; letter-spacing: .14em;
 }
-.archive-heading-right :is(.documentary-intro,.field-notes-intro) {
+.archive-heading-right .field-notes-intro {
     margin: 6px 0 0 auto; font-size: 12px; line-height: 1.5; color: #aaa;
-}
-/* Keep year menus clear of the right-hand heading, above their archives. */
-.archive-heading-right :is(.documentary-years,.field-notes-years) {
-    position: relative; inset: auto; align-self: end; justify-self: end;
-    width: max-content; margin: 0 0 24px auto;
 }
 @media(max-width: 560px) {
     .world-room-content.archive-heading-right { padding-top: 76px; }
-    .archive-heading-right :is(.documentary-header,.field-notes-header) {
+    .archive-heading-right .field-notes-header {
         width: min(620px, calc(100vw - 36px)); margin-right: calc((100% - 100vw) / 2 + 18px);
     }
 }

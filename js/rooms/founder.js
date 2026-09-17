@@ -19,17 +19,6 @@ function wait(milliseconds) {
     return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
-// Each passage has its own spoken rhythm. Longer passages move a little faster,
-// and every completed paragraph holds for the same deliberate second.
-const POEM_PACING = [
-    { character: 52, space: 30, comma: 170, sentence: 520, question: 900, hold: 1000 },
-    { character: 47, space: 27, comma: 240, sentence: 620, question: 620, hold: 1000 },
-    { character: 54, space: 32, comma: 260, sentence: 760, question: 760, hold: 1000 },
-    { character: 50, space: 30, comma: 220, sentence: 680, question: 680, hold: 1000 },
-    { character: 42, space: 24, comma: 190, sentence: 720, question: 720, hold: 1000 },
-    { character: 49, space: 29, comma: 300, sentence: 900, question: 900, hold: 1000 }
-];
-
 // Word-level cues aligned directly against the supplied narration. These are
 // absolute media times; each array maps one-to-one to its poem paragraph.
 const NARRATION_WORD_CUES = [
@@ -54,10 +43,6 @@ function normalisePoemWord(word) {
     return word.toLowerCase().replace(/[^a-z0-9-]/g, "");
 }
 
-function pacingFor(index) {
-    return POEM_PACING[index] ?? POEM_PACING.at(-1);
-}
-
 export function initOpening() {
     const entryButton = document.querySelector(".menu-toggle");
     const entryLabel = entryButton?.querySelector(".menu-toggle-label");
@@ -71,7 +56,7 @@ export function initOpening() {
     const enterMenu = introduction?.querySelector("[data-opening-enter]");
     const transition = document.getElementById("room-transition");
     const narration = document.getElementById("founder-poem-narration");
-    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition) return;
+    if (!entryButton || !entryLabel || !introduction || !copy || !poemReveal || !actions || !enter || !skip || !replay || !enterMenu || !transition || !narration) return;
 
     const background = [...document.body.children].filter((element) => (
         element !== introduction && element.tagName !== "SCRIPT"
@@ -83,7 +68,6 @@ export function initOpening() {
     let replayDestination = "reveal";
     let returnFocus = null;
     let backgroundState = new Map();
-    let activeTyping = null;
     let narrationClockStartedAt = 0;
 
     function renderEntryState() {
@@ -127,8 +111,6 @@ export function initOpening() {
     }
 
     function closeIntroduction() {
-        activeTyping?.wake?.();
-        activeTyping = null;
         sequence += 1;
         introduction.classList.remove("is-open");
         introduction.setAttribute("aria-hidden", "true");
@@ -178,49 +160,8 @@ export function initOpening() {
         }, 650);
     }
 
-    const waitForTypingDelay = (milliseconds, token) => new Promise((resolve) => {
-        const typing = activeTyping;
-        if (!typing || typing.token !== token || token !== sequence) {
-            resolve();
-            return;
-        }
-        let settled = false;
-        const finish = () => {
-            if (settled) return;
-            settled = true;
-            window.clearTimeout(timer);
-            if (typing.wake === finish) typing.wake = null;
-            resolve();
-        };
-        const timer = window.setTimeout(finish, milliseconds * typing.speed);
-        typing.wake = finish;
-    });
-
-    async function typeParagraph(paragraph, token, pacing) {
-        const element = document.createElement("p");
-        element.className = "is-active";
-        copy.replaceChildren(element);
-        const typing = { token, speed: 1, wake: null };
-        activeTyping = typing;
-        for (const character of paragraph) {
-            if (token !== sequence) {
-                if (activeTyping === typing) activeTyping = null;
-                return;
-            }
-            element.textContent += character;
-            let delay = character === " " ? pacing.space : pacing.character;
-            if (character === ",") delay += pacing.comma;
-            else if (character === "?") delay += pacing.question;
-            else if (/[.!]/.test(character)) delay += pacing.sentence;
-            else if (/[—;]/.test(character)) delay += pacing.comma + 120;
-            await waitForTypingDelay(delay, token);
-        }
-        if (activeTyping === typing) activeTyping = null;
-        return element;
-    }
-
     const narrationTime = () => {
-        if (narration && !narration.paused) return narration.currentTime;
+        if (!narration.paused) return narration.currentTime;
         return (performance.now() - narrationClockStartedAt) / 1000;
     };
 
@@ -282,34 +223,22 @@ export function initOpening() {
                 loadPoem(),
                 openingDelay > 0 ? wait(openingDelay) : Promise.resolve()
             ]);
-            if (narration) {
-                narration.pause();
-                narration.currentTime = 0;
-                narrationClockStartedAt = performance.now();
-                try {
-                    // Do not begin the text clock until the recording is
-                    // genuinely playing; buffering here would desynchronise
-                    // every word that follows.
-                    await narration.play();
-                } catch {
-                    // Autoplay restrictions still receive the same timeline.
-                }
-                narrationClockStartedAt = performance.now() - (narration.currentTime * 1000);
+            narration.pause();
+            narration.currentTime = 0;
+            narrationClockStartedAt = performance.now();
+            try {
+                // Do not begin the text clock until the recording is genuinely
+                // playing; buffering here would desynchronise every word.
+                await narration.play();
+            } catch {
+                // Autoplay restrictions still receive the same timeline.
             }
+            narrationClockStartedAt = performance.now() - (narration.currentTime * 1000);
             skip.hidden = !allowSkip;
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
-                const pacing = pacingFor(index);
-                const element = narration
-                    ? await revealNarratedParagraph(paragraph, index, token)
-                    : await typeParagraph(paragraph, token, pacing);
+                const element = await revealNarratedParagraph(paragraph, index, token);
                 if (!element || token !== sequence) return;
-                await wait(narration ? 0 : pacing.hold);
-                const isFinalParagraph = index === content.paragraphs.length - 1;
-                if (!isFinalParagraph && !narration) {
-                    element.classList.add("is-leaving");
-                    await wait(700);
-                }
             }
             if (token !== sequence) return;
             const finalParagraph = copy.querySelector(".is-active");

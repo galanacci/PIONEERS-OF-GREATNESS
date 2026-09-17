@@ -1,14 +1,13 @@
-/* UNCUT — a self-updating screening room generated from the YouTube playlist. */
+/* Video Journal — the reconstructed workspace and its live CRT archive. */
 .documentary-room {
     overflow: hidden;
     background: #17120e;
 }
 
-.documentary-room.is-archive-open { overflow-y: auto; }
-
 .documentary-environment {
     position: absolute;
     inset: 0;
+    --crt-screen-radius: 3% / 4.5%;
     z-index: 4;
     box-sizing: border-box;
     width: 100%;
@@ -22,13 +21,6 @@
 }
 
 .world-room .documentary-environment.page-template { display: block; grid-template: none; gap: 0; width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
-
-.documentary-room.is-archive-open .documentary-environment {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 700ms ease, visibility 0s linear 700ms;
-    pointer-events: none;
-}
 
 .documentary-scene,
 .documentary-renderer { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
@@ -44,12 +36,12 @@
     width: var(--crt-width, 0px);
     height: var(--crt-height, 0px);
     overflow: hidden;
-    border-radius: 3% / 4.5%;
+    border-radius: var(--crt-screen-radius);
     background: #010202;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    clip-path: inset(0 round 3% 3% 4.5% 4.5%);
+    clip-path: inset(0 round 3% / 4.5%);
     transform: none;
     transition: opacity 360ms ease, visibility 0s linear 360ms;
     filter: brightness(.86) contrast(1.14) saturate(.78) sepia(.06);
@@ -62,7 +54,8 @@
     width: var(--crt-width, 0px);
     height: var(--crt-height, 0px);
     overflow: hidden;
-    border-radius: 3% / 4.5%;
+    border-radius: var(--crt-screen-radius);
+    clip-path: inset(0 round 3% / 4.5%);
     pointer-events: none;
     box-shadow: inset 0 0 50px 19px rgba(0,0,0,.5);
     transition: box-shadow 700ms ease;
@@ -84,11 +77,11 @@
     transform: none;
     transition: opacity 360ms ease, visibility 0s linear 0s;
 }
-.documentary-crt-player iframe { position: relative; z-index: 1; display: block; width: 100%; height: 100%; border: 0; background: #000; opacity: 0; transition: opacity 760ms ease; }
+.documentary-crt-player iframe { position: relative; z-index: 1; display: block; width: 100%; height: 100%; border: 0; border-radius: inherit; background: #000; opacity: 0; transition: opacity 760ms ease; }
 .documentary-crt-player iframe.is-signal-ready { opacity: .94; }
 .documentary-crt-player.is-tuning iframe { opacity: 0; transition-duration: 170ms; }
 .documentary-crt-glass::before,
-.documentary-crt-glass::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.documentary-crt-glass::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
 .documentary-crt-glass::before {
     z-index: 1;
     opacity: .44;
@@ -101,7 +94,6 @@
 }
 .documentary-crt-glass::after {
     z-index: 2;
-    border-radius: inherit;
     box-shadow: inset 0 0 42px 16px rgba(0,0,0,.31);
     background:
         linear-gradient(180deg,transparent 0%,transparent 76%,rgba(0,0,0,.12) 100%),
@@ -158,15 +150,6 @@
 .documentary-scene.is-ready + .documentary-scene-status { opacity: 0; pointer-events: none; }
 
 .documentary-crt-interface { position: absolute; left: 0; right: 0; bottom: max(25px,env(safe-area-inset-bottom)); z-index: 5; display: grid; justify-items: center; gap: 10px; }
-.documentary-crt-state { width: min(720px,calc(100vw - 40px)); margin: 0; overflow: hidden; color: rgba(255,255,255,.58); font-family: var(--font-brand); font-size: 8px; letter-spacing: .18em; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
-.documentary-tv-trigger { box-sizing: border-box; min-width: 238px; height: 48px; padding: 0 24px; border: 1px solid rgba(255,255,255,.74); background: #000; color: #fff; font-family: var(--font-brand); letter-spacing: .16em; }
-.documentary-tv-trigger span,
-.documentary-tv-trigger small { display: block; }
-.documentary-tv-trigger span { font-size: 11px; font-weight: 700; }
-.documentary-tv-trigger small { margin-top: 3px; color: rgba(255,255,255,.42); font-size: 7px; letter-spacing: .13em; }
-.documentary-tv-trigger:is(:hover,:focus-visible):not(:disabled) { border-color: #673caf; outline: 0; color: #8f66d0; }
-.documentary-tv-trigger:disabled { border-color: rgba(255,255,255,.16); color: rgba(255,255,255,.24); }
-.documentary-tv-trigger.is-booting { border-color: #673caf; color: #8f66d0; pointer-events: none; }
 .documentary-crt-controls {
     width: min(720px,calc(100vw - 40px));
     grid-template-columns: repeat(3,minmax(0,1fr));
@@ -217,7 +200,7 @@
 .documentary-crt-archive-toggle { position: relative; z-index: 10; flex-direction: column; gap: 3px; }
 .documentary-crt-controls > .room-navigation-credit { grid-column: 1 / -1; justify-self: center; margin: 0; color: #fff; font-size: 8px; font-weight: 700; line-height: normal; letter-spacing: 0; text-align: center; white-space: nowrap; }
 .documentary-crt-archive-menu {
-    position: fixed; left: 50%; top: 88px; bottom: 108px; z-index: 9;
+    position: fixed; left: 50%; top: 96px; bottom: 108px; z-index: 9;
     box-sizing: border-box; width: min(720px,calc(100vw - 80px));
     padding: 24px 28px; border: 1px solid rgba(255,255,255,.5); background: rgba(0,0,0,.98);
     color: #fff; overflow: hidden; opacity: 0; visibility: hidden; flex-direction: column;
@@ -228,9 +211,9 @@
 .documentary-crt-archive-menu.is-open { display: flex; opacity: 1; visibility: visible; transform: translate(-50%,0); transition-delay: 0s; pointer-events: auto; }
 .documentary-crt-archive-menu header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 4px 12px; border-bottom: 1px solid rgba(255,255,255,.18); }
 .documentary-crt-archive-menu header p { margin: 0; font-family: var(--font-brand); font-size: 12px; font-weight: 600; letter-spacing: .18em; }
-.documentary-crt-year-control { position: relative; display: inline-flex; align-items: center; }
-.documentary-crt-year-control::after { content: ""; position: absolute; right: 7px; width: 6px; height: 6px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; pointer-events: none; transform: translateY(-2px) rotate(45deg); }
-.documentary-crt-year-filter { min-width: 82px; padding: 7px 24px 7px 9px; border: 0; border-radius: 0; outline: 0; appearance: none; background: #000; color: #fff; font-family: var(--font-brand); font-size: 11px; letter-spacing: .12em; cursor: pointer; }
+.documentary-crt-year-control { position: relative; display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.documentary-crt-year-control::after { content: ""; position: static; flex: 0 0 auto; width: 6px; height: 6px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; pointer-events: none; transform: translateY(-2px) rotate(45deg); }
+.documentary-crt-year-filter { width: auto; min-width: 0; padding: 7px 0; border: 0; border-radius: 0; outline: 0; appearance: none; background: #000; color: #fff; font-family: var(--font-brand); font-size: 11px; letter-spacing: .12em; text-align: right; cursor: pointer; }
 .documentary-crt-year-filter:focus-visible { border: 0; outline: 0; color: #9b70df; }
 .documentary-crt-now-playing { flex: 0 0 auto; padding: 16px 4px 17px; border-bottom: 1px solid rgba(255,255,255,.18); }
 .documentary-crt-now-playing span { display: block; color: #9b70df; font-family: var(--font-brand); font-size: 11px; font-weight: 600; letter-spacing: .17em; }
@@ -247,309 +230,26 @@
 .documentary-crt-episode-option.is-current { outline: 1px solid #673caf; outline-offset: -1px; }
 .documentary-crt-episode-option.is-current strong { color: #9b70df; }
 
-.documentary-content {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 700ms ease, visibility 0s linear 700ms;
-}
-
-.documentary-room.is-archive-open .documentary-content {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 700ms ease, visibility 0s linear 0s;
-}
-
-.documentary-room:not(.is-archive-open) > .archive-bottom-navigation { opacity: 0; visibility: hidden; pointer-events: none; }
-
-.documentary-content {
-    width: min(86vw, 920px);
-    justify-content: flex-start;
-    padding-bottom: clamp(64px, 10vh, 120px);
-}
-
-.documentary-years {
-    position: fixed;
-    top: 40px;
-    right: 40px;
-    left: auto;
-    z-index: 2;
-    display: block;
-    width: auto;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.65);
-}
-
-.documentary-years::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 3px;
-    width: 5px;
-    height: 5px;
-    border-right: 1px solid currentColor;
-    border-bottom: 1px solid currentColor;
-    pointer-events: none;
-    transform: translateY(-70%) rotate(45deg);
-}
-
-.documentary-year-trigger {
-    padding: 6px 16px 6px 4px;
-    border: 0;
-    background-color: transparent;
-    color: inherit;
-    font-family: 'Lora', serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    cursor: pointer;
-}
-
-.documentary-year-trigger:hover,
-.documentary-year-trigger:focus-visible,
-.documentary-year-trigger:active,
-.documentary-year-option:hover,
-.documentary-year-option:active,
-.documentary-year-option:focus-visible {
-    border: 0;
-    outline: 0;
-    box-shadow: none;
-}
-
-.documentary-year-options {
-    position: absolute;
-    top: calc(100% + 7px);
-    right: 0;
-    min-width: 100%;
-    background: transparent;
-    text-align: right;
-}
-
-.documentary-year-options[hidden] {
-    display: none;
-}
-
-.documentary-year-option {
-    display: block;
-    width: 100%;
-    padding: 5px 3px;
-    border: 0;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.45);
-    font-family: 'Lora', serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-align: right;
-    cursor: pointer;
-}
-
-.documentary-year-option:hover,
-.documentary-year-option:focus-visible {
-    color: #fff;
-}
-
-.documentary-year-option.is-selected {
-    color: #673CAF;
-}
-
-.documentary-years:hover {
-    color: #fff;
-}
-
-.documentary-years:focus-within,
-.documentary-years:active,
-.documentary-years.is-open {
-    color: #673CAF;
-}
-
-.documentary-header {
-    margin-top: clamp(70px, 12vh, 120px);
-}
-
-.documentary-header h1 {
-    margin-top: 14px;
-    font-size: clamp(54px, 10vw, 118px);
-    letter-spacing: 0.08em;
-    line-height: 0.9;
-}
-
-.documentary-intro {
-    max-width: 570px;
-    margin: 28px 0 0;
-    color: rgba(255, 255, 255, 0.58);
-    font-size: clamp(13px, 1.4vw, 17px);
-    letter-spacing: 0.04em;
-    line-height: 1.7;
-}
-
-.documentary-feature {
-    margin-bottom: clamp(42px, 7vh, 72px);
-}
-
-.documentary-player {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.documentary-player iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
-
-.documentary-feature-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 24px;
-    margin-top: 18px;
-    color: rgba(255, 255, 255, 0.48);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-}
-
-.documentary-feature h2 {
-    margin: 13px 0 0;
-    font-size: clamp(21px, 3vw, 34px);
-    font-weight: 500;
-    letter-spacing: 0.035em;
-    line-height: 1.25;
-}
-
-.documentary-feature-summary {
-    max-width: 720px;
-    margin: 14px 0 0;
-    color: rgba(255, 255, 255, 0.62);
-    font-size: clamp(13px, 1.45vw, 16px);
-    letter-spacing: 0.025em;
-    line-height: 1.65;
-}
-
-.documentary-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.documentary-episode-button {
-    width: 100%;
-    display: grid;
-    grid-template-columns: minmax(90px, 0.35fr) minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 20px;
-    padding: 18px 14px;
-    border: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.16);
-    color: rgba(255, 255, 255, 0.74);
-    font-family: 'Lora', serif;
-    text-align: left;
-    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
-}
-
-.documentary-episode:last-child .documentary-episode-button {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-}
-
-.documentary-episode-title {
-    overflow: hidden;
-    font-size: clamp(13px, 1.6vw, 17px);
-    letter-spacing: 0.055em;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.documentary-episode-number,
-.documentary-episode-status {
-    font-size: 10px;
-    letter-spacing: 0.16em;
-}
-
-.documentary-episode-status {
-    color: rgba(255, 255, 255, 0.34);
-}
-
-.documentary-episode-button:hover,
-.documentary-episode-button:focus-visible,
-.documentary-episode.is-current .documentary-episode-button {
-    outline: 0;
-    border-color: #673CAF;
-    background: rgba(103, 60, 175, 0.13);
-    color: var(--color-text);
-}
-
-.documentary-episode.is-current .documentary-episode-status {
-    color: #9b75d9;
-}
-
-.documentary-state {
-    padding: clamp(80px, 14vh, 140px) 0;
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 12px;
-    letter-spacing: 0.18em;
-    text-align: center;
-}
+html[data-performance-tier="low"] .documentary-renderer { filter: brightness(.86) contrast(1.08) saturate(.88); }
+html[data-performance-tier="low"] .documentary-crt-player::after { animation: documentary-crt-scan 4.8s linear infinite; }
+html[data-performance-tier="low"] .documentary-crt-glass { animation: none; }
 
 @media (max-width: 680px) {
     .documentary-environment-header { top: 24px; right: 24px; }
     .documentary-crt-interface { bottom: max(25px,env(safe-area-inset-bottom)); }
-    .documentary-tv-trigger { min-width: min(238px,calc(100vw - 72px)); }
     .documentary-crt-controls { width: calc(100vw - 40px); grid-template-columns: repeat(3,minmax(0,1fr)); column-gap: 8px; row-gap: 15px; }
     .documentary-crt-controls > button,
     .documentary-crt-archive-toggle { padding: 0 7px; font-size: 9px; }
     .documentary-crt-archive-menu { top: max(78px,calc(env(safe-area-inset-top) + 62px)); bottom: 110px; width: calc(100vw - 36px); padding: 22px 18px; }
-    .documentary-crt-episode-option { grid-template-columns: 42px minmax(0,1fr); gap: 7px 10px; }
-    .documentary-crt-episode-option strong { font-size: 11px; white-space: normal; }
+    .documentary-crt-archive-menu header p { font-size: 13px; }
+    .documentary-crt-year-filter { font-size: 12px; }
+    .documentary-crt-episode-option { min-height: 68px; grid-template-columns: 46px minmax(0,1fr); gap: 8px 12px; padding: 14px 6px; }
+    .documentary-crt-episode-option strong { font-size: 13px; line-height: 1.4; white-space: normal; }
     .documentary-crt-episode-option span,
-    .documentary-crt-episode-option time { font-size: 8px; }
+    .documentary-crt-episode-option time { font-size: 10px; line-height: 1.3; }
     .documentary-crt-episode-option time { grid-column: 2; }
-    .documentary-crt-now-playing { padding: 14px 4px 15px; }
-    .documentary-crt-now-playing h3 { font-size: 12px; }
-    .documentary-crt-now-playing p { font-size: 11px; line-height: 1.6; }
-
-    .documentary-content {
-        width: calc(100% - 36px);
-    }
-
-    .documentary-header {
-        margin-top: 76px;
-    }
-
-    .documentary-feature-summary {
-        margin-top: 12px;
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .documentary-episode-button {
-        grid-template-columns: 1fr auto;
-        gap: 8px 14px;
-        padding: 16px 8px;
-    }
-
-    .documentary-episode-title {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        white-space: normal;
-    }
-
-    .documentary-episode-status {
-        text-align: right;
-    }
-
-    .room-watch {
-        display: inline-flex;
-        align-items: center;
-        min-height: 44px;
-    }
-}
-
-@media (max-width: 480px) {
-    .documentary-years {
-        top: 24px;
-        right: 24px;
-    }
+    .documentary-crt-now-playing { padding: 16px 4px 17px; touch-action: none; cursor: pointer; }
+    .documentary-crt-now-playing span { font-size: 12px; }
+    .documentary-crt-now-playing h3 { font-size: 14px; line-height: 1.4; }
+    .documentary-crt-now-playing p { font-size: 13px; line-height: 1.65; }
 }

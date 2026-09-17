@@ -1,7 +1,10 @@
 const POSITION_KEY = "pog:desktop-shortcut-position:v1";
 const GRID = 16;
 const EDGE = 20;
-const LAUNCH_LOADING_DURATION = 2000;
+const LAUNCH_START_DELAY = 180;
+const LAUNCH_LOADING_DURATION = 1500;
+const LAUNCH_BLACKOUT_FADE_DURATION = 250;
+const LAUNCH_BLACK_HOLD_DURATION = 100;
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
 const snap = (value) => Math.round(value / GRID) * GRID;
@@ -19,6 +22,12 @@ export function initLauncher() {
     const loading = document.getElementById("pog-launch-loading");
     const loadingVideo = document.getElementById("pog-launch-loading-video");
     if (!desktop || !shortcut) return;
+
+    if (loadingVideo) {
+        const mobile = window.matchMedia("(max-width: 760px), (hover: none), (pointer: coarse)").matches;
+        loadingVideo.src = mobile ? loadingVideo.dataset.mobileSrc : loadingVideo.dataset.desktopSrc;
+        loadingVideo.load();
+    }
 
     let position = null;
     let dragging = false;
@@ -77,13 +86,14 @@ export function initLauncher() {
         launching = true;
         window.clearTimeout(mobileLaunchTimer);
         mobileLaunchTimer = null;
+        await wait(LAUNCH_START_DELAY);
         shortcut.classList.remove("is-selected");
         window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name: "boot" } }));
         if (loading && loadingVideo) {
             const loadingStartedAt = performance.now();
             loading.hidden = false;
             loading.setAttribute("aria-hidden", "false");
-            loading.classList.remove("is-exiting");
+            loading.classList.remove("is-blackout", "is-exiting");
             requestAnimationFrame(() => loading.classList.add("is-open"));
             if (loadingVideo.readyState < HTMLMediaElement.HAVE_METADATA) {
                 await Promise.race([
@@ -97,6 +107,11 @@ export function initLauncher() {
             loadingVideo.play().catch(() => { /* Muted playback may still be restricted on some browsers. */ });
             // The loading screen is intentional pacing, not merely a network wait.
             await wait(Math.max(0, LAUNCH_LOADING_DURATION - (performance.now() - loadingStartedAt)));
+            // Fade the loading artwork into the layer's solid black background,
+            // then keep that layer mounted while the destination opens beneath it.
+            loading.classList.add("is-blackout");
+            await wait(LAUNCH_BLACKOUT_FADE_DURATION + LAUNCH_BLACK_HOLD_DURATION);
+            loadingVideo.pause();
             // Keep the loading layer mounted until the destination is fully
             // visible. Removing it after an arbitrary frame count exposed the
             // desktop for a single frame while the menu was still fading in.
@@ -105,9 +120,8 @@ export function initLauncher() {
             loading.classList.add("is-exiting");
             loading.classList.remove("is-open");
             loading.setAttribute("aria-hidden", "true");
-            loadingVideo.pause();
             loading.hidden = true;
-            loading.classList.remove("is-exiting");
+            loading.classList.remove("is-blackout", "is-exiting");
         } else {
             window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
         }
@@ -145,7 +159,7 @@ export function initLauncher() {
         if (moved) save();
         else if (isTouchLauncher) {
             window.clearTimeout(mobileLaunchTimer);
-            mobileLaunchTimer = window.setTimeout(launch, 150);
+            mobileLaunchTimer = window.setTimeout(launch, 0);
         }
     };
     shortcut.addEventListener("pointerup", finishDrag);

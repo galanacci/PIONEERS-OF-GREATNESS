@@ -85,9 +85,14 @@
     .collections-product-identity { bottom: 128px; width: calc(100% - 44px); }
     .collections-product-identity h2 { font-size: 16px; }
     .collections-product-drawer { bottom: 110px; width: calc(100% - 36px); max-height: 42svh; padding: 22px 18px; }
-    .collections-product-description { font-size: 12px; }
+    .collections-panel-label { font-size: 12px; }
+    .collections-product-description { font-size: 14px; line-height: 1.65; }
+    .collections-product-spec { font-size: 11px; }
     .collections-size-options { gap: 7px; }
-    .collections-size-options button { min-width: 46px; min-height: 40px; padding: 0 10px; }
+    .collections-size-options button { min-width: 48px; min-height: 48px; padding: 0 11px; font-size: 12px; }
+    .collections-size-feedback,
+    .collections-cart-empty,
+    .collections-cart-list { font-size: 11px; line-height: 1.5; }
     .collections-product-footer { bottom: max(25px,env(safe-area-inset-bottom)); width: calc(100% - 36px); }
     .collections-product-actions { gap: 8px; }
     .collections-product-action { padding: 0 10px; font-size: 10px; }

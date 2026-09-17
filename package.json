@@ -6,6 +6,7 @@
     "validate": "node scripts/validate-content.mjs",
     "test:browser": "playwright test",
     "sync:field-notes": "node scripts/sync-instagram.mjs",
+    "build:field-note-thumbnails": "node scripts/generate-field-note-thumbnails.mjs",
     "sync:documentary": "node scripts/sync-youtube.mjs",
     "build:social-preview": "node scripts/generate-social-preview.mjs",
     "test": "npm run validate && npm run test:browser"

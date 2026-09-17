@@ -7,12 +7,13 @@ export function initMenu() {
     const list = panel?.querySelector(".menu-list");
     const waitlist = panel?.querySelector(".menu-waitlist");
     const audio = panel?.querySelector(".audio-toggle");
+    const backgroundVideo = overlay?.querySelector(".background-video");
     const items = [...(panel?.querySelectorAll(".menu-item") || [])];
     const collections = panel?.querySelector('[data-preview-room="collections-room"]');
     const form = document.getElementById("email-form");
     const status = document.getElementById("status");
     const waitlistHome = form?.parentElement;
-    const regions = document.querySelectorAll("nav, #container, .container, .copyright, #pog-desktop");
+    const regions = document.querySelectorAll(".menu-infrastructure, .copyright, #pog-desktop");
     if (!toggle || !overlay || !panel || !list || !waitlist || !form || !status || !waitlistHome || !items.length) return;
     if (COLLECTIONS_PREVIEW_ENABLED && collections) {
         collections.dataset.menuAction = "room";
@@ -37,6 +38,7 @@ export function initMenu() {
     };
     const open = () => {
         overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false");
+        backgroundVideo?.play().catch(() => {});
         toggle.setAttribute("aria-expanded", "true");
         regions.forEach((region) => { region.inert = true; });
         list.classList.remove("is-keyboard-nav"); select(selected); items[selected].focus();
@@ -53,6 +55,7 @@ export function initMenu() {
         if(pageWaitlist){
             const saved=pageWaitlist;pageWaitlist=null;
             overlay.classList.remove('is-open');overlay.setAttribute('aria-hidden','true');
+            backgroundVideo?.pause();
             overlay.style.removeProperty('z-index');overlay.inert=saved.overlayInert;
             saved.room.inert=saved.roomInert;
             saved.focus?.focus({preventScroll:true});
@@ -72,6 +75,7 @@ export function initMenu() {
     const close = (focusToggle = true, keepAmbience = false) => {
         hideWaitlist(false);
         overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden", "true");
+        backgroundVideo?.pause();
         toggle.setAttribute("aria-expanded", "false");
         regions.forEach((region) => { region.inert = false; });
         if (!keepAmbience) window.dispatchEvent(new CustomEvent("pog:ambience-stop"));
@@ -114,6 +118,10 @@ export function initMenu() {
     window.addEventListener("pog:opening-complete", open);
     window.addEventListener("pog:return-to-menu", open);
     window.addEventListener("pog:waitlist-complete", () => hideWaitlist());
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) backgroundVideo?.pause();
+        else if (overlay.classList.contains("is-open")) backgroundVideo?.play().catch(() => {});
+    });
     overlay.addEventListener("click", (event) => {
         if (!waitlistOpen || event.target.closest("#email-form, .audio-toggle, .menu-item")) return;
         hideWaitlist();

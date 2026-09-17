@@ -2,6 +2,8 @@ function formatDate(timestamp) {
     return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(timestamp)).toUpperCase();
 }
 
+const thumbnailFor = (source) => source.replace(/\/[^/]+$/, "/thumb.webp");
+
 function createNote(note, openEntry) {
     const article = document.createElement("article");
     article.className = "field-note";
@@ -12,7 +14,11 @@ function createNote(note, openEntry) {
     const media = document.createElement("span");
     media.className = "field-note-media";
     const image = document.createElement("img");
-    image.src = note.images[0];
+    const coverSource = note.images[0];
+    image.src = thumbnailFor(coverSource);
+    image.addEventListener("error", () => {
+        if (image.src.endsWith("/thumb.webp")) image.src = coverSource;
+    }, { once: true });
     image.alt = `Cover image for ${note.entry}`;
     image.loading = "lazy";
     image.decoding = "async";
@@ -82,18 +88,15 @@ function createEntryViewer(room) {
     lightbox.hidden = true;
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
-    lightbox.setAttribute("aria-label", "Enlarged diary image");
-    const lightboxClose = document.createElement("button");
-    lightboxClose.type = "button";
-    lightboxClose.className = "field-note-image-lightbox-close";
-    lightboxClose.setAttribute("aria-label", "Close enlarged image");
-    lightboxClose.textContent = "×";
+    lightbox.tabIndex = -1;
     const lightboxImage = document.createElement("img");
     lightboxImage.alt = "";
-    lightbox.append(lightboxClose, lightboxImage);
+    lightbox.append(lightboxImage);
     room.append(lightbox);
 
     let activeNote = null;
+    let lightboxIndex = 0;
+    let lightboxPointer = null;
     let returnFocus = null;
     let returnAnimationTimer;
     const updateScrollHints = () => {
@@ -116,12 +119,28 @@ function createEntryViewer(room) {
             galleryScrollHint.style.removeProperty("top");
         }
     };
-    const closeLightbox = () => { lightbox.hidden = true; };
-    const openLightbox = (src, alt) => {
-        lightboxImage.src = src;
-        lightboxImage.alt = alt;
+    const closeLightbox = () => {
+        lightbox.hidden = true;
+        lightbox.classList.remove("is-dragging");
+        lightboxPointer = null;
+    };
+    const showLightboxImage = (index) => {
+        if (!activeNote?.images?.length) return;
+        const imageCount = activeNote.images.length;
+        lightboxIndex = (index + imageCount) % imageCount;
+        lightboxImage.src = activeNote.images[lightboxIndex];
+        lightboxImage.alt = `${activeNote.entry}, image ${lightboxIndex + 1} of ${imageCount}`;
+        lightbox.setAttribute("aria-label", `Enlarged diary image ${lightboxIndex + 1} of ${imageCount}. Swipe or drag left and right to navigate. Tap or click to close.`);
+        [-1, 1].forEach((offset) => {
+            const preload = new Image();
+            preload.src = activeNote.images[(lightboxIndex + offset + imageCount) % imageCount];
+        });
+    };
+    const navigateLightbox = (direction) => showLightboxImage(lightboxIndex + direction);
+    const openLightbox = (index) => {
+        showLightboxImage(index);
         lightbox.hidden = false;
-        lightboxClose.focus({ preventScroll: true });
+        lightbox.focus({ preventScroll: true });
     };
     const closeViewer = () => {
         if (viewer.hidden) return;
@@ -159,7 +178,7 @@ function createEntryViewer(room) {
             galleryImage.loading = index > 2 ? "lazy" : "eager";
             galleryImage.decoding = "async";
             imageButton.append(galleryImage);
-            imageButton.addEventListener("click", () => openLightbox(src, galleryImage.alt));
+            imageButton.addEventListener("click", () => openLightbox(index));
             return imageButton;
         }));
         viewer.hidden = false;
@@ -181,8 +200,28 @@ function createEntryViewer(room) {
     close.addEventListener("pointerdown", animateReturn);
     close.addEventListener("pointercancel", () => close.classList.remove("is-emblem-pressed"));
     close.addEventListener("click", returnToArchive);
-    lightboxClose.addEventListener("click", closeLightbox);
-    lightbox.addEventListener("pointerdown", (event) => { if (event.target === lightbox) closeLightbox(); });
+    lightbox.addEventListener("pointerdown", (event) => {
+        if (!event.isPrimary || event.button > 0) return;
+        lightboxPointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+        lightbox.classList.add("is-dragging");
+        try { lightbox.setPointerCapture?.(event.pointerId); } catch { /* Synthetic pointers may not be capturable. */ }
+    });
+    lightbox.addEventListener("pointerup", (event) => {
+        if (!lightboxPointer || lightboxPointer.id !== event.pointerId) return;
+        const deltaX = event.clientX - lightboxPointer.x;
+        const deltaY = event.clientY - lightboxPointer.y;
+        const horizontalSwipe = Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+        const tap = Math.hypot(deltaX, deltaY) < 10;
+        try { lightbox.releasePointerCapture?.(event.pointerId); } catch { /* The pointer may already be released. */ }
+        lightbox.classList.remove("is-dragging");
+        lightboxPointer = null;
+        if (horizontalSwipe) navigateLightbox(deltaX < 0 ? 1 : -1);
+        else if (tap) closeLightbox();
+    });
+    lightbox.addEventListener("pointercancel", () => {
+        lightbox.classList.remove("is-dragging");
+        lightboxPointer = null;
+    });
     viewer.addEventListener("pointerdown", (event) => {
         if (event.target === viewer) closeViewer();
     });
@@ -192,7 +231,15 @@ function createEntryViewer(room) {
             closeViewer();
         }
     });
-    lightbox.addEventListener("keydown", (event) => { if (event.key === "Escape") { event.preventDefault(); closeLightbox(); } });
+    lightbox.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            navigateLightbox(event.key === "ArrowRight" ? 1 : -1);
+        } else if (event.key === "Escape" || event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            closeLightbox();
+        }
+    });
     window.addEventListener("pog:room-closing", (event) => {
         if (event.detail?.roomId === "field-notes-room") closeViewer();
     });

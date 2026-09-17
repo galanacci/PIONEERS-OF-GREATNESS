@@ -104,7 +104,7 @@ export function initPageTemplate() {
             });
             back.addEventListener('pointercancel', () => back.classList.remove('is-emblem-pressed'));
         }
-        if (content.matches('.documentary-content,.field-notes-content')) {
+        if (content.matches('.field-notes-content')) {
             content.classList.add('archive-heading-right');
             const room=content.closest('.world-room');
             if(!room.querySelector('.archive-bottom-navigation')){

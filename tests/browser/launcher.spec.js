@@ -1,5 +1,15 @@
 import { test, expect } from "@playwright/test";
 
+test("selects an appropriate launch asset and performance tier for the device", async ({ page }) => {
+    await page.goto("/");
+    const isMobileViewport = page.viewportSize()?.width <= 760;
+    await expect(page.locator("#pog-launch-loading-video")).toHaveAttribute(
+        "src",
+        isMobileViewport ? /pog-launch-loading-mobile\.mp4$/ : /pog-launch-loading\.mp4$/
+    );
+    await expect(page.locator("html")).toHaveAttribute("data-performance-tier", /^(low|balanced|high)$/);
+});
+
 test("PoG.EXE behaves like a persistent desktop shortcut", async ({ page }) => {
     test.skip(page.viewportSize()?.width <= 680, "Mobile uses single-tap launch.");
     await page.goto("/");
@@ -22,8 +32,14 @@ test("double clicking PoG.EXE starts the returning entry path", async ({ page })
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
     await page.locator("#pog-exe-shortcut").dblclick();
-    await expect(page.locator("#pog-launch-loading")).toBeVisible();
-    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 5000 });
+    const loading = page.locator("#pog-launch-loading");
+    await expect(loading).toBeHidden();
+    await page.waitForTimeout(100);
+    await expect(loading).toBeHidden();
+    await expect(loading).toBeVisible({ timeout: 600 });
+    await expect(loading).toHaveClass(/is-blackout/, { timeout: 2200 });
+    await expect(page.locator("#pog-launch-loading-video")).toHaveCSS("opacity", "0", { timeout: 750 });
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 2500 });
 });
 
 test("a mobile tap selects PoG.EXE briefly then launches", async ({ page }) => {

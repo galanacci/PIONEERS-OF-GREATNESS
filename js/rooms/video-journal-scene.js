@@ -1,5 +1,6 @@
 import * as THREE from "../vendor/three/three.module.js";
 import { GLTFLoader } from "../vendor/three/GLTFLoader.js";
+import { getPerformanceTier } from "../core/performance-tier.js";
 
 const ASSETS = Object.freeze({
     workspace: "src/video-journal/workspace-scan.glb"
@@ -25,12 +26,20 @@ export function mountVideoJournalScene(host, hooks = {}) {
 
 class VideoJournalScene {
     constructor() {
+        this.performanceTier = getPerformanceTier();
+        const mobile = innerWidth < 760;
+        const pixelRatioLimit = mobile
+            ? this.performanceTier === "high" ? 1.25 : this.performanceTier === "balanced" ? 1 : .8
+            : this.performanceTier === "low" ? 1 : 1.5;
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x090604);
         this.scene.fog = new THREE.FogExp2(0x090604, 0.048);
         this.camera = new THREE.PerspectiveCamera(39, 1, 0.05, 40);
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-        this.renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 760 ? 1.25 : 1.5));
+        this.renderer = new THREE.WebGLRenderer({
+            antialias: this.performanceTier !== "low",
+            powerPreference: this.performanceTier === "high" ? "high-performance" : "low-power"
+        });
+        this.renderer.setPixelRatio(Math.min(devicePixelRatio, pixelRatioLimit));
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.79;
@@ -41,13 +50,12 @@ class VideoJournalScene {
         this.loader = new GLTFLoader();
         this.scene.environment = this.createStudioEnvironment();
         this.scene.environmentIntensity = 0.78;
-        this.raycaster = new THREE.Raycaster();
-        this.pointer = new THREE.Vector2();
         this.clock = new THREE.Clock();
         this.loaded = false;
         this.failed = false;
-        this.hovered = false;
         this.frame = 0;
+        this.lastRenderAt = 0;
+        this.minimumFrameInterval = this.performanceTier === "low" ? 1000 / 30 : 0;
         this.bootPromise = null;
         this.screenMode = "off";
         this.staticFrame = 0;
@@ -58,8 +66,8 @@ class VideoJournalScene {
         this.lastScreenRect = "";
 
         this.screenCanvas = document.createElement("canvas");
-        this.screenCanvas.width = 512;
-        this.screenCanvas.height = 384;
+        this.screenCanvas.width = this.performanceTier === "high" ? 512 : 384;
+        this.screenCanvas.height = this.performanceTier === "high" ? 384 : 288;
         this.screenContext = this.screenCanvas.getContext("2d", { alpha: false });
         this.screenTexture = new THREE.CanvasTexture(this.screenCanvas);
         this.screenTexture.colorSpace = THREE.SRGBColorSpace;
@@ -85,9 +93,6 @@ class VideoJournalScene {
         this.scene.add(this.baseShadow);
 
         this.tick = this.tick.bind(this);
-        this.onPointerMove = this.onPointerMove.bind(this);
-        this.onPointerDown = this.onPointerDown.bind(this);
-        this.onPointerLeave = this.onPointerLeave.bind(this);
         this.onResize = this.onResize.bind(this);
         this.load();
     }
@@ -292,9 +297,6 @@ class VideoJournalScene {
         host.prepend(this.renderer.domElement);
         this.resizeObserver = new ResizeObserver(this.onResize);
         this.resizeObserver.observe(host);
-        this.renderer.domElement.addEventListener("pointermove", this.onPointerMove);
-        this.renderer.domElement.addEventListener("pointerdown", this.onPointerDown);
-        this.renderer.domElement.addEventListener("pointerleave", this.onPointerLeave);
         this.onResize();
         if (this.loaded) {
             hooks.onReady?.();
@@ -316,9 +318,6 @@ class VideoJournalScene {
     detach() {
         this.stop();
         this.resizeObserver?.disconnect();
-        this.renderer.domElement.removeEventListener("pointermove", this.onPointerMove);
-        this.renderer.domElement.removeEventListener("pointerdown", this.onPointerDown);
-        this.renderer.domElement.removeEventListener("pointerleave", this.onPointerLeave);
         this.renderer.domElement.remove();
         this.host = null;
         this.hooks = null;
@@ -362,33 +361,6 @@ class VideoJournalScene {
         if (signature === this.lastScreenRect) return;
         this.lastScreenRect = signature;
         this.hooks.onScreenRect(rect);
-    }
-
-    pick(event) {
-        if (!this.televisionMeshes.length || !this.host) return false;
-        const rect = this.host.getBoundingClientRect();
-        this.pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
-        this.raycaster.setFromCamera(this.pointer, this.camera);
-        return this.raycaster.intersectObjects(this.televisionMeshes, false).length > 0;
-    }
-
-    onPointerMove(event) {
-        const hovered = this.pick(event);
-        if (hovered === this.hovered) return;
-        this.hovered = hovered;
-        this.renderer.domElement.style.cursor = hovered ? "pointer" : "default";
-        this.hooks?.onHover?.(hovered);
-    }
-
-    onPointerDown(event) {
-        if (!this.pick(event) || this.bootPromise) return;
-        this.hooks?.onActivate?.();
-    }
-
-    onPointerLeave() {
-        this.hovered = false;
-        this.renderer.domElement.style.cursor = "default";
-        this.hooks?.onHover?.(false);
     }
 
     reset() {
@@ -567,9 +539,14 @@ class VideoJournalScene {
         this.clock.stop();
     }
 
-    tick() {
+    tick(now) {
         this.frame = 0;
         if (!this.host?.isConnected || document.hidden) return;
+        if (this.minimumFrameInterval && now - this.lastRenderAt < this.minimumFrameInterval) {
+            this.frame = requestAnimationFrame(this.tick);
+            return;
+        }
+        this.lastRenderAt = now;
         const elapsed = this.clock.getElapsedTime();
         const cameraConfig = VIDEO_JOURNAL_LAYOUT.camera;
         const entrance = cameraConfig.entrance;
@@ -602,6 +579,10 @@ class VideoJournalScene {
         }
         this.renderer.render(this.scene, this.camera);
         this.emitScreenRect();
-        this.frame = requestAnimationFrame(this.tick);
+        const needsContinuousFrames = this.cameraEntranceStart !== null
+            || this.screenMode === "static"
+            || this.screenMode === "tracking";
+        if (needsContinuousFrames) this.frame = requestAnimationFrame(this.tick);
+        else this.clock.stop();
     }
 }

@@ -19,18 +19,28 @@ test("Video Journal plays and changes episodes inside the reconstructed CRT", as
 
     const room = page.locator("#documentary-room");
     const environment = page.locator("#documentary-environment");
-    const trigger = page.locator("#documentary-tv-trigger");
     await expect(room).toHaveClass(/is-open/);
     await expect(environment).toHaveAttribute("aria-hidden", "false");
     await expect(page.locator("#documentary-scene")).toHaveClass(/is-ready/, { timeout: 20000 });
     await expect(page.locator(".documentary-renderer")).toHaveAttribute("data-camera-mode", "entrance-pan");
-    await expect(trigger).toBeEnabled();
-    await expect(page.locator("#documentary-feature iframe")).toHaveCount(0);
-
-    await expect(page.locator("#documentary-crt-state")).toBeHidden();
     await expect(page.locator("#documentary-crt-player")).toHaveClass(/is-playing/, { timeout: 3500 });
     await expect(page.locator(".documentary-renderer")).toHaveAttribute("data-camera-mode", "entrance-pan");
     await expect(page.locator("#documentary-crt-player iframe")).toHaveCount(1);
+    const screenMask = await page.evaluate(() => {
+        const player = getComputedStyle(document.querySelector("#documentary-crt-player"));
+        const glass = getComputedStyle(document.querySelector(".documentary-crt-glass"));
+        const frame = getComputedStyle(document.querySelector("#documentary-crt-player iframe"));
+        return {
+            playerRadius: player.borderRadius,
+            glassRadius: glass.borderRadius,
+            frameRadius: frame.borderRadius,
+            playerClip: player.clipPath,
+            glassClip: glass.clipPath
+        };
+    });
+    expect(screenMask.glassRadius).toBe(screenMask.playerRadius);
+    expect(screenMask.frameRadius).toBe(screenMask.playerRadius);
+    expect(screenMask.glassClip).toBe(screenMask.playerClip);
     await expect(page.locator("#documentary-crt-controls")).toBeVisible();
     expect(await page.evaluate(() => window.__crtAudioAudit.map(({ action }) => action).slice(0, 3))).toEqual([
         "power",
@@ -53,7 +63,32 @@ test("Video Journal plays and changes episodes inside the reconstructed CRT", as
     expect(archivePlacement.menuTop).toBeLessThanOrEqual(archivePlacement.headerBottom + 40);
     await expect(page.locator("#documentary-crt-archive-toggle")).toHaveCSS("background-color", "rgb(0, 0, 0)");
     await expect(page.locator(".documentary-crt-year-filter")).toHaveValue("2026");
+    const yearArrowGap = await page.locator(".documentary-crt-year-control").evaluate((control) => {
+        const select = control.querySelector("select").getBoundingClientRect();
+        return control.getBoundingClientRect().right - select.right;
+    });
+    expect(yearArrowGap).toBeGreaterThanOrEqual(6);
+    expect(yearArrowGap).toBeLessThanOrEqual(18);
     await expect(page.locator(".documentary-crt-episode-option").first()).toContainText("112");
+    if ((await page.viewportSize()).width <= 680) {
+        const firstOption = page.locator(".documentary-crt-episode-option").first();
+        expect((await firstOption.boundingBox()).height).toBeGreaterThanOrEqual(64);
+        expect(Number.parseFloat(await firstOption.locator("strong").evaluate((node) => getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(13);
+        expect(Number.parseFloat(await page.locator(".documentary-crt-now-playing p").evaluate((node) => getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(13);
+        const episodeList = page.locator(".documentary-crt-episode-list");
+        await episodeList.evaluate((list) => { list.scrollTop = 90; });
+        expect(await episodeList.evaluate((list) => list.scrollTop)).toBeGreaterThan(0);
+        const description = page.locator(".documentary-crt-now-playing");
+        await description.tap();
+        await expect(page.locator("#documentary-crt-archive-menu")).toBeHidden();
+        await page.locator("#documentary-crt-archive-toggle").tap();
+        await expect(page.locator("#documentary-crt-archive-menu")).toBeVisible();
+        await description.dispatchEvent("pointerdown", { pointerId: 8, pointerType: "touch", isPrimary: true, button: 0, clientX: 180, clientY: 180 });
+        await description.dispatchEvent("pointerup", { pointerId: 8, pointerType: "touch", isPrimary: true, button: 0, clientX: 182, clientY: 245 });
+        await expect(page.locator("#documentary-crt-archive-menu")).toBeHidden();
+        await page.locator("#documentary-crt-archive-toggle").tap();
+        await expect(page.locator("#documentary-crt-archive-menu")).toBeVisible();
+    }
     await page.locator("#documentary-crt-archive-toggle").click();
     const firstSource = await page.locator("#documentary-crt-player iframe").getAttribute("src");
     await page.evaluate(() => {
@@ -93,5 +128,4 @@ test("Video Journal plays and changes episodes inside the reconstructed CRT", as
     await expect(room).toHaveClass(/is-open/);
     await expect(environment).toHaveAttribute("aria-hidden", "false");
     await expect(page.locator("#documentary-crt-player iframe")).toHaveCount(1);
-    await expect(page.locator("#documentary-feature iframe")).toHaveCount(0);
 });

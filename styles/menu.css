@@ -80,6 +80,7 @@
 .menu-waitlist #email-form > button[type="submit"]:focus-visible { color: #a981e8; }
 @media (max-width: 700px) {
     .menu-overlay { background-color: #000; }
+    .menu-item { min-height: 48px; display: flex; align-items: center; }
 }
 @media (max-width: 600px) {
     .menu-waitlist #email-form input[type="email"] { font-size: 16px; letter-spacing: .04em; height: 46px; }

@@ -73,8 +73,15 @@ test("Collections stays locked publicly and unlocks through its preview query", 
     await page.locator('[data-collections-action="details"]').click();
     await expect(page.locator("#collections-product-drawer")).toHaveClass(/is-open/);
     await expect(page.locator("#collections-product-description")).not.toBeEmpty();
+    if (testInfo.project.name === "mobile") {
+        expect(Number.parseFloat(await page.locator("#collections-product-description").evaluate((node) => getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14);
+        expect(Number.parseFloat(await page.locator(".collections-panel-label").first().evaluate((node) => getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(12);
+    }
     await page.locator('[data-collections-action="size"]').click();
     await expect(page.locator("#collections-size-options button")).toHaveCount(4);
+    if (testInfo.project.name === "mobile") {
+        expect((await page.locator("#collections-size-options button").first().boundingBox()).height).toBeGreaterThanOrEqual(48);
+    }
     await page.locator("#collections-size-options button").first().click();
     await expect(page.locator("#collections-cart-count")).toHaveText("1");
     await page.locator('[data-collections-action="cart"]').click();
@@ -184,9 +191,9 @@ test("menu emits game-like feedback for pointer, touch, keyboard and locked choi
         window.__menuSoundLog = [];
         window.addEventListener("pog:menu-sound", (event) => window.__menuSoundLog.push(event.detail.name));
     });
-    const continueButton = page.getByRole("button", { name: "Enter experience" });
-    await continueButton.dispatchEvent("pointerover", { pointerType: "mouse" });
-    await continueButton.click();
+    const enterButton = page.getByRole("button", { name: "Enter experience" });
+    await enterButton.dispatchEvent("pointerover", { pointerType: "mouse" });
+    await enterButton.click();
     const entrySounds = await page.evaluate(() => window.__menuSoundLog.slice());
     expect(entrySounds.filter((sound) => sound === "select")).toHaveLength(1);
     expect(entrySounds.filter((sound) => sound === "boot")).toHaveLength(1);
@@ -237,10 +244,10 @@ test("ENTER emits the dedicated boot-up sound for first and returning visits", a
     }));
     await page.goto("/");
     await captureEntrySound();
-    const begin = page.getByRole("button", { name: "Enter experience" });
-    await begin.dispatchEvent("pointerdown", { pointerType: "touch" });
+    const enterButton = page.getByRole("button", { name: "Enter experience" });
+    await enterButton.dispatchEvent("pointerdown", { pointerType: "touch" });
     expect(await page.evaluate(() => window.__entrySoundLog)).toEqual(["boot"]);
-    await begin.dispatchEvent("click");
+    await enterButton.dispatchEvent("click");
     expect(await page.evaluate(() => window.__entryTimeline)).toEqual(["boot", "start"]);
     expect(await page.evaluate(() => window.__entrySoundLog.filter((sound) => sound === "boot"))).toHaveLength(1);
     expect(await page.evaluate(() => window.__entrySoundLog)).not.toContain("confirm");
@@ -455,7 +462,7 @@ test("ENTER fades in randomized ambience and page or menu exits fade it out", as
     })), { timeout: 3000 }).toEqual({ level: targetLevel, muted: false });
 });
 
-test("the poem gates the first visit and returning visitors continue directly", async ({ page }) => {
+test("the poem gates the first visit and returning visitors enter directly", async ({ page }) => {
     if (page.viewportSize()?.width < 560) await page.setViewportSize({ width: 320, height: 568 });
     await page.route("**/data/greatness-poem.json", async (route) => route.fulfill({
         status: 200,
@@ -723,6 +730,11 @@ test("Behind the Scenes opens a diary viewer with expandable entry images", asyn
     await expect(viewer.locator(".field-note-viewer-caption")).not.toBeEmpty();
     await expect(viewer.locator(".field-note-viewer-meta")).toContainText("ENTRY");
     await expect(viewer.getByRole("link", { name: "OPEN ENTRY" })).toHaveAttribute("href", /instagram\.com/);
+    if ((await page.viewportSize()).width <= 680) {
+        const headerBox = await viewer.locator(".field-note-viewer-header").boundingBox();
+        const detailsBox = await viewer.locator(".field-note-viewer-details").boundingBox();
+        expect(detailsBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height + 24);
+    }
     const gallery = viewer.locator(".field-note-viewer-gallery");
     const galleryImages = gallery.getByRole("button");
     await expect(galleryImages.first()).toBeVisible();
@@ -736,6 +748,15 @@ test("Behind the Scenes opens a diary viewer with expandable entry images", asyn
     await expect(lightbox).toBeVisible();
     const enlargedImage = lightbox.locator("img");
     await expect(enlargedImage).toBeVisible();
+    expect(await galleryImages.count()).toBeGreaterThan(1);
+    const firstImageSource = await enlargedImage.getAttribute("src");
+    await lightbox.press("ArrowRight");
+    await expect(enlargedImage).not.toHaveAttribute("src", firstImageSource);
+    const secondImageSource = await enlargedImage.getAttribute("src");
+    await lightbox.dispatchEvent("pointerdown", { pointerId: 7, pointerType: "touch", isPrimary: true, button: 0, clientX: 180, clientY: 200 });
+    await lightbox.dispatchEvent("pointerup", { pointerId: 7, pointerType: "touch", isPrimary: true, button: 0, clientX: 250, clientY: 202 });
+    await expect(enlargedImage).not.toHaveAttribute("src", secondImageSource);
+    await expect(enlargedImage).toHaveAttribute("src", firstImageSource);
     if ((await page.viewportSize()).width > 680) {
         const box = await enlargedImage.boundingBox();
         expect(box.x).toBeGreaterThanOrEqual(0);
@@ -743,7 +764,7 @@ test("Behind the Scenes opens a diary viewer with expandable entry images", asyn
         expect(box.x + box.width).toBeLessThanOrEqual((await page.viewportSize()).width);
         expect(box.y + box.height).toBeLessThanOrEqual((await page.viewportSize()).height);
     }
-    await lightbox.getByRole("button", { name: "Close enlarged image" }).click();
+    await lightbox.click({ position: { x: 8, y: 8 } });
     await expect(lightbox).toBeHidden();
     const closeViewer = viewer.getByRole("button", { name: "Return to Behind The Scenes entries" });
     await closeViewer.hover();
@@ -767,9 +788,7 @@ test("Documentary changes CRT episodes and removes playback on exit", async ({ p
     await page.getByRole("menuitem", { name: "VIDEO JOURNAL" }).click();
     await expect(page.locator("#documentary-room")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(page.locator("#documentary-scene")).toHaveClass(/is-ready/, { timeout: 20000 });
-    await expect(page.locator("#documentary-feature iframe")).toHaveCount(0);
     await expect(page.locator("#documentary-crt-player")).toHaveClass(/is-playing/, { timeout: 10000 });
-    await expect(page.locator("#documentary-crt-state")).toBeHidden();
     await expect(page.locator(".documentary-crt-now-playing h3")).toContainText("RAPID PROTOTYPE MODE");
     await page.locator("#documentary-crt-previous").click();
     await expect(page.locator(".documentary-crt-now-playing h3")).toContainText("BUILDING THE POG AI SYSTEM");
