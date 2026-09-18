@@ -1,0 +1,71 @@
+.mobile-orientation-guard {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    box-sizing: border-box;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    padding: max(28px, env(safe-area-inset-top)) max(28px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(28px, env(safe-area-inset-left));
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    outline: 0;
+}
+
+.mobile-orientation-device {
+    position: relative;
+    box-sizing: border-box;
+    width: 34px;
+    height: 54px;
+    margin: 4px 0;
+    border: 1px solid rgba(255, 255, 255, .84);
+    background: #000;
+}
+
+.mobile-orientation-device::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 8px;
+    height: 1px;
+    background: rgba(255, 255, 255, .68);
+    transform: translateX(-50%);
+}
+
+.mobile-orientation-device span {
+    position: absolute;
+    inset: 8px 4px 5px;
+    border: 1px solid rgba(155, 112, 223, .72);
+}
+
+.mobile-orientation-guard p,
+.mobile-orientation-guard > span {
+    margin: 0;
+    font-family: var(--font-brand);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.mobile-orientation-guard p {
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: .2em;
+}
+
+.mobile-orientation-guard > span {
+    color: #9b70df;
+    font-size: 10px;
+    letter-spacing: .16em;
+}
+
+body.is-mobile-orientation-locked .mobile-orientation-guard {
+    display: grid;
+}
+
+@media (orientation: landscape) and (max-height: 600px) and (pointer: coarse) {
+    .mobile-orientation-guard { display: grid; }
+}

@@ -14,8 +14,10 @@ import { initWaitlist } from "./services/waitlist.js";
 import { initLauncher } from "./core/launcher.js";
 import { initTouchFeedback } from "./core/touch-feedback.js";
 import { initPerformanceTier } from "./core/performance-tier.js";
+import { initOrientationGuard } from "./core/orientation-guard.js";
 
 initPerformanceTier();
+initOrientationGuard();
 initWaitlist();
 initPageTemplate();
 initAudio();
