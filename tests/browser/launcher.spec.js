@@ -27,6 +27,20 @@ test("the launch instruction matches the input mode and is remembered after use"
     await expect(hint).not.toHaveClass(/is-visible/);
 });
 
+test("the main menu fades in but hard-cuts when exiting", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:opening-complete")));
+    const menu = page.locator("#menu-overlay");
+    await expect(menu).toHaveClass(/is-open/);
+    await expect(menu).toHaveCSS("transition-duration", "0.22s");
+    await page.getByRole("menuitem", { name: "EXIT" }).click();
+    await expect(menu).not.toHaveClass(/is-open/);
+    await expect(menu).not.toHaveClass(/is-opening/);
+    await expect(menu).toHaveCSS("transition-duration", "0s");
+    await expect(menu).toHaveCSS("opacity", "0");
+    await expect(menu).toHaveCSS("visibility", "hidden");
+});
+
 test("PoG.EXE behaves like a persistent desktop shortcut", async ({ page }) => {
     test.skip(page.viewportSize()?.width <= 680, "Mobile uses single-tap launch.");
     await page.goto("/");

@@ -11,14 +11,17 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 220ms ease, visibility 0s linear 220ms;
+    transition: none;
+}
+
+.menu-overlay.is-opening {
+    transition: opacity 220ms ease;
 }
 
 .menu-overlay.is-open {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transition-delay: 0s;
 }
 
 .menu-panel {

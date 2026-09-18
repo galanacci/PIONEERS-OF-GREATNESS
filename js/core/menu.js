@@ -23,6 +23,7 @@ export function initMenu() {
     let selected = Math.max(0, items.findIndex((item) => item.classList.contains("is-selected")));
     let waitlistOpen = false;
     let pageWaitlist = null;
+    let openingTimer = null;
     const sound = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
     const select = (index, withSound = false) => {
         const next = (index + items.length) % items.length;
@@ -36,8 +37,25 @@ export function initMenu() {
             item.toggleAttribute("aria-current", active);
         });
     };
+    const showOverlay = ({ animate = true } = {}) => {
+        window.clearTimeout(openingTimer);
+        overlay.classList.toggle("is-opening", animate);
+        if (animate) void overlay.offsetWidth;
+        overlay.classList.add("is-open");
+        overlay.setAttribute("aria-hidden", "false");
+        if (animate) openingTimer = window.setTimeout(() => {
+            openingTimer = null;
+            overlay.classList.remove("is-opening");
+        }, 220);
+    };
+    const hideOverlay = () => {
+        window.clearTimeout(openingTimer);
+        openingTimer = null;
+        overlay.classList.remove("is-opening", "is-open");
+        overlay.setAttribute("aria-hidden", "true");
+    };
     const open = () => {
-        overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false");
+        showOverlay();
         backgroundVideo?.play().catch(() => {});
         toggle.setAttribute("aria-expanded", "true");
         regions.forEach((region) => { region.inert = true; });
@@ -54,7 +72,7 @@ export function initMenu() {
         window.dispatchEvent(new CustomEvent("pog:waitlist-dismissed"));
         if(pageWaitlist){
             const saved=pageWaitlist;pageWaitlist=null;
-            overlay.classList.remove('is-open');overlay.setAttribute('aria-hidden','true');
+            hideOverlay();
             backgroundVideo?.pause();
             overlay.style.removeProperty('z-index');overlay.inert=saved.overlayInert;
             saved.room.inert=saved.roomInert;
@@ -74,7 +92,7 @@ export function initMenu() {
     };
     const close = (focusToggle = true, keepAmbience = false) => {
         hideWaitlist(false);
-        overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden", "true");
+        hideOverlay();
         backgroundVideo?.pause();
         toggle.setAttribute("aria-expanded", "false");
         regions.forEach((region) => { region.inert = false; });
@@ -107,7 +125,7 @@ export function initMenu() {
         if(!room||pageWaitlist)return;
         pageWaitlist={room,roomInert:room.inert,overlayInert:overlay.inert,focus:event.detail?.returnFocus};
         room.inert=true;overlay.inert=false;
-        overlay.style.zIndex='2100';overlay.classList.add('is-open');overlay.setAttribute('aria-hidden','false');
+        overlay.style.zIndex='2100';showOverlay();
         showWaitlist();
     });
     toggle.addEventListener("click", () => {
