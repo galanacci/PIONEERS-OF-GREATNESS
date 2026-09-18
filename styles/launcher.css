@@ -40,6 +40,7 @@
 }
 .pog-exe-shortcut.is-ready { visibility: visible; }
 .pog-exe-shortcut img { width: 74px; height: 74px; object-fit: contain; pointer-events: none; }
+.pog-exe-shortcut:hover { color: #fff; }
 .pog-exe-shortcut.is-selected,
 .pog-exe-shortcut:focus-visible {
     border-color: rgba(169, 129, 232, .86);
@@ -103,20 +104,59 @@
     opacity: .28;
     transition: opacity 250ms ease;
 }
-.pog-launch-full-logo {
+.pog-launch-content {
     position: relative;
     z-index: 1;
-    display: block;
     width: min(516px, 52vw);
-    height: auto;
-    object-fit: contain;
+    display: grid;
+    gap: clamp(20px, 3vh, 32px);
     transition: opacity 250ms ease;
 }
+.pog-launch-full-logo {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+.pog-launch-progress {
+    width: 100%;
+    color: #fff;
+    font-family: var(--font-brand);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .18em;
+}
+.pog-launch-progress-track {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 9px;
+    padding: 2px;
+    border: 1px solid rgba(255, 255, 255, .82);
+    background: rgba(0, 0, 0, .72);
+}
+.pog-launch-progress-fill {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #9b70df;
+    box-shadow: 0 0 8px rgba(155, 112, 223, .34);
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+}
+.pog-launch-progress-status {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    line-height: 1;
+}
 .pog-launch-loading.is-blackout .pog-launch-video-background,
-.pog-launch-loading.is-blackout .pog-launch-full-logo { opacity: 0; }
+.pog-launch-loading.is-blackout .pog-launch-content { opacity: 0; }
 
 @media (max-width: 680px) {
-    .pog-launch-full-logo { width: min(56vw, 336px); }
+    .pog-launch-content { width: min(56vw, 336px); gap: 20px; }
+    .pog-launch-progress { font-size: 9px; }
 }
 
 .menu-overlay .background-video {

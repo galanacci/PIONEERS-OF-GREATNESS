@@ -24,6 +24,9 @@ export function initLauncher() {
     const shortcutInstruction = document.getElementById("pog-exe-instruction");
     const loading = document.getElementById("pog-launch-loading");
     const loadingVideo = document.getElementById("pog-launch-loading-video");
+    const loadingProgress = document.getElementById("pog-launch-progress");
+    const loadingProgressFill = loadingProgress?.querySelector(".pog-launch-progress-fill");
+    const loadingProgressValue = loadingProgress?.querySelector(".pog-launch-progress-value");
     if (!desktop || !shortcut) return;
 
     let position = null;
@@ -83,6 +86,26 @@ export function initLauncher() {
     };
     const select = () => shortcut.classList.add("is-selected");
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+    const setLoadingProgress = (value) => {
+        const progress = clamp(value, 0, 100);
+        const rounded = Math.round(progress);
+        loadingProgress?.setAttribute("aria-valuenow", String(rounded));
+        if (loadingProgressFill) loadingProgressFill.style.transform = `scaleX(${progress / 100})`;
+        if (loadingProgressValue) loadingProgressValue.textContent = `${String(rounded).padStart(3, "0")}%`;
+    };
+    const runLoadingProgress = (startedAt) => new Promise((resolve) => {
+        setLoadingProgress(0);
+        const update = (now) => {
+            const progress = Math.min(1, (now - startedAt) / LAUNCH_LOADING_DURATION);
+            setLoadingProgress(progress * 100);
+            if (progress >= 1) {
+                resolve();
+                return;
+            }
+            requestAnimationFrame(update);
+        };
+        requestAnimationFrame(update);
+    });
     const prepareLoadingVideo = () => {
         if (!loadingVideo || loadingVideo.src) return;
         const mobile = window.matchMedia("(max-width: 760px), (hover: none), (pointer: coarse)").matches;
@@ -118,6 +141,7 @@ export function initLauncher() {
         window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name: "boot" } }));
         if (loading && loadingVideo) {
             const loadingStartedAt = performance.now();
+            const progressComplete = runLoadingProgress(loadingStartedAt);
             loading.hidden = false;
             loading.setAttribute("aria-hidden", "false");
             loading.classList.remove("is-blackout", "is-exiting");
@@ -133,7 +157,7 @@ export function initLauncher() {
             loadingVideo.currentTime = Math.random() * playableDuration;
             loadingVideo.play().catch(() => { /* Muted playback may still be restricted on some browsers. */ });
             // The loading screen is intentional pacing, not merely a network wait.
-            await wait(Math.max(0, LAUNCH_LOADING_DURATION - (performance.now() - loadingStartedAt)));
+            await progressComplete;
             // Fade the loading artwork into the layer's solid black background,
             // then keep that layer mounted while the destination opens beneath it.
             loading.classList.add("is-blackout");

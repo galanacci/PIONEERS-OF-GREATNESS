@@ -44,7 +44,13 @@
 
     <section id="pog-launch-loading" class="pog-launch-loading" hidden aria-hidden="true" aria-label="Loading PIONEERS OF GREATNESS">
         <video id="pog-launch-loading-video" class="pog-launch-video-background" muted playsinline preload="none" aria-hidden="true" data-mobile-src="src/pog-launch-loading-mobile-optimized.mp4" data-desktop-src="src/pog-launch-loading-desktop-optimized.mp4"></video>
-        <img class="pog-launch-full-logo" src="src/POG_FULL_LOGO_WHITE.png" alt="PIONEERS OF GREATNESS">
+        <div class="pog-launch-content">
+            <img class="pog-launch-full-logo" src="src/POG_FULL_LOGO_WHITE.png" alt="PIONEERS OF GREATNESS">
+            <div id="pog-launch-progress" class="pog-launch-progress" role="progressbar" aria-label="Loading PIONEERS OF GREATNESS" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <span class="pog-launch-progress-track" aria-hidden="true"><span class="pog-launch-progress-fill"></span></span>
+                <span class="pog-launch-progress-status" aria-hidden="true">LOADING <span class="pog-launch-progress-value">000%</span></span>
+            </div>
+        </div>
     </section>
 
     <div class="menu-infrastructure" aria-hidden="true">

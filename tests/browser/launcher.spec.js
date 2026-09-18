@@ -33,6 +33,8 @@ test("PoG.EXE behaves like a persistent desktop shortcut", async ({ page }) => {
     const shortcut = page.locator("#pog-exe-shortcut");
     await expect(shortcut).toBeVisible();
     await expect(shortcut).toHaveText("PoG.EXE");
+    await shortcut.hover();
+    await expect(shortcut).toHaveCSS("color", "rgb(255, 255, 255)");
     await shortcut.click();
     await expect(shortcut).toHaveClass(/is-selected/);
 
@@ -49,6 +51,13 @@ test("double clicking PoG.EXE starts the returning entry path", async ({ page })
     await page.goto("/");
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
+    const progress = page.locator("#pog-launch-progress");
+    await expect(progress).toHaveAttribute("aria-valuenow", "0");
+    const progressAtStart = page.evaluate(() => new Promise((resolve) => {
+        window.addEventListener("pog:start-requested", () => {
+            resolve(document.getElementById("pog-launch-progress")?.getAttribute("aria-valuenow"));
+        }, { once: true });
+    }));
     const loadingStates = page.evaluate(() => new Promise((resolve) => {
         const loadingElement = document.getElementById("pog-launch-loading");
         const states = { visible: !loadingElement.hidden, blackout: loadingElement.classList.contains("is-blackout") };
@@ -65,6 +74,7 @@ test("double clicking PoG.EXE starts the returning entry path", async ({ page })
     await page.locator("#pog-exe-shortcut").dblclick();
     const loading = page.locator("#pog-launch-loading");
     expect(await loadingStates).toEqual({ visible: true, blackout: true });
+    expect(await progressAtStart).toBe("100");
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 2500 });
     await expect(loading).toBeHidden({ timeout: 2500 });
 });
