@@ -44,8 +44,8 @@ textarea {
     letter-spacing: 1px;
     text-transform: uppercase;
     color: white;
-    border: 0.2px solid #673CAF;
-    background-color: #673CAF;
+    border: 0.2px solid #9b70df;
+    background-color: #9b70df;
     text-decoration: none;
     z-index: 1000;
 }
@@ -111,13 +111,13 @@ input[type="email"]::placeholder {
 
 #email-form > button[type="submit"]:hover {
     border-color: white;
-    color: #673CAF;
+    color: #9b70df;
 }
 
 #email-form input[type="email"]:focus-visible,
 #email-form > button[type="submit"]:focus-visible {
     outline: 0;
-    box-shadow: inset 0 0 0 1px #673CAF;
+    box-shadow: inset 0 0 0 1px #9b70df;
 }
 
 #email-form > button[type="submit"] {
@@ -138,8 +138,8 @@ button {
 
 button:hover {
     background-color:transparent;
-    border: 0.2px solid #673CAF;
-    color: #673CAF;
+    border: 0.2px solid #9b70df;
+    color: #9b70df;
 }
 
 #status {
@@ -275,7 +275,7 @@ button:hover {
 .audio-toggle:focus-visible {
     border: 0;
     outline: 0;
-    color: #673CAF;
+    color: #9b70df;
     opacity: 1;
 }
 

@@ -3,7 +3,7 @@ import { GLTFLoader } from "../vendor/three/GLTFLoader.js";
 import { getPerformanceTier } from "../core/performance-tier.js";
 
 const ASSETS = Object.freeze({
-    workspace: "src/video-journal/workspace-scan.glb"
+    workspace: "src/video-journal/workspace-scan-optimized.glb"
 });
 
 // Spatial calibration remains isolated here so the room can evolve without rebuilding its interaction layer.
@@ -60,6 +60,7 @@ class VideoJournalScene {
         this.screenMode = "off";
         this.staticFrame = 0;
         this.televisionMeshes = [];
+        this.optimizedTextures = new WeakSet();
         this.cameraTarget = new THREE.Vector3(...VIDEO_JOURNAL_LAYOUT.camera.target);
         this.entranceTarget = this.cameraTarget.clone();
         this.cameraEntranceStart = null;
@@ -225,8 +226,10 @@ class VideoJournalScene {
                     });
                 }
                 if (!material?.map) return material;
+                this.optimizeTextureForTier(material.map);
                 material.map.colorSpace = THREE.SRGBColorSpace;
-                material.map.anisotropy = Math.min(4, this.renderer.capabilities.getMaxAnisotropy());
+                const anisotropyLimit = this.performanceTier === "high" ? 4 : this.performanceTier === "balanced" ? 2 : 1;
+                material.map.anisotropy = Math.min(anisotropyLimit, this.renderer.capabilities.getMaxAnisotropy());
                 if (/^TV(?:front|back)$/i.test(materialName)) {
                     const televisionMaterial = material.clone();
                     televisionMaterial.name = materialName;
@@ -272,6 +275,25 @@ class VideoJournalScene {
             this.baseShadow.position.z += 0.42;
             this.placeTelevisionLights(televisionCentre);
         }
+    }
+
+    optimizeTextureForTier(texture) {
+        if (!texture?.image || this.performanceTier === "high" || this.optimizedTextures.has(texture)) return;
+        this.optimizedTextures.add(texture);
+        const source = texture.image;
+        const width = source.width || source.videoWidth || 0;
+        const height = source.height || source.videoHeight || 0;
+        const maximumDimension = this.performanceTier === "low" ? 512 : 1024;
+        if (!width || !height || Math.max(width, height) <= maximumDimension) return;
+        const scale = maximumDimension / Math.max(width, height);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(width * scale));
+        canvas.height = Math.max(1, Math.round(height * scale));
+        const context = canvas.getContext("2d", { alpha: true });
+        if (!context) return;
+        context.drawImage(source, 0, 0, canvas.width, canvas.height);
+        texture.image = canvas;
+        texture.needsUpdate = true;
     }
 
     placeTelevisionLights(centre) {

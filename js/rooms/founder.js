@@ -1,4 +1,5 @@
 const COMPLETION_KEY = "pog:founder-introduction:v2";
+const FIRST_VISIT_SKIP_DELAY = 7000;
 function hasCompletedIntroduction() {
     try {
         return localStorage.getItem(COMPLETION_KEY) === "complete";
@@ -69,6 +70,12 @@ export function initOpening() {
     let returnFocus = null;
     let backgroundState = new Map();
     let narrationClockStartedAt = 0;
+    let delayedSkipTimer = null;
+
+    const clearDelayedSkip = () => {
+        if (delayedSkipTimer !== null) window.clearTimeout(delayedSkipTimer);
+        delayedSkipTimer = null;
+    };
 
     function renderEntryState() {
         entryLabel.textContent = "ENTER";
@@ -112,6 +119,7 @@ export function initOpening() {
 
     function closeIntroduction() {
         sequence += 1;
+        clearDelayedSkip();
         introduction.classList.remove("is-open");
         introduction.setAttribute("aria-hidden", "true");
         document.body.classList.remove("founder-introduction-active");
@@ -133,6 +141,7 @@ export function initOpening() {
     }
 
     function showFinalReveal() {
+        clearDelayedSkip();
         openIntroduction();
         copy.hidden = true;
         copy.replaceChildren();
@@ -218,6 +227,13 @@ export function initOpening() {
         actions.hidden = true;
         enter.hidden = true;
         skip.hidden = true;
+        clearDelayedSkip();
+        if (!allowSkip) {
+            delayedSkipTimer = window.setTimeout(() => {
+                delayedSkipTimer = null;
+                if (token === sequence && introduction.classList.contains("is-open")) skip.hidden = false;
+            }, FIRST_VISIT_SKIP_DELAY);
+        }
         try {
             const [content] = await Promise.all([
                 loadPoem(),
@@ -234,13 +250,16 @@ export function initOpening() {
                 // Autoplay restrictions still receive the same timeline.
             }
             narrationClockStartedAt = performance.now() - (narration.currentTime * 1000);
-            skip.hidden = !allowSkip;
+            if (allowSkip) {
+                skip.hidden = false;
+            }
             for (const [index, paragraph] of content.paragraphs.entries()) {
                 if (token !== sequence) return;
                 const element = await revealNarratedParagraph(paragraph, index, token);
                 if (!element || token !== sequence) return;
             }
             if (token !== sequence) return;
+            clearDelayedSkip();
             const finalParagraph = copy.querySelector(".is-active");
             finalParagraph?.classList.remove("is-active");
             finalParagraph?.classList.add("is-leaving");
@@ -250,6 +269,7 @@ export function initOpening() {
             else if (replayDestination === "menu") enterSite();
             else showFinalReveal();
         } catch (error) {
+            clearDelayedSkip();
             console.error("THE BEGINNING could not be loaded.", error);
             const state = document.createElement("p");
             state.textContent = "THE BEGINNING IS TEMPORARILY UNAVAILABLE.";
@@ -296,6 +316,7 @@ export function initOpening() {
     }
 
     async function skipPoem() {
+        clearDelayedSkip();
         if (replayDestination === "origin") {
             sequence += 1;
             skip.hidden = true;

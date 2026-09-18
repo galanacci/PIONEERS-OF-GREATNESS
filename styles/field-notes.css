@@ -112,7 +112,7 @@
 
 .field-note-link:hover,
 .field-note-link:focus-visible {
-    color: #673CAF;
+    color: #9b70df;
 }
 
 .field-notes-state {
@@ -225,7 +225,7 @@
     color: #fff;
     cursor: pointer;
 }
-#field-notes-room .field-note-card:focus-visible { outline: 2px solid #673caf; outline-offset: -2px; }
+#field-notes-room .field-note-card:focus-visible { outline: 2px solid #9b70df; outline-offset: -2px; }
 #field-notes-room .field-note-media {
     position: relative;
     display: block;
@@ -384,10 +384,10 @@
     .field-note-viewer { padding: 76px 18px 90px; }
     .field-note-viewer-window { grid-template-columns: 1fr; grid-template-rows: minmax(0,56%) minmax(0,44%); }
     .field-note-viewer-details { padding: 20px 18px 18px; border-top: 1px solid rgba(255,255,255,.18); border-left: 0; }
-    .field-note-viewer-details { scrollbar-width: thin; scrollbar-color: #673caf transparent; }
+    .field-note-viewer-details { scrollbar-width: thin; scrollbar-color: #9b70df transparent; }
     .field-note-viewer-details::-webkit-scrollbar { width: 3px; }
     .field-note-viewer-details::-webkit-scrollbar-track { background: transparent; }
-    .field-note-viewer-details::-webkit-scrollbar-thumb { background: #673caf; }
+    .field-note-viewer-details::-webkit-scrollbar-thumb { background: #9b70df; }
     .field-note-viewer-media img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
     .field-note-viewer-caption { margin: 16px 0; font-size: 11px; line-height: 1.65; }
     .field-note-viewer-nav { width: 40px; height: 46px; }
@@ -444,7 +444,7 @@
     background: #050505;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
-    scrollbar-color: #673caf transparent;
+    scrollbar-color: #9b70df transparent;
 }
 #field-notes-room .field-note-viewer-gallery-wrap {
     position: relative;
@@ -453,7 +453,7 @@
     isolation: isolate;
 }
 #field-notes-room .field-note-viewer-gallery::-webkit-scrollbar { height: 3px; }
-#field-notes-room .field-note-viewer-gallery::-webkit-scrollbar-thumb { background: #673caf; }
+#field-notes-room .field-note-viewer-gallery::-webkit-scrollbar-thumb { background: #9b70df; }
 #field-notes-room .field-note-viewer-gallery-image {
     flex: 0 0 128px;
     height: 128px;

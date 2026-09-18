@@ -79,3 +79,42 @@ test("Mission briefs type only on their first visit", async ({ page }, testInfo)
         expect(terminalSize.scrollHeight).toBeLessThanOrEqual(terminalSize.clientHeight + 1);
     }
 });
+
+test("Founder reading type remains legible at common mobile widths", async ({ page }) => {
+    test.skip(page.viewportSize()?.width > 680, "Mobile typography coverage.");
+    for (const width of [360, 390, 430]) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.goto("/");
+        await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:open-room", {
+            detail: { roomId: "founder-room", skipTransition: true }
+        })));
+        await page.locator('[data-founder-section="mission"]').click();
+        const missionType = await page.locator(".founder-mission-terminal").evaluate((terminal) => {
+            const size = (selector) => Number.parseFloat(getComputedStyle(terminal.querySelector(selector)).fontSize);
+            return {
+                brief: size(".founder-mission-brief"),
+                detailLabel: size(".founder-mission-details dt"),
+                detailValue: size(".founder-mission-details dd"),
+                priority: size(".founder-mission-priorities li")
+            };
+        });
+        expect(missionType.brief).toBeGreaterThanOrEqual(16);
+        expect(missionType.detailLabel).toBeGreaterThanOrEqual(11);
+        expect(missionType.detailValue).toBeGreaterThanOrEqual(14);
+        expect(missionType.priority).toBeGreaterThanOrEqual(14);
+        const controls = page.locator("#founder-experience .page-controls button");
+        for (const control of await controls.all()) {
+            const bounds = await control.boundingBox();
+            expect(bounds.height).toBeGreaterThanOrEqual(44);
+        }
+
+        await page.locator("#founder-room .room-return").click();
+        await page.locator('[data-founder-section="journey"]').click();
+        await expect(page.locator("#founder-journey-menu-title")).toBeVisible();
+        await page.locator(".journey-object.is-selected").evaluate((button) => button.click());
+        await expect(page.locator(".founder-journey-copy p").first()).toBeVisible();
+        const journeyCopySize = await page.locator(".founder-journey-copy p").first()
+            .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize));
+        expect(journeyCopySize).toBeGreaterThanOrEqual(16);
+    }
+});

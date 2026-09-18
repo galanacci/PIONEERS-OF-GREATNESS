@@ -181,7 +181,7 @@
     transition: color 160ms ease,border-color 160ms ease;
 }
 .documentary-crt-controls > button:is(:hover,:focus-visible),
-.documentary-crt-archive-toggle:is(:hover,:focus-visible,[aria-expanded="true"]) { border-color: #673caf; outline: 0; color: #673caf; }
+.documentary-crt-archive-toggle:is(:hover,:focus-visible,[aria-expanded="true"]) { border-color: #9b70df; outline: 0; color: #9b70df; }
 #documentary-room .documentary-crt-controls > button,
 #documentary-room .documentary-crt-archive-toggle,
 #documentary-room .documentary-crt-controls > button:is(:hover,:focus,:focus-visible,:active),
@@ -219,7 +219,7 @@
 .documentary-crt-now-playing span { display: block; color: #9b70df; font-family: var(--font-brand); font-size: 11px; font-weight: 600; letter-spacing: .17em; }
 .documentary-crt-now-playing h3 { margin: 8px 0 7px; color: #fff; font-family: var(--font-brand); font-size: 12px; line-height: 1.35; letter-spacing: .12em; }
 .documentary-crt-now-playing p { max-width: 620px; margin: 0; color: rgba(255,255,255,.68); font-family: var(--font-brand); font-size: 11px; line-height: 1.65; letter-spacing: .07em; }
-.documentary-crt-episode-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #673caf #080808; }
+.documentary-crt-episode-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #9b70df #080808; }
 .documentary-crt-episode-option { width: 100%; min-height: 54px; display: grid; grid-template-columns: 52px minmax(0,1fr) auto; align-items: center; gap: 14px; padding: 13px 4px; border: 0; border-bottom: 1px solid rgba(255,255,255,.12); background: #000; color: rgba(255,255,255,.72); text-align: left; cursor: pointer; }
 .documentary-crt-episode-option span,
 .documentary-crt-episode-option time { font-family: var(--font-brand); font-size: 9px; letter-spacing: .12em; }
@@ -227,7 +227,7 @@
 .documentary-crt-episode-option time { color: rgba(255,255,255,.4); }
 .documentary-crt-episode-option:is(:hover,:focus-visible,.is-current) { outline: 0; color: #fff; }
 .documentary-crt-episode-option.is-current span { color: #9b70df; }
-.documentary-crt-episode-option.is-current { outline: 1px solid #673caf; outline-offset: -1px; }
+.documentary-crt-episode-option.is-current { outline: 1px solid #9b70df; outline-offset: -1px; }
 .documentary-crt-episode-option.is-current strong { color: #9b70df; }
 
 html[data-performance-tier="low"] .documentary-renderer { filter: brightness(.86) contrast(1.08) saturate(.88); }

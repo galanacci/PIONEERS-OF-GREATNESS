@@ -740,7 +740,7 @@ test("Behind the Scenes opens a diary viewer with expandable entry images", asyn
     await expect(galleryImages.first()).toBeVisible();
     expect(await galleryImages.count()).toBeGreaterThan(0);
     if ((await page.viewportSize()).width <= 680) {
-        await expect(viewer.locator(".field-note-viewer-details")).toHaveCSS("scrollbar-color", "rgb(103, 60, 175) rgba(0, 0, 0, 0)");
+        await expect(viewer.locator(".field-note-viewer-details")).toHaveCSS("scrollbar-color", "rgb(155, 112, 223) rgba(0, 0, 0, 0)");
         await expect(viewer.locator(".field-note-viewer-gallery-wrap")).toHaveAttribute("data-scroll-direction", /left|right/);
     }
     await galleryImages.first().click();

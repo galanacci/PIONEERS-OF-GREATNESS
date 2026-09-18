@@ -68,7 +68,7 @@
     border: 1px solid rgba(255,255,255,.4); background: #000;
     align-items: stretch;
 }
-.menu-waitlist #email-form:focus-within { border-color: #673caf; }
+.menu-waitlist #email-form:focus-within { border-color: #9b70df; }
 .menu-waitlist #email-form .input-container { flex: 1; min-width: 0; max-width: none; }
 .menu-waitlist #email-form input[type="email"] {
     width: 100%; max-width: none; min-width: 0;
@@ -113,7 +113,7 @@
 .menu-item:hover {
     border: 0;
     background: transparent;
-    color: #673CAF;
+    color: #9b70df;
 }
 
 /* Keyboard selection echoes the P°G purple without overpowering the menu. */
@@ -122,7 +122,7 @@
 }
 
 .menu-list.is-keyboard-nav .menu-item.is-selected {
-    outline: 1px solid #673CAF;
+    outline: 1px solid #9b70df;
     outline-offset: 3px;
     background-color: rgba(103, 60, 175, 0.12);
 }
@@ -130,8 +130,8 @@
 /* Enter/click confirms an actionable selection with a complete purple state. */
 .menu-item.is-activated,
 .menu-item:not([aria-disabled="true"]):active {
-    color: #673CAF;
-    outline: 1px solid #673CAF;
+    color: #9b70df;
+    outline: 1px solid #9b70df;
     outline-offset: 3px;
     background-color: rgba(103, 60, 175, 0.22);
 }

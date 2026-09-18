@@ -85,7 +85,7 @@
 .founder-code-law-number {
     flex: 0 0 auto;
     margin-top: 0.65em;
-    color: #673caf;
+    color: #9b70df;
     font-family: var(--font-brand);
     font-size: 11px;
     font-weight: 600;
@@ -169,6 +169,16 @@
 }
 
 @media (max-width: 560px) {
+    .founder-mission-count,
+    .founder-mission-phase,
+    .founder-mission-terminal-label,
+    .founder-mission-priorities > p,
+    .founder-mission-signal,
+    .founder-mission-details dt {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
     .page-template .founder-code-header {
         column-gap: 10px;
     }
@@ -418,8 +428,8 @@
 
     .founder-mission-brief {
         margin-top: 11px;
-        font-size: 11px;
-        line-height: 1.5;
+        font-size: 16px;
+        line-height: 1.55;
     }
 
     .founder-mission-details {
@@ -430,8 +440,14 @@
         padding: 9px 10px;
     }
 
+    .founder-mission-details dt {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
     .founder-mission-details dd {
-        font-size: 9px;
+        font-size: 14px;
+        line-height: 1.5;
     }
 
     .founder-mission-priorities {
@@ -446,7 +462,8 @@
     }
 
     .founder-mission-priorities li {
-        font-size: 8px;
+        font-size: 14px;
+        line-height: 1.5;
     }
 
     .founder-mission-signal {
@@ -651,7 +668,7 @@
 .founder-origin-control:focus-visible {
     border: 0;
     outline: 0;
-    color: #673CAF;
+    color: #9b70df;
 }
 
 .founder-origin-control:disabled {
@@ -728,7 +745,7 @@
     border: 0;
     outline: 0;
     background: rgba(103, 60, 175, 0.12);
-    box-shadow: inset 0 1px #673CAF, inset 0 -1px #673CAF;
+    box-shadow: inset 0 1px #9b70df, inset 0 -1px #9b70df;
     color: #fff;
 }
 
@@ -863,7 +880,7 @@
     border: 0;
     outline: 0;
     background: rgba(103, 60, 175, 0.12);
-    box-shadow: inset 0 1px #673CAF, inset 0 -1px #673CAF;
+    box-shadow: inset 0 1px #9b70df, inset 0 -1px #9b70df;
     color: #fff;
 }
 
@@ -897,7 +914,7 @@
 .founder-journey-control:focus-visible {
     border: 0;
     outline: 0;
-    color: #673CAF;
+    color: #9b70df;
 }
 
 .founder-journey-menu-footer p {
@@ -1158,7 +1175,7 @@
 
     .founder-origin-frame-header h2 {
         margin-top: 7px;
-        font-size: 11px;
+        font-size: 14px;
         line-height: 1.4;
     }
 
@@ -1200,8 +1217,8 @@
 
     .founder-origin-copy p {
         margin-bottom: 0.72em;
-        font-size: clamp(11px, 3.2vw, 14px);
-        line-height: 1.45;
+        font-size: 16px;
+        line-height: 1.55;
     }
 
     .founder-origin-copy p:first-child {
@@ -1215,7 +1232,7 @@
 
     .founder-origin-control {
         padding: 5px 0;
-        font-size: 8px;
+        font-size: 12px;
         white-space: normal;
         line-height: 1.5;
     }
@@ -1246,7 +1263,7 @@
     }
 
     .founder-journey-item-label {
-        font-size: clamp(11px, 3.5vw, 15px);
+        font-size: clamp(14px, 4vw, 16px);
     }
 
     .founder-journey-menu-footer {
@@ -1283,8 +1300,8 @@
     .founder-journey-copy p {
         max-width: none;
         margin-bottom: 0.55em;
-        font-size: clamp(11px, 3.2vw, 14px);
-        line-height: 1.42;
+        font-size: 16px;
+        line-height: 1.55;
     }
 
     .founder-journey-controls {
@@ -1293,7 +1310,7 @@
 
     .founder-journey-control {
         padding: 5px 0;
-        font-size: 8px;
+        font-size: 12px;
         white-space: normal;
         line-height: 1.45;
     }
@@ -1305,10 +1322,11 @@
     }
 
     .founder-origin-copy p {
-        font-size: 11px;
+        font-size: 16px;
+        line-height: 1.55;
     }
 
     .founder-origin-copy p:first-child {
-        font-size: 16px;
+        font-size: 20px;
     }
 }

@@ -48,6 +48,36 @@
 }
 .pog-exe-shortcut:active { border-color: #a981e8; }
 
+.pog-exe-hint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 200px;
+    margin: 0;
+    color: rgba(255, 255, 255, .68);
+    font-family: var(--font-brand);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    line-height: 1.4;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 260ms ease, visibility 0s linear 260ms;
+}
+.pog-exe-hint.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}
+.pog-exe-hint.is-dismissing {
+    opacity: 0;
+    visibility: hidden;
+}
+
 .pog-launch-loading {
     position: fixed;
     inset: 0;
@@ -108,4 +138,5 @@ body:has(.pog-launch-loading.is-open) .pog-desktop { visibility: hidden; pointer
 @media (max-width: 680px) {
     .pog-exe-shortcut { width: 90px; min-height: 98px; font-size: 11px; }
     .pog-exe-shortcut img { width: 66px; height: 66px; }
+    .pog-exe-hint { font-size: 10px; }
 }

@@ -1,4 +1,5 @@
 const POSITION_KEY = "pog:desktop-shortcut-position:v1";
+const HINT_KEY = "pog:desktop-shortcut-hint:v1";
 const GRID = 16;
 const EDGE = 20;
 const LAUNCH_START_DELAY = 180;
@@ -19,15 +20,11 @@ function positionBounds(shortcut) {
 export function initLauncher() {
     const desktop = document.getElementById("pog-desktop");
     const shortcut = document.getElementById("pog-exe-shortcut");
+    const shortcutHint = document.getElementById("pog-exe-hint");
+    const shortcutInstruction = document.getElementById("pog-exe-instruction");
     const loading = document.getElementById("pog-launch-loading");
     const loadingVideo = document.getElementById("pog-launch-loading-video");
     if (!desktop || !shortcut) return;
-
-    if (loadingVideo) {
-        const mobile = window.matchMedia("(max-width: 760px), (hover: none), (pointer: coarse)").matches;
-        loadingVideo.src = mobile ? loadingVideo.dataset.mobileSrc : loadingVideo.dataset.desktopSrc;
-        loadingVideo.load();
-    }
 
     let position = null;
     let dragging = false;
@@ -37,6 +34,24 @@ export function initLauncher() {
     let mobileLaunchTimer = null;
     let launching = false;
     const isTouchLauncher = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    let hintDismissed = false;
+    try { hintDismissed = localStorage.getItem(HINT_KEY) === "dismissed"; } catch { /* persistence is optional */ }
+
+    const positionHint = () => {
+        if (!shortcutHint || !position) return;
+        const width = 200;
+        const x = clamp(position.x + (shortcut.offsetWidth / 2) - (width / 2), 8, Math.max(8, window.innerWidth - width - 8));
+        const below = position.y + shortcut.offsetHeight + 9;
+        const y = below + 24 <= window.innerHeight ? below : Math.max(8, position.y - 27);
+        shortcutHint.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    };
+    const dismissHint = () => {
+        if (!shortcutHint || hintDismissed) return;
+        hintDismissed = true;
+        shortcutHint.classList.add("is-dismissing");
+        shortcutHint.classList.remove("is-visible");
+        try { localStorage.setItem(HINT_KEY, "dismissed"); } catch { /* persistence is optional */ }
+    };
 
     const save = () => {
         try { localStorage.setItem(POSITION_KEY, JSON.stringify(position)); } catch { /* persistence is optional */ }
@@ -46,6 +61,7 @@ export function initLauncher() {
         const bounds = positionBounds(shortcut);
         position = { x: clamp(snap(position.x), EDGE, bounds.x), y: clamp(snap(position.y), EDGE, bounds.y) };
         shortcut.style.transform = `translate3d(${position.x}px, ${position.y}px, 0)`;
+        positionHint();
     };
     const initialise = () => {
         try { position = JSON.parse(localStorage.getItem(POSITION_KEY)); } catch { position = null; }
@@ -60,10 +76,19 @@ export function initLauncher() {
         render();
         // Do not expose the browser's default 0,0 placement before the saved grid
         // coordinate has painted; it reads as a flicker on refresh.
-        requestAnimationFrame(() => requestAnimationFrame(() => shortcut.classList.add("is-ready")));
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            shortcut.classList.add("is-ready");
+            if (!hintDismissed && shortcutHint) shortcutHint.classList.add("is-visible");
+        }));
     };
     const select = () => shortcut.classList.add("is-selected");
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+    const prepareLoadingVideo = () => {
+        if (!loadingVideo || loadingVideo.src) return;
+        const mobile = window.matchMedia("(max-width: 760px), (hover: none), (pointer: coarse)").matches;
+        loadingVideo.src = mobile ? loadingVideo.dataset.mobileSrc : loadingVideo.dataset.desktopSrc;
+        loadingVideo.load();
+    };
     const waitForDestination = () => new Promise((resolve) => {
         const startedAt = performance.now();
         const check = () => {
@@ -87,6 +112,8 @@ export function initLauncher() {
         window.clearTimeout(mobileLaunchTimer);
         mobileLaunchTimer = null;
         await wait(LAUNCH_START_DELAY);
+        dismissHint();
+        prepareLoadingVideo();
         shortcut.classList.remove("is-selected");
         window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name: "boot" } }));
         if (loading && loadingVideo) {
@@ -173,5 +200,14 @@ export function initLauncher() {
     });
     desktop.addEventListener("pointerdown", (event) => { if (event.target === desktop) shortcut.classList.remove("is-selected"); });
     window.addEventListener("resize", () => { render(); save(); });
+    if (shortcutHint) shortcutHint.textContent = isTouchLauncher ? "TAP TO OPEN" : "DOUBLE CLICK TO OPEN";
+    if (shortcutInstruction) {
+        shortcutInstruction.textContent = isTouchLauncher
+            ? "Tap the shortcut to enter PIONEERS OF GREATNESS."
+            : "Select the shortcut, then double click or press Enter to enter PIONEERS OF GREATNESS.";
+    }
+    shortcut.setAttribute("aria-label", isTouchLauncher
+        ? "PoG.EXE shortcut. Tap to enter."
+        : "PoG.EXE shortcut. Double click or press Enter to enter.");
     initialise();
 }

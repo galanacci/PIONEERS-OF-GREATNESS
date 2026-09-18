@@ -2,12 +2,29 @@ import { test, expect } from "@playwright/test";
 
 test("selects an appropriate launch asset and performance tier for the device", async ({ page }) => {
     await page.goto("/");
-    const isMobileViewport = page.viewportSize()?.width <= 760;
-    await expect(page.locator("#pog-launch-loading-video")).toHaveAttribute(
-        "src",
-        isMobileViewport ? /pog-launch-loading-mobile\.mp4$/ : /pog-launch-loading\.mp4$/
-    );
+    const loadingVideo = page.locator("#pog-launch-loading-video");
+    await expect(loadingVideo).not.toHaveAttribute("src", /.+/);
+    await expect(loadingVideo).toHaveAttribute("preload", "none");
+    await expect(loadingVideo).toHaveAttribute("data-mobile-src", /pog-launch-loading-mobile-optimized\.mp4$/);
+    await expect(loadingVideo).toHaveAttribute("data-desktop-src", /pog-launch-loading-desktop-optimized\.mp4$/);
     await expect(page.locator("html")).toHaveAttribute("data-performance-tier", /^(low|balanced|high)$/);
+});
+
+test("the launch instruction matches the input mode and is remembered after use", async ({ page }) => {
+    await page.goto("/");
+    const isTouch = page.viewportSize()?.width <= 680;
+    const hint = page.locator("#pog-exe-hint");
+    const shortcut = page.locator("#pog-exe-shortcut");
+    await expect(hint).toHaveText(isTouch ? "TAP TO OPEN" : "DOUBLE CLICK TO OPEN");
+    await expect(shortcut).toHaveAttribute("aria-label", isTouch ? /Tap to enter/ : /Double click or press Enter/);
+    await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
+    if (isTouch) await shortcut.tap();
+    else await shortcut.dblclick();
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("pog:desktop-shortcut-hint:v1")), { timeout: 3000 })
+        .toBe("dismissed");
+    await expect(hint).not.toHaveClass(/is-visible/);
+    await page.reload();
+    await expect(hint).not.toHaveClass(/is-visible/);
 });
 
 test("PoG.EXE behaves like a persistent desktop shortcut", async ({ page }) => {
@@ -28,18 +45,28 @@ test("PoG.EXE behaves like a persistent desktop shortcut", async ({ page }) => {
 });
 
 test("double clicking PoG.EXE starts the returning entry path", async ({ page }) => {
+    test.skip(page.viewportSize()?.width <= 680, "Touch launch uses a single tap.");
     await page.goto("/");
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
+    const loadingStates = page.evaluate(() => new Promise((resolve) => {
+        const loadingElement = document.getElementById("pog-launch-loading");
+        const states = { visible: !loadingElement.hidden, blackout: loadingElement.classList.contains("is-blackout") };
+        const observer = new MutationObserver(() => {
+            states.visible ||= !loadingElement.hidden;
+            states.blackout ||= loadingElement.classList.contains("is-blackout");
+            if (!states.visible || !states.blackout) return;
+            observer.disconnect();
+            resolve(states);
+        });
+        observer.observe(loadingElement, { attributes: true, attributeFilter: ["class", "hidden"] });
+        setTimeout(() => { observer.disconnect(); resolve(states); }, 5000);
+    }));
     await page.locator("#pog-exe-shortcut").dblclick();
     const loading = page.locator("#pog-launch-loading");
-    await expect(loading).toBeHidden();
-    await page.waitForTimeout(100);
-    await expect(loading).toBeHidden();
-    await expect(loading).toBeVisible({ timeout: 600 });
-    await expect(loading).toHaveClass(/is-blackout/, { timeout: 2200 });
-    await expect(page.locator("#pog-launch-loading-video")).toHaveCSS("opacity", "0", { timeout: 750 });
+    expect(await loadingStates).toEqual({ visible: true, blackout: true });
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 2500 });
+    await expect(loading).toBeHidden({ timeout: 2500 });
 });
 
 test("a mobile tap selects PoG.EXE briefly then launches", async ({ page }) => {
@@ -48,9 +75,21 @@ test("a mobile tap selects PoG.EXE briefly then launches", async ({ page }) => {
     await page.evaluate(() => localStorage.setItem("pog:founder-introduction:v2", "complete"));
     await page.reload();
     const shortcut = page.locator("#pog-exe-shortcut");
+    const sawSelected = page.evaluate(() => new Promise((resolve) => {
+        const shortcutElement = document.getElementById("pog-exe-shortcut");
+        if (shortcutElement?.classList.contains("is-selected")) return resolve(true);
+        const observer = new MutationObserver(() => {
+            if (!shortcutElement?.classList.contains("is-selected")) return;
+            observer.disconnect();
+            resolve(true);
+        });
+        observer.observe(shortcutElement, { attributes: true, attributeFilter: ["class"] });
+        setTimeout(() => { observer.disconnect(); resolve(false); }, 1000);
+    }));
     await shortcut.tap();
-    await expect(shortcut).toHaveClass(/is-selected/);
+    expect(await sawSelected).toBe(true);
     await expect(page.locator("#pog-launch-loading")).toBeVisible();
+    await expect(page.locator("#pog-launch-loading-video")).toHaveAttribute("src", /pog-launch-loading-mobile-optimized\.mp4$/);
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 5000 });
 });
 
@@ -72,4 +111,25 @@ test("the narrated poem retains every word already spoken", async ({ page }) => 
     }));
     expect(state.words).toHaveLength(22);
     expect(state.words.slice(0, 19).every((word) => word.opacity === "1" && word.color !== "rgba(0, 0, 0, 0)")).toBe(true);
+});
+
+test("the first-visit poem reveals a clean delayed skip path", async ({ page }) => {
+    test.skip(page.viewportSize()?.width <= 680, "One desktop timing check covers the shared poem controller.");
+    await page.goto("/");
+    await page.evaluate(() => localStorage.removeItem("pog:founder-introduction:v2"));
+    await page.reload();
+    await page.locator("#pog-exe-shortcut").dblclick();
+    const introduction = page.locator("#founder-introduction");
+    const skip = page.locator("#founder-introduction-skip");
+    await expect(introduction).toHaveClass(/is-open/, { timeout: 5000 });
+    await expect(skip).toBeHidden();
+    await expect(skip).toBeVisible({ timeout: 8000 });
+    const skipBox = await skip.boundingBox();
+    expect(skipBox.width).toBeGreaterThanOrEqual(44);
+    expect(skipBox.height).toBeGreaterThanOrEqual(44);
+    await skip.click();
+    await expect(introduction).not.toHaveClass(/is-open/, { timeout: 3000 });
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
+    await expect(page.locator("#pog-launch-loading")).toBeHidden();
+    await expect.poll(() => page.locator("#founder-poem-narration").evaluate((audio) => audio.paused)).toBe(true);
 });

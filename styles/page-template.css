@@ -66,7 +66,7 @@
     .menu-settings-trigger { display: none; }
 }
 .page-template .menu-settings :is(.journey-motion,.menu-settings-trigger):is(:hover,:focus,:focus-visible,:active) {
-    outline: none; border: 0; box-shadow: none; background: transparent; color: #673caf;
+    outline: none; border: 0; box-shadow: none; background: transparent; color: #9b70df;
 }
 .page-template :is(.founder-origin-media,.founder-journey-media,.journey-space) {
     grid-area: auto; width: 100%; max-width: none; height: 100%; min-height: 0; margin: 0;
@@ -111,9 +111,9 @@
     transform: rotate(180deg);
 }
 .page-template button:disabled { opacity: .3; cursor: default; }
-.page-template button:focus-visible { outline: 2px solid #673CAF; outline-offset: 3px; }
+.page-template button:focus-visible { outline: 2px solid #9b70df; outline-offset: 3px; }
 .page-template :is(.page-controls button,.founder-origin-control,.founder-journey-control):is(:hover,:active):not(:disabled) {
-    background: #000; border-color: #673CAF; color: #673CAF;
+    background: #000; border-color: #9b70df; color: #9b70df;
 }
 .page-template .journey-space .journey-object.is-hovered { color: #a981e8; }
 .page-template .room-watch { justify-self: center; font-size: 10px; margin: 0; }
@@ -132,6 +132,17 @@
     }
     .page-template :is(.founder-origin-copy,.founder-journey-copy) p {
         width: 100%; max-width: none; text-align: right;
+        font-size: 16px;
+        line-height: 1.55;
+    }
+    .page-template :is(.founder-origin-frame-header,.founder-journey-entry-header) h2 {
+        font-size: 14px;
+        line-height: 1.45;
+    }
+    .page-template :is(.founder-origin-control,.founder-journey-control,.page-controls button) {
+        min-height: 44px;
+        height: 44px;
+        font-size: 12px;
     }
     .page-template .field-notes-intro { font-size: 11px; }
     .page-controls-center { gap: 12px; }
@@ -165,10 +176,10 @@
     box-shadow: none !important;
 }
 .world-room :is(.archive-bottom-menu,.journey-menu-return,.founder-origin-return,.founder-journey-return,.page-controls-center > button):is(:hover,:focus,:focus-visible,:active,[aria-expanded="true"]) {
-    color: #673CAF; border-color: #673CAF !important;
+    color: #9b70df; border-color: #9b70df !important;
 }
 .world-room :is(.archive-bottom-menu,.journey-menu-return,.founder-origin-return,.founder-journey-return,.page-controls-center > button):focus-visible {
-    outline: 2px solid #673CAF !important; outline-offset: 3px;
+    outline: 2px solid #9b70df !important; outline-offset: 3px;
 }
 .page-quick-menu {
     position: fixed; z-index: 10000; inset: auto; margin: 0; border: 1px solid rgba(255,255,255,.25); width: 240px; max-width: calc(100vw - 24px);

@@ -94,6 +94,10 @@ body.founder-introduction-active {
     z-index: 2;
     top: clamp(24px, 5vh, 48px);
     right: clamp(24px, 5vw, 64px);
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 12px;
     color: rgba(255, 255, 255, 0.55) !important;
 }
 
