@@ -10,6 +10,15 @@ test("selects an appropriate launch asset and performance tier for the device", 
     await expect(page.locator("html")).toHaveAttribute("data-performance-tier", /^(low|balanced|high)$/);
 });
 
+test("loading preview opens the main menu after the launch screen", async ({ page }) => {
+    await page.addInitScript(() => localStorage.removeItem("pog:founder-introduction:v2"));
+    await page.goto("/?preview=loading");
+    await expect(page.locator("#pog-launch-loading")).toBeVisible({ timeout: 2500 });
+    await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 5000 });
+    await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#pog-launch-loading")).toBeHidden({ timeout: 2500 });
+});
+
 test("the launch instruction matches the input mode and is remembered after use", async ({ page }) => {
     await page.goto("/");
     const isTouch = page.viewportSize()?.width <= 680;

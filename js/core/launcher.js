@@ -6,6 +6,7 @@ const LAUNCH_START_DELAY = 180;
 const LAUNCH_LOADING_DURATION = 1500;
 const LAUNCH_BLACKOUT_FADE_DURATION = 250;
 const LAUNCH_BLACK_HOLD_DURATION = 100;
+const LOADING_PREVIEW_ENABLED = new URLSearchParams(window.location.search).get("preview") === "loading";
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
 const snap = (value) => Math.round(value / GRID) * GRID;
@@ -166,7 +167,7 @@ export function initLauncher() {
             // Keep the loading layer mounted until the destination is fully
             // visible. Removing it after an arbitrary frame count exposed the
             // desktop for a single frame while the menu was still fading in.
-            window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
+            window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher", preview: LOADING_PREVIEW_ENABLED ? "loading" : null } }));
             await waitForDestination();
             loading.classList.add("is-exiting");
             loading.classList.remove("is-open");
@@ -174,7 +175,7 @@ export function initLauncher() {
             loading.hidden = true;
             loading.classList.remove("is-blackout", "is-exiting");
         } else {
-            window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher" } }));
+            window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher", preview: LOADING_PREVIEW_ENABLED ? "loading" : null } }));
         }
         launching = false;
     };
@@ -222,6 +223,7 @@ export function initLauncher() {
     shortcut.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") { event.preventDefault(); launch(); }
     });
+    if (LOADING_PREVIEW_ENABLED) window.setTimeout(() => launch(), 0);
     desktop.addEventListener("pointerdown", (event) => { if (event.target === desktop) shortcut.classList.remove("is-selected"); });
     window.addEventListener("resize", () => { render(); save(); });
     if (shortcutHint) shortcutHint.textContent = isTouchLauncher ? "TAP TO OPEN" : "DOUBLE CLICK TO OPEN";

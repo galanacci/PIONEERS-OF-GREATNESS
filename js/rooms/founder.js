@@ -282,9 +282,10 @@ export function initOpening() {
 
     async function enterOpeningPath(event) {
         replaying = false;
-        const returning = hasCompletedIntroduction();
+        const loadingPreview = event?.detail?.preview === "loading";
+        const returning = loadingPreview || hasCompletedIntroduction();
         const launchedFromDesktop = event?.detail?.source === "launcher";
-        replayDestination = returning ? "reveal" : "menu";
+        replayDestination = loadingPreview ? "menu" : returning ? "reveal" : "menu";
         returnFocus = null;
         if (!launchedFromDesktop) window.dispatchEvent(new CustomEvent("pog:show-transition"));
         if (returning) {
