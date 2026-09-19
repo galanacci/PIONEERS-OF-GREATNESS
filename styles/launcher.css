@@ -176,6 +176,10 @@ body:has(.menu-overlay.is-open) .pog-desktop { visibility: hidden; pointer-event
 body:has(.pog-launch-loading.is-open) .pog-desktop { visibility: hidden; pointer-events: none; }
 .loading-preview .pog-desktop { visibility: hidden; pointer-events: none; }
 
+/* An externally launched PoG.EXE never exposes PoG's own desktop. Its EXIT
+   route returns to the desktop that launched it instead. */
+.external-entry .pog-desktop { visibility: hidden; pointer-events: none; }
+
 @media (max-width: 680px) {
     .pog-exe-shortcut { width: 90px; min-height: 98px; font-size: 11px; }
     .pog-exe-shortcut img { width: 66px; height: 66px; }

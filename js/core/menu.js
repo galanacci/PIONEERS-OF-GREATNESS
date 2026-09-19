@@ -1,4 +1,5 @@
 import { COLLECTIONS_PREVIEW_ENABLED, isKnownRoom } from "../room-registry.js";
+import { ENTRY_CONTEXT, exitToEntrySource } from "./entry-context.js";
 
 export function initMenu() {
     const toggle = document.querySelector(".menu-toggle");
@@ -99,6 +100,18 @@ export function initMenu() {
         if (!keepAmbience) window.dispatchEvent(new CustomEvent("pog:ambience-stop"));
         if (focusToggle) toggle.focus();
     };
+    const exitExperience = () => {
+        if (ENTRY_CONTEXT.returnUrl) {
+            // Keep the PoG menu on screen until navigation commits so an
+            // externally launched session never flashes the hidden PoG desktop.
+            backgroundVideo?.pause();
+            window.dispatchEvent(new CustomEvent("pog:ambience-stop"));
+            exitToEntrySource();
+            return;
+        }
+
+        close();
+    };
     const activate = (item) => {
         select(items.indexOf(item));
         if (item.getAttribute("aria-disabled") === "true") {
@@ -117,7 +130,7 @@ export function initMenu() {
         else if (item.dataset.menuAction === "room" && isKnownRoom(item.dataset.roomTarget)) {
             close(false, true);
             window.dispatchEvent(new CustomEvent("pog:open-room", { detail: { roomId: item.dataset.roomTarget } }));
-        } else if (item.dataset.menuAction === "exit") close();
+        } else if (item.dataset.menuAction === "exit") exitExperience();
     };
     select(selected);
     window.addEventListener('pog:page-waitlist',event=>{
@@ -174,6 +187,10 @@ export function initMenu() {
         } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
             event.preventDefault(); select(selected + (event.key === "ArrowDown" ? 1 : -1), true); items[selected].focus();
         } else if (event.key === "Enter") { event.preventDefault(); activate(items[selected]); }
-        else if (event.key === "Escape") { event.preventDefault(); close(); }
+        else if (event.key === "Escape") {
+            event.preventDefault();
+            if (ENTRY_CONTEXT.returnUrl) exitExperience();
+            else close();
+        }
     });
 }
