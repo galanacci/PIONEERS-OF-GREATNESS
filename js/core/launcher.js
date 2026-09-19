@@ -7,6 +7,7 @@ const LAUNCH_LOADING_DURATION = 1500;
 const LAUNCH_BLACKOUT_FADE_DURATION = 250;
 const LAUNCH_BLACK_HOLD_DURATION = 100;
 const LOADING_PREVIEW_ENABLED = new URLSearchParams(window.location.search).get("preview") === "loading";
+if (LOADING_PREVIEW_ENABLED) document.documentElement.classList.add("loading-preview");
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
 const snap = (value) => Math.round(value / GRID) * GRID;
