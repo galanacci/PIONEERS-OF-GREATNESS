@@ -8,6 +8,7 @@ const LAUNCH_BLACKOUT_FADE_DURATION = 250;
 const LAUNCH_BLACK_HOLD_DURATION = 100;
 const LOADING_PREVIEW_ENABLED = new URLSearchParams(window.location.search).get("preview") === "loading";
 if (LOADING_PREVIEW_ENABLED) document.documentElement.classList.add("loading-preview");
+const releaseLoadingPreview = () => document.documentElement.classList.remove("loading-preview");
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
 const snap = (value) => Math.round(value / GRID) * GRID;
@@ -170,6 +171,7 @@ export function initLauncher() {
             // desktop for a single frame while the menu was still fading in.
             window.dispatchEvent(new CustomEvent("pog:start-requested", { detail: { source: "launcher", preview: LOADING_PREVIEW_ENABLED ? "loading" : null } }));
             await waitForDestination();
+            if (LOADING_PREVIEW_ENABLED) window.addEventListener("pog:ambience-stop", releaseLoadingPreview, { once: true });
             loading.classList.add("is-exiting");
             loading.classList.remove("is-open");
             loading.setAttribute("aria-hidden", "true");

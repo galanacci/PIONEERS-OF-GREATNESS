@@ -17,6 +17,9 @@ test("loading preview opens the main menu after the launch screen", async ({ pag
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 5000 });
     await expect(page.locator("#founder-introduction")).not.toHaveClass(/is-open/);
     await expect(page.locator("#pog-launch-loading")).toBeHidden({ timeout: 2500 });
+    await page.getByRole("menuitem", { name: "EXIT" }).click();
+    await expect(page.locator("#menu-overlay")).not.toHaveClass(/is-open/);
+    await expect(page.locator("#pog-desktop")).toHaveCSS("visibility", "visible");
 });
 
 test("the launch instruction matches the input mode and is remembered after use", async ({ page }) => {
