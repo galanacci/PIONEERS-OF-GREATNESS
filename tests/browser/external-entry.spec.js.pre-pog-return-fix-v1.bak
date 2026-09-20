@@ -28,11 +28,11 @@ test("EXIT returns a GALANACCI-launched PoG session to galanacci.com", async ({ 
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/, { timeout: 5000 });
 
     await Promise.all([
-        page.waitForURL("https://galanacci.com/?entry=pog"),
+        page.waitForURL("https://galanacci.com/"),
         page.getByRole("menuitem", { name: "EXIT" }).click()
     ]);
 
-    expect(page.url()).toBe("https://galanacci.com/?entry=pog");
+    expect(page.url()).toBe("https://galanacci.com/");
 });
 
 test("direct PoG sessions still EXIT back to the PoG desktop", async ({ page }) => {

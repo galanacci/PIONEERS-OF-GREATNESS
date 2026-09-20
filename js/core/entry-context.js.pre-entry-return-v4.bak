@@ -6,7 +6,7 @@ const SOURCE_CONFIG = Object.freeze({
         source: "galanacci",
         bypassDesktop: true,
         destination: "menu",
-        returnUrl: "https://galanacci.com/?entry=pog"
+        returnUrl: "https://galanacci.com/?return=pog"
     })
 });
 
