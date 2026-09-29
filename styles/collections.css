@@ -24,9 +24,11 @@
 .collections-product-page.is-visible { opacity: 1; visibility: visible; transform: translateY(0); transition-delay: 0s; pointer-events: auto; }
 .collections-product-layout { position: relative; width: 100%; height: 100%; min-height: 0; }
 .collections-product-gallery { position: absolute; inset: 0; }
-.collections-product-images { position: absolute; inset: clamp(58px,7vh,84px) clamp(110px,12vw,230px) clamp(205px,23vh,250px); }
-.collections-product-image { position: absolute; inset: 0; margin: 0; opacity: 0; visibility: hidden; transform: translateX(14px); transition: opacity 260ms ease,transform 360ms cubic-bezier(.22,.72,.18,1),visibility 0s linear 360ms; }
-.collections-product-image.is-active { opacity: 1; visibility: visible; transform: translateX(0); transition-delay: 0s; }
+.collections-product-images { position: absolute; inset: clamp(58px,7vh,84px) clamp(110px,12vw,230px) clamp(205px,23vh,250px); container-type: size; }
+.collections-product-image { position: absolute; top: 50%; left: 50%; width: min(100cqw,80cqh); aspect-ratio: 4 / 5; margin: 0; opacity: 0; visibility: hidden; transform: translate(calc(-50% + 14px),-50%); transition: opacity 260ms ease,transform 360ms cubic-bezier(.22,.72,.18,1),visibility 0s linear 360ms; }
+.collections-product-image.is-active { opacity: 1; visibility: visible; transform: translate(-50%,-50%); transition-delay: 0s; }
+.collections-product-image[hidden], .collections-image-step[hidden], .collections-image-indicators span[hidden] { display: none; }
+.collections-product-photo { display: block; width: 100%; height: 100%; object-fit: cover; }
 .collections-product-placeholder { position: relative; display: grid; place-content: center; justify-items: center; box-sizing: border-box; width: 100%; height: 100%; padding: 48px; background: #050505; color: rgba(255,255,255,.2); text-align: center; }
 .collections-placeholder-view, .collections-placeholder-title, .collections-placeholder-copy { font-family: var(--font-brand); }
 .collections-placeholder-view { position: absolute; top: 20px; right: 20px; font-size: 8px; letter-spacing: .16em; }

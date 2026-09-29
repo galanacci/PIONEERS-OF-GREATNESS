@@ -2,10 +2,32 @@
   "products": [
     {
       "id": "preview-piece-01",
-      "title": "COLLECTION PIECE 01",
+      "title": "FORGE DENIM JACKET",
       "type": "OUTERWEAR STUDY",
       "price": "PRIVATE PREVIEW",
       "model": "src/collections/placeholders/GLN_DENIM_JACKET.glb",
+      "images": [
+        {
+          "src": "src/collections/products/forge-denim-jacket-front-cutout.webp",
+          "alt": "Front view of the PIONEERS OF GREATNESS FORGE denim jacket"
+        },
+        {
+          "src": "src/collections/products/forge-denim-jacket-back-cutout.webp",
+          "alt": "Back view of the PIONEERS OF GREATNESS FORGE denim jacket"
+        },
+        {
+          "src": "src/collections/products/forge-denim-jacket-detail.webp",
+          "alt": "Close-up detail of the FORGE denim jacket collar, stitching and chest pocket"
+        },
+        {
+          "src": "src/collections/products/forge-denim-jacket-editorial-japan-2025-01.webp",
+          "alt": "FORGE DENIM JACKET editorial at a railway crossing in Japan, 2025"
+        },
+        {
+          "src": "src/collections/products/forge-denim-jacket-editorial-japan-2025-02.webp",
+          "alt": "FORGE DENIM JACKET editorial at Shibuya Crossing in Japan, 2025"
+        }
+      ],
       "description": "A temporary garment study used to establish the PIONEERS OF GREATNESS collection showroom. Final product story, materials and release details will replace this preview copy.",
       "colours": ["BLACK"],
       "sizes": ["S", "M", "L", "XL"]

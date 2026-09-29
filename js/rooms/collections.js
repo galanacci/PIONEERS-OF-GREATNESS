@@ -31,12 +31,14 @@ export function initCollections() {
     const cartCount = document.getElementById("collections-cart-count");
     const cartEmpty = document.getElementById("collections-cart-empty");
     const cartList = document.getElementById("collections-cart-list");
-    const placeholderTitles = [...page.querySelectorAll("[data-collections-image-title]")];
+    const imageContainer = page.querySelector(".collections-product-images");
+    const indicatorContainer = page.querySelector(".collections-image-indicators");
     const productImages = [...page.querySelectorAll("[data-collections-product-image]")];
+    const placeholderTemplates = productImages.map((image) => image.firstElementChild.cloneNode(true));
     const imageIndicators = [...page.querySelectorAll(".collections-image-indicators span")];
     const actionButtons = [...page.querySelectorAll("[data-collections-action]")];
     const panels = [...page.querySelectorAll("[data-collections-panel]")];
-    if (!type || !title || !price || !description || !spec || !drawer || !sizeOptions || !sizeFeedback || !cartCount || !cartEmpty || !cartList) return;
+    if (!type || !title || !price || !description || !spec || !drawer || !sizeOptions || !sizeFeedback || !cartCount || !cartEmpty || !cartList || !imageContainer || !indicatorContainer) return;
 
     let products = [];
     let scene;
@@ -45,6 +47,7 @@ export function initCollections() {
     let selected = -1;
     let hovered = -1;
     let imageIndex = 0;
+    let imageCount = productImages.length;
     let openPanel = null;
     let readySent = false;
     const cart = [];
@@ -56,9 +59,25 @@ export function initCollections() {
     };
 
     const setProductImage = (index) => {
-        imageIndex = (index + productImages.length) % productImages.length;
+        imageIndex = (index + imageCount) % imageCount;
         productImages.forEach((image, itemIndex) => image.classList.toggle("is-active", itemIndex === imageIndex));
         imageIndicators.forEach((indicator, itemIndex) => indicator.classList.toggle("is-active", itemIndex === imageIndex));
+    };
+
+    const ensureImageSlots = (count) => {
+        while (productImages.length < count) {
+            const image = document.createElement("figure");
+            image.className = "collections-product-image";
+            image.dataset.collectionsProductImage = "";
+            image.hidden = true;
+            imageContainer.append(image);
+            productImages.push(image);
+
+            const indicator = document.createElement("span");
+            indicator.hidden = true;
+            indicatorContainer.append(indicator);
+            imageIndicators.push(indicator);
+        }
     };
 
     const closePanels = () => {
@@ -148,7 +167,25 @@ export function initCollections() {
         price.textContent = product.price;
         description.textContent = product.description;
         spec.textContent = `${product.colours.join(" / ")} · PLACEHOLDER MATERIAL AND CONSTRUCTION DETAILS`;
-        placeholderTitles.forEach((node) => { node.textContent = product.title; });
+        imageCount = product.images?.length || placeholderTemplates.length;
+        ensureImageSlots(imageCount);
+        productImages.forEach((image, itemIndex) => {
+            const asset = product.images?.[itemIndex];
+            const content = asset ? document.createElement("img") : (placeholderTemplates[itemIndex] || placeholderTemplates.at(-1)).cloneNode(true);
+            if (asset) {
+                content.className = "collections-product-photo";
+                content.src = asset.src;
+                content.alt = asset.alt;
+                content.decoding = "async";
+            } else {
+                content.querySelector("[data-collections-image-title]").textContent = product.title;
+            }
+            image.replaceChildren(content);
+            image.hidden = itemIndex >= imageCount;
+        });
+        imageIndicators.forEach((indicator, itemIndex) => { indicator.hidden = itemIndex >= imageCount; });
+        imagePrevious.hidden = imageCount < 2;
+        imageNext.hidden = imageCount < 2;
         buildSizes(product);
         setProductImage(0);
     };
