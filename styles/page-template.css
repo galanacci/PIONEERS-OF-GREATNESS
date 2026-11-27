@@ -223,10 +223,11 @@
 }
 .field-notes-content.archive-heading-right > .room-divider { display: none; }
 .world-room :is(.page-template,.archive-heading-right) > .room-return {
-    width: 82px;
     font-size: 0; display: grid; align-items: center; justify-items: start; text-decoration: none;
 }
-.world-room :is(.page-template,.archive-heading-right) > .room-return::after {
+/* Every room and nested viewer uses the same back-label treatment. */
+.world-room .room-return { min-width: 82px; }
+.world-room .room-return::after {
     content: 'BACK';
     position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
     color: #888;
