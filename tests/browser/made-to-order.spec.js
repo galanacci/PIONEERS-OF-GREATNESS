@@ -39,7 +39,7 @@ test("enquiry requires one size and repeats the exact international price and re
     await expect(page.locator(".collections-bank-details")).not.toContainText("00-00-00");
     const link = page.getByRole("link", { name: "EMAIL MADE-TO-ORDER ENQUIRY" });
     const href = decodeURIComponent(await link.getAttribute("href"));
-    expect(href.startsWith("mailto:admin@galanacci.com?")).toBe(true);
+    expect(href.startsWith("mailto:service@pioneersofgreatness.com?")).toBe(true);
     expect(href).toContain("Size: L");
     expect(href).toContain("Amount: £205.00 GBP");
     const reference = href.match(/POG-[A-F0-9]{12}/)[0];
