@@ -6,7 +6,7 @@ async function openForge(page, configured = false, testMode = false) {
         const response = await route.fetch();
         const data = await response.json();
         // Synthetic values stay in this browser fixture, never production data.
-        data.madeToOrder = { enquiryEmail: "orders@example.com", bank: {
+        data.madeToOrder = { enquiryEmail: data.madeToOrder.enquiryEmail, bank: {
             accountName: "TEST ACCOUNT", bankName: "TEST BANK", sortCode: "00-00-00",
             accountNumber: "00000000", iban: "TEST-IBAN", bic: "TEST-BIC"
         }};
@@ -39,6 +39,7 @@ test("enquiry requires one size and repeats the exact international price and re
     await expect(page.locator(".collections-bank-details")).not.toContainText("00-00-00");
     const link = page.getByRole("link", { name: "EMAIL MADE-TO-ORDER ENQUIRY" });
     const href = decodeURIComponent(await link.getAttribute("href"));
+    expect(href.startsWith("mailto:admin@galanacci.com?")).toBe(true);
     expect(href).toContain("Size: L");
     expect(href).toContain("Amount: £205.00 GBP");
     const reference = href.match(/POG-[A-F0-9]{12}/)[0];
