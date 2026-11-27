@@ -25,7 +25,7 @@
     <meta name="twitter:image:alt" content="PIONEERS OF GREATNESS — This ripple will be a tsunami">
     <meta name="theme-color" content="#000000">
     <link rel="canonical" href="https://pioneersofgreatness.com/">
-    <link rel="stylesheet" href="style.css?v=20260919-loading-preview-2">
+    <link rel="stylesheet" href="style.css?v=20261127-back-label-all-rooms">
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -82,7 +82,7 @@
                 <li><button type="button" class="menu-item" role="menuitem" data-menu-action="exit">EXIT</button></li>
             </ul>
             <div class="menu-waitlist" aria-label="Join the waitlist" hidden></div>
-            <p class="menu-version">VERSION_044</p>
+            <p class="menu-version">VERSION_052</p>
             <div class="menu-audio">
             <span class="audio-track"><span aria-hidden="true">♪</span> MUHAMMAD ALI TRAINING</span>
             <button type="button" class="audio-toggle" aria-label="Turn training ambience on" aria-pressed="false">
@@ -184,19 +184,11 @@
             <div id="collections-stage" class="collections-stage" aria-label="Interactive Collections showroom" aria-busy="true">
                 <div id="collections-canvas" class="collections-canvas" aria-hidden="true"></div>
                 <p id="collections-status" class="collections-status" role="status" aria-live="polite">PREPARING COLLECTION…</p>
-                <div id="collections-room-cart-drawer" class="collections-product-drawer collections-room-cart-drawer" aria-hidden="true">
-                    <section class="collections-product-panel">
-                        <p class="collections-panel-label">CART</p>
-                        <p id="collections-room-cart-empty" class="collections-cart-empty">YOUR CART IS EMPTY</p>
-                        <ul id="collections-room-cart-list" class="collections-cart-list"></ul>
-                    </section>
-                </div>
                 <div class="collections-rail">
                     <div class="collections-room-actions" role="navigation" aria-label="Collection actions">
                         <button type="button" class="collections-room-action" aria-disabled="true">DETAILS</button>
-                        <button type="button" class="collections-room-action collections-cart-action" data-collections-room-cart aria-expanded="false" aria-label="Cart, 0 items">
-                            <span>CART</span>
-                            <span id="collections-room-cart-count">0</span>
+                        <button type="button" class="collections-room-action collections-cart-action" disabled aria-label="Select a piece in the collection">
+                            <span>SELECT A PIECE</span>
                         </button>
                         <button type="button" class="collections-room-action" aria-disabled="true">SIZE</button>
                     </div>
@@ -240,17 +232,13 @@
                             <p id="collections-product-price" class="collections-product-price">PRIVATE PREVIEW</p>
                         </div>
                     </div>
-                    <div id="collections-product-drawer" class="collections-product-drawer" aria-hidden="true">
+                    <div id="collections-product-drawer" class="collections-product-drawer" aria-hidden="true" inert>
                         <section class="collections-product-panel" data-collections-panel="details" hidden>
                             <p class="collections-panel-label">PRODUCT DETAILS</p>
                             <p id="collections-product-description" class="collections-product-description"></p>
                             <p id="collections-product-spec" class="collections-product-spec"></p>
                         </section>
-                        <section class="collections-product-panel" data-collections-panel="cart" hidden>
-                            <p class="collections-panel-label">CART</p>
-                            <p id="collections-cart-empty" class="collections-cart-empty">YOUR CART IS EMPTY</p>
-                            <ul id="collections-cart-list" class="collections-cart-list"></ul>
-                        </section>
+                        <section class="collections-product-panel" data-collections-panel="enquiry" hidden></section>
                         <section class="collections-product-panel" data-collections-panel="size" hidden>
                             <p class="collections-panel-label">SELECT SIZE</p>
                             <div id="collections-size-options" class="collections-size-options" role="group" aria-label="Product sizes"></div>
@@ -260,11 +248,10 @@
                     <footer class="collections-product-footer">
                         <div class="collections-product-actions" role="navigation" aria-label="Product actions">
                             <button type="button" class="collections-product-action" data-collections-action="details" aria-expanded="false">DETAILS</button>
-                            <button type="button" class="collections-product-action collections-cart-action" data-collections-action="cart" aria-expanded="false" aria-label="Cart, 0 items">
-                                <span>CART</span>
-                                <span id="collections-cart-count">0</span>
-                            </button>
                             <button type="button" class="collections-product-action" data-collections-action="size" aria-expanded="false">SIZE</button>
+                            <button type="button" class="collections-product-action" data-collections-action="enquiry" aria-expanded="false" aria-label="Made-to-order enquiry">
+                                <span>MADE-TO-ORDER ENQUIRY</span>
+                            </button>
                         </div>
                         <p class="collections-product-credit room-navigation-credit">© 2026 A GALANACCI® COMPANY</p>
                     </footer>
