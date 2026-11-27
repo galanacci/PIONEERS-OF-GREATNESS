@@ -20,24 +20,52 @@
           {
             "id": "uk",
             "label": "United Kingdom",
-            "currency": "GBP",
-            "totalMinor": null,
-            "deliveryIncluded": null,
+            "shippingMinor": 0,
+            "shippingEstimate": false,
             "international": false
           },
           {
-            "id": "international",
-            "label": "International",
-            "currency": "GBP",
-            "totalMinor": null,
-            "deliveryIncluded": null,
+            "id": "europe",
+            "label": "Europe (outside UK)",
+            "shippingMinor": 2000,
+            "shippingEstimate": true,
+            "international": true
+          },
+          {
+            "id": "north-america",
+            "label": "USA & Canada",
+            "shippingMinor": 3000,
+            "shippingEstimate": true,
+            "international": true
+          },
+          {
+            "id": "asia",
+            "label": "Asia",
+            "shippingMinor": 3500,
+            "shippingEstimate": true,
+            "international": true
+          },
+          {
+            "id": "oceania",
+            "label": "Australia & New Zealand",
+            "shippingMinor": 3500,
+            "shippingEstimate": true,
+            "international": true
+          },
+          {
+            "id": "rest-of-world",
+            "label": "Rest of the world",
+            "shippingMinor": 4000,
+            "shippingEstimate": true,
             "international": true
           }
-        ]
+        ],
+        "basePriceMinor": 17500,
+        "currency": "GBP"
       },
       "title": "FORGE DENIM JACKET",
       "type": "OUTERWEAR STUDY",
-      "price": "PRIVATE PREVIEW",
+      "price": "£175.00",
       "model": "src/collections/placeholders/GLN_DENIM_JACKET.glb",
       "images": [
         {

@@ -222,6 +222,7 @@ export function initCollections() {
             });
             scene.setFocus(focused, null);
             stage.classList.add("is-ready");
+            if (new URLSearchParams(window.location.search).get("payment-test") === "forge") selectProduct(0);
             sendReady();
         } catch (error) {
             console.error(error);
