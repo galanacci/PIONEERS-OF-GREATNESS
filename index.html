@@ -190,7 +190,6 @@
                         <button type="button" class="collections-room-action collections-cart-action" disabled aria-label="Select a piece in the collection">
                             <span>SELECT A PIECE</span>
                         </button>
-                        <button type="button" class="collections-room-action" aria-disabled="true">SIZE</button>
                     </div>
                     <p class="room-navigation-credit">© 2026 A GALANACCI® COMPANY</p>
                 </div>
@@ -238,17 +237,17 @@
                             <p id="collections-product-description" class="collections-product-description"></p>
                             <p id="collections-product-spec" class="collections-product-spec"></p>
                         </section>
-                        <section class="collections-product-panel" data-collections-panel="enquiry" hidden></section>
-                        <section class="collections-product-panel" data-collections-panel="size" hidden>
-                            <p class="collections-panel-label">SELECT SIZE</p>
-                            <div id="collections-size-options" class="collections-size-options" role="group" aria-label="Product sizes"></div>
-                            <p id="collections-size-feedback" class="collections-size-feedback" aria-live="polite"></p>
+                        <section class="collections-product-panel" data-collections-panel="enquiry" hidden>
+                            <fieldset class="collections-order-size">
+                                <legend class="collections-panel-label">SELECT SIZE</legend>
+                                <div id="collections-size-options" class="collections-size-options" role="group" aria-label="Product sizes"></div>
+                                <p id="collections-size-feedback" class="collections-size-feedback" aria-live="polite"></p>
+                            </fieldset>
                         </section>
                     </div>
                     <footer class="collections-product-footer">
                         <div class="collections-product-actions" role="navigation" aria-label="Product actions">
                             <button type="button" class="collections-product-action" data-collections-action="details" aria-expanded="false">DETAILS</button>
-                            <button type="button" class="collections-product-action" data-collections-action="size" aria-expanded="false">SIZE</button>
                             <button type="button" class="collections-product-action" data-collections-action="enquiry" aria-expanded="false" aria-label="Made-to-order enquiry">
                                 <span>MADE-TO-ORDER ENQUIRY</span>
                             </button>

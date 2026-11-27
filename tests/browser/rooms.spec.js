@@ -27,11 +27,10 @@ test("Collections stays locked publicly and unlocks through its preview query", 
     await expect(page.locator("#room-transition")).not.toHaveClass(/is-active/, { timeout: 30000 });
     await expect(page.locator(".collections-product-chip")).toHaveCount(0);
     await expect(page.locator("#collections-model-labels")).toHaveCount(0);
-    await expect(page.locator(".collections-room-actions .collections-room-action")).toHaveCount(3);
+    await expect(page.locator(".collections-room-actions .collections-room-action")).toHaveCount(2);
     await expect(page.locator(".collections-discovery")).toHaveCount(0);
     await expect(page.locator(".collections-rail .room-navigation-credit")).toBeVisible();
     await expect(page.locator(".collections-room-actions .collections-room-action").first()).toHaveAttribute("aria-disabled", "true");
-    await expect(page.locator(".collections-room-actions .collections-room-action").last()).toHaveAttribute("aria-disabled", "true");
     await page.evaluate(() => {
         window.__collectionSounds = [];
         window.addEventListener("pog:menu-sound", (event) => window.__collectionSounds.push(event.detail?.name));
@@ -70,14 +69,13 @@ test("Collections stays locked publicly and unlocks through its preview query", 
         expect(Number.parseFloat(await page.locator("#collections-product-description").evaluate((node) => getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(14);
         expect(Number.parseFloat(await page.locator(".collections-panel-label").first().evaluate((node) => getComputedStyle(node).fontSize))).toBeGreaterThanOrEqual(12);
     }
-    await page.locator('[data-collections-action="size"]').click();
+    await page.locator('[data-collections-action="enquiry"]').click();
     await expect(page.locator("#collections-size-options button")).toHaveCount(4);
     if (testInfo.project.name === "mobile") {
         expect((await page.locator("#collections-size-options button").first().boundingBox()).height).toBeGreaterThanOrEqual(48);
     }
     await page.locator("#collections-size-options button").first().click();
     await expect(page.locator("#collections-size-options button").first()).toHaveAttribute("aria-pressed", "true");
-    await page.locator('[data-collections-action="enquiry"]').click();
     await expect(page.locator(".collections-order-instructions")).toContainText("private preview");
     await page.locator(".collections-image-next").click();
     await expect(page.locator("[data-collections-product-image]").nth(1)).toHaveClass(/is-active/);

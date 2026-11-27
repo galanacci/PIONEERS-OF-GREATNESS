@@ -28,6 +28,7 @@ export function initMadeToOrder(page) {
     const panel = page.querySelector('[data-collections-panel="enquiry"]');
     const price = page.querySelector("#collections-product-price");
     const action = page.querySelector('[data-collections-action="enquiry"]');
+    const sizeFields = panel.querySelector(".collections-order-size");
     panel.replaceChildren();
     const heading = document.createElement("h3");
     heading.id = "collections-order-heading";
@@ -66,7 +67,7 @@ export function initMadeToOrder(page) {
     draft.readOnly = true;
     draft.setAttribute("aria-label", "Test enquiry preview");
     draft.hidden = true;
-    panel.append(testBanner, heading, marketLabel, select, summary, breakdown, instructions, bankList, email, testPreview, draft, copy, feedback);
+    panel.append(testBanner, heading, sizeFields, marketLabel, select, summary, breakdown, instructions, bankList, email, testPreview, draft, copy, feedback);
     let product, config = {}, size = null, reference = "", details = "";
     let testMode = false;
     testPreview.addEventListener("click", () => {
