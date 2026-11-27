@@ -98,6 +98,60 @@ test("Collections stays locked publicly and unlocks through its preview query", 
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });
 
+test("FORGE DENIM JACKET shows product and Japan editorial images without changing other pieces", async ({ page }) => {
+    test.setTimeout(60000);
+    await page.goto("/?preview=collections");
+    await openMenu(page);
+    await page.getByRole("menuitem", { name: "COLLECTIONS" }).click();
+    await expect(page.locator("#collections-stage")).toHaveClass(/is-ready/, { timeout: 20000 });
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:collections-open-product", {
+        detail: { index: 0 }
+    })));
+    await expect(page.locator("#collections-product-title")).toHaveText("FORGE DENIM JACKET");
+    const photos = page.locator(".collections-product-photo");
+    const expectFourFiveFrame = async () => {
+        const frame = await page.locator("[data-collections-product-image].is-active").boundingBox();
+        expect(frame).not.toBeNull();
+        expect(frame.width / frame.height).toBeCloseTo(4 / 5, 2);
+    };
+    await expect(photos).toHaveCount(5);
+    await expectFourFiveFrame();
+    await expect.poll(() => photos.first().evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
+    await expect(photos.first()).toHaveAttribute("src", /front-cutout\.webp$/);
+    await expect(photos.first()).toHaveAttribute("alt", /Front view.*FORGE denim jacket/);
+    await expect(page.locator("[data-collections-product-image]").nth(4)).not.toHaveAttribute("hidden");
+    await expect(page.locator(".collections-image-indicators span").nth(4)).toBeVisible();
+    await page.locator(".collections-image-next").click();
+    await expect(page.locator("[data-collections-product-image]").nth(1)).toHaveClass(/is-active/);
+    await expectFourFiveFrame();
+    await expect.poll(() => photos.nth(1).evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
+    await expect(photos.nth(1)).toHaveAttribute("src", /back-cutout\.webp$/);
+    await page.locator(".collections-image-next").click();
+    await expect(page.locator("[data-collections-product-image]").nth(2)).toHaveClass(/is-active/);
+    await expectFourFiveFrame();
+    await expect.poll(() => photos.nth(2).evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
+    await expect(photos.nth(2)).toHaveAttribute("src", /detail\.webp$/);
+    await page.locator(".collections-image-next").click();
+    await expect(page.locator("[data-collections-product-image]").nth(3)).toHaveClass(/is-active/);
+    await expectFourFiveFrame();
+    await expect.poll(() => photos.nth(3).evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
+    await expect(photos.nth(3)).toHaveAttribute("src", /editorial-japan-2025-01\.webp$/);
+    await page.locator(".collections-image-next").click();
+    await expect(page.locator("[data-collections-product-image]").nth(4)).toHaveClass(/is-active/);
+    await expectFourFiveFrame();
+    await expect.poll(() => photos.nth(4).evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
+    await expect(photos.nth(4)).toHaveAttribute("src", /editorial-japan-2025-02\.webp$/);
+    await page.locator(".collections-image-next").click();
+    await expect(page.locator("[data-collections-product-image]").first()).toHaveClass(/is-active/);
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:collections-open-product", {
+        detail: { index: 1 }
+    })));
+    await expect(page.locator(".collections-product-photo")).toHaveCount(0);
+    await expect(page.locator("[data-collections-product-image]:not([hidden]) .collections-product-placeholder")).toHaveCount(3);
+    await expect(page.locator("[data-collections-product-image]").nth(3)).toBeHidden();
+    await expect(page.locator("[data-collections-product-image]").nth(4)).toBeHidden();
+});
+
 test("presentation controls match the viewing device", async ({ page }, testInfo) => {
     await page.goto("/");
     await expect(page.locator(".room-transition-label")).toHaveText("LOADING");
