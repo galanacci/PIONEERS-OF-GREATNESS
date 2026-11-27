@@ -77,9 +77,10 @@ test("Collections stays locked publicly and unlocks through its preview query", 
     await page.locator("#collections-size-options button").first().click();
     await expect(page.locator("#collections-size-options button").first()).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".collections-order-instructions")).toContainText("private preview");
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#collections-product-drawer")).toHaveAttribute("inert", "");
     await page.locator(".collections-image-next").click();
     await expect(page.locator("[data-collections-product-image]").nth(1)).toHaveClass(/is-active/);
-    await page.keyboard.press("Escape");
     await page.keyboard.press("Escape");
     await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
     await page.locator("#collections-room .room-return").click();
