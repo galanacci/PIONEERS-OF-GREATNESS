@@ -35,7 +35,6 @@ export function initCollections() {
 
     const order = initMadeToOrder(page);
     let orderSettings = {};
-    let chosenSize = null;
     let products = [];
     let scene;
     let loading;
@@ -109,24 +108,20 @@ export function initCollections() {
             button.setAttribute("aria-label", `Select size ${value}`);
             button.setAttribute("aria-pressed", "false");
             button.addEventListener("click", () => {
-                chosenSize = value;
                 sizeOptions.querySelectorAll("button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
                 sizeFeedback.textContent = `SIZE ${value} SELECTED`;
-                page.querySelector('[data-collections-action="size"]').textContent = `SIZE ${value}`;
                 order.size(value);
                 sound("confirm");
             });
             return button;
         }));
-        sizeFeedback.textContent = "";
+        sizeFeedback.textContent = "CHOOSE YOUR SIZE";
     };
 
     const fillProduct = (index) => {
         const product = products[index];
         type.textContent = product.type;
         title.textContent = product.title;
-        chosenSize = null;
-        page.querySelector('[data-collections-action="size"]').textContent = "SIZE";
         order.product(product, orderSettings);
         description.textContent = product.description;
         spec.textContent = `${product.colours.join(" / ")} · PLACEHOLDER MATERIAL AND CONSTRUCTION DETAILS`;
@@ -236,13 +231,11 @@ export function initCollections() {
     imageNext.addEventListener("click", () => setProductImage(imageIndex + 1));
     actionButtons.forEach((button) => button.addEventListener("click", () => {
         const name = button.dataset.collectionsAction;
-        if (name === "enquiry" && !chosenSize) {
-            if (openPanel !== "size") togglePanel("size");
-            sizeFeedback.textContent = "CHOOSE YOUR SIZE TO CONTINUE";
-            sizeOptions.querySelector("button")?.focus();
-            return;
-        }
         togglePanel(name);
+        if (openPanel === "enquiry") {
+            drawer.scrollTop = 0;
+            (sizeOptions.querySelector('[aria-pressed="true"]') || sizeOptions.querySelector("button"))?.focus({ preventScroll: true });
+        }
     }));
     back.addEventListener("click", (event) => {
         if (selected < 0) return;

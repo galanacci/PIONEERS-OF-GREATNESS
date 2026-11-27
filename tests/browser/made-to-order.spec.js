@@ -27,11 +27,16 @@ test("enquiry requires one size and repeats the exact international price and re
     const enquiry = page.getByRole("button", { name: "Made-to-order enquiry", exact: true });
     await expect(page.locator("#collections-product-price")).toContainText("£175.00");
     await enquiry.click();
-    await expect(page.locator("#collections-size-feedback")).toHaveText("CHOOSE YOUR SIZE TO CONTINUE");
+    await expect(page.locator('[data-collections-action="size"]')).toHaveCount(0);
+    await expect(page.locator('[data-collections-panel="enquiry"] #collections-size-options')).toBeVisible();
+    await expect(page.locator("#collections-size-feedback")).toHaveText("CHOOSE YOUR SIZE");
     await page.getByRole("button", { name: "Select size S", exact: true }).click();
     await page.getByRole("button", { name: "Select size L", exact: true }).click();
     await expect(page.locator('#collections-size-options [aria-pressed="true"]')).toHaveCount(1);
     await enquiry.click();
+    await expect(page.locator("#collections-product-drawer")).toHaveAttribute("inert", "");
+    await enquiry.click();
+    await expect(page.getByRole("button", { name: "Select size L", exact: true })).toHaveAttribute("aria-pressed", "true");
     await page.getByLabel("DELIVERY REGION", { exact: true }).selectOption("north-america");
     await expect(page.locator("#collections-product-price")).toContainText("£175.00 · + £30.00");
     await expect(page.locator(".collections-order-summary")).toContainText("SIZE L · £205.00");
@@ -61,7 +66,6 @@ test("missing payment configuration cannot invite a transfer or send a false enq
     await openForge(page);
     await page.getByRole("button", { name: "Made-to-order enquiry", exact: true }).click();
     await page.getByRole("button", { name: "Select size M", exact: true }).click();
-    await page.getByRole("button", { name: "Made-to-order enquiry", exact: true }).click();
     await expect(page.locator(".collections-order-instructions")).toContainText("please do not send payment");
     await expect(page.locator(".collections-order-email")).toBeHidden();
     await expect(page.locator(".collections-order-email")).not.toHaveAttribute("href");
@@ -94,7 +98,6 @@ test("FORGE test checkout previews regional totals without enabling transfers or
     await expect(page.locator("#collections-product-price")).toContainText("£175.00");
     await page.getByRole("button", { name: "Made-to-order enquiry", exact: true }).click();
     await page.getByRole("button", { name: "Select size XL", exact: true }).click();
-    await page.getByRole("button", { name: "Made-to-order enquiry", exact: true }).click();
     await expect(page.locator(".collections-order-test-banner")).toContainText("NO PAYMENT WILL BE TAKEN");
     const regions = [["uk", "£175.00"], ["europe", "£195.00"], ["north-america", "£205.00"], ["asia", "£210.00"], ["oceania", "£210.00"], ["rest-of-world", "£215.00"]];
     for (const [region, total] of regions) {
