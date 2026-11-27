@@ -100,3 +100,17 @@
     .collections-product-action { padding: 0 10px; font-size: 10px; }
     .collections-room.is-product-open .room-return { top: max(18px,env(safe-area-inset-top)); left: 18px; }
 }
+.collections-product-actions { grid-template-columns: 1fr 1fr 2fr; }
+.collections-product-action { white-space: normal; }
+.collections-size-options button[aria-pressed="true"] { border-color: #c5a3ff; background: #39254d; color: #fff; }
+.collections-product-drawer:has([data-collections-panel="enquiry"]:not([hidden])) { max-height: min(560px, calc(100svh - 220px)); }
+[data-collections-panel="enquiry"] { text-align: left; font-size: 13px; line-height: 1.6; }
+[data-collections-panel="enquiry"] label { display: block; font-size: 11px; letter-spacing: .12em; }
+[data-collections-panel="enquiry"] select { width: 100%; min-height: 44px; margin: 8px 0; background: #17121e; color: #fff; border: 1px solid #79668f; padding: 10px; }
+.collections-order-summary { color: #d3b6ff; }
+.collections-bank-details { display: grid; grid-template-columns: 1fr 1.6fr; gap: 8px 14px; }
+.collections-bank-details dt { color: #b8a8c8; }
+.collections-bank-details dd { margin: 0; overflow-wrap: anywhere; user-select: text; }
+.collections-order-email, [data-collections-panel="enquiry"] button { display: block; width: 100%; box-sizing: border-box; padding: 12px; margin-top: 12px; border: 1px solid #b99cd5; color: #fff; background: #23182e; font: inherit; text-align: center; text-decoration: none; cursor: pointer; }
+[data-collections-panel="enquiry"] [hidden] { display: none; }
+.collections-order-email:focus-visible, [data-collections-panel="enquiry"] :focus-visible { outline: 2px solid #c5a3ff; outline-offset: 3px; }

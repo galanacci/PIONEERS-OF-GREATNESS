@@ -39,14 +39,7 @@ test("Collections stays locked publicly and unlocks through its preview query", 
     await page.locator(".collections-room-actions .collections-room-action").first().click({ force: true });
     expect(await page.evaluate(() => window.__collectionSounds)).toContain("locked");
     await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
-    const roomCartButton = page.locator("[data-collections-room-cart]");
-    await expect(roomCartButton).toBeEnabled();
-    await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
-    await roomCartButton.click();
-    await expect(page.locator("#collections-room-cart-drawer")).toHaveClass(/is-open/);
-    await expect(page.locator("#collections-room-cart-empty")).toBeVisible();
-    await roomCartButton.click();
-    await expect(page.locator("#collections-room-cart-drawer")).not.toHaveClass(/is-open/);
+    await expect(page.getByRole("button", { name: "Select a piece in the collection" })).toBeDisabled();
     const roomControlsBox = await page.locator(".collections-room-actions").boundingBox();
     await page.evaluate(() => window.dispatchEvent(new CustomEvent("pog:collections-open-product", {
         detail: { index: 1 }
@@ -83,17 +76,14 @@ test("Collections stays locked publicly and unlocks through its preview query", 
         expect((await page.locator("#collections-size-options button").first().boundingBox()).height).toBeGreaterThanOrEqual(48);
     }
     await page.locator("#collections-size-options button").first().click();
-    await expect(page.locator("#collections-cart-count")).toHaveText("1");
-    await page.locator('[data-collections-action="cart"]').click();
-    await expect(page.locator("#collections-cart-list li")).toHaveCount(1);
+    await expect(page.locator("#collections-size-options button").first()).toHaveAttribute("aria-pressed", "true");
+    await page.locator('[data-collections-action="enquiry"]').click();
+    await expect(page.locator(".collections-order-instructions")).toContainText("private preview");
     await page.locator(".collections-image-next").click();
     await expect(page.locator("[data-collections-product-image]").nth(1)).toHaveClass(/is-active/);
     await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
     await expect(page.locator("#collections-product-sheet")).toHaveAttribute("aria-hidden", "true");
-    await expect(page.locator("#collections-room-cart-count")).toHaveText("1");
-    await roomCartButton.click();
-    await expect(page.locator("#collections-room-cart-list li")).toHaveCount(1);
-    await roomCartButton.click();
     await page.locator("#collections-room .room-return").click();
     await expect(page.locator("#menu-overlay")).toHaveClass(/is-open/);
 });

@@ -1,7 +1,40 @@
 {
+  "madeToOrder": {
+    "enquiryEmail": null,
+    "bank": {
+      "accountName": null,
+      "bankName": null,
+      "sortCode": null,
+      "accountNumber": null,
+      "iban": null,
+      "bic": null
+    }
+  },
   "products": [
     {
       "id": "preview-piece-01",
+      "madeToOrder": {
+        "enabled": true,
+        "leadTime": null,
+        "markets": [
+          {
+            "id": "uk",
+            "label": "United Kingdom",
+            "currency": "GBP",
+            "totalMinor": null,
+            "deliveryIncluded": null,
+            "international": false
+          },
+          {
+            "id": "international",
+            "label": "International",
+            "currency": "GBP",
+            "totalMinor": null,
+            "deliveryIncluded": null,
+            "international": true
+          }
+        ]
+      },
       "title": "FORGE DENIM JACKET",
       "type": "OUTERWEAR STUDY",
       "price": "PRIVATE PREVIEW",

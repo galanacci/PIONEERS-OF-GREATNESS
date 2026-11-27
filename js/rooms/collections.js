@@ -1,4 +1,5 @@
 import { COLLECTIONS_PREVIEW_ENABLED } from "../room-registry.js";
+import { initMadeToOrder } from "./made-to-order.js";
 
 const ROOM_ID = "collections-room";
 const sound = (name) => window.dispatchEvent(new CustomEvent("pog:menu-sound", { detail: { name } }));
@@ -11,14 +12,9 @@ export function initCollections() {
     const status = document.getElementById("collections-status");
     const page = document.getElementById("collections-product-sheet");
     const back = room?.querySelector(".room-return");
-    const roomCartButton = room?.querySelector("[data-collections-room-cart]");
-    const roomCartDrawer = document.getElementById("collections-room-cart-drawer");
-    const roomCartCount = document.getElementById("collections-room-cart-count");
-    const roomCartEmpty = document.getElementById("collections-room-cart-empty");
-    const roomCartList = document.getElementById("collections-room-cart-list");
     const imagePrevious = page?.querySelector(".collections-image-previous");
     const imageNext = page?.querySelector(".collections-image-next");
-    if (!room || !stage || !canvas || !status || !page || !back || !roomCartButton || !roomCartDrawer || !roomCartCount || !roomCartEmpty || !roomCartList || !imagePrevious || !imageNext) return;
+    if (!room || !stage || !canvas || !status || !page || !back || !imagePrevious || !imageNext) return;
 
     const type = document.getElementById("collections-product-type");
     const title = document.getElementById("collections-product-title");
@@ -28,9 +24,6 @@ export function initCollections() {
     const drawer = document.getElementById("collections-product-drawer");
     const sizeOptions = document.getElementById("collections-size-options");
     const sizeFeedback = document.getElementById("collections-size-feedback");
-    const cartCount = document.getElementById("collections-cart-count");
-    const cartEmpty = document.getElementById("collections-cart-empty");
-    const cartList = document.getElementById("collections-cart-list");
     const imageContainer = page.querySelector(".collections-product-images");
     const indicatorContainer = page.querySelector(".collections-image-indicators");
     const productImages = [...page.querySelectorAll("[data-collections-product-image]")];
@@ -38,8 +31,11 @@ export function initCollections() {
     const imageIndicators = [...page.querySelectorAll(".collections-image-indicators span")];
     const actionButtons = [...page.querySelectorAll("[data-collections-action]")];
     const panels = [...page.querySelectorAll("[data-collections-panel]")];
-    if (!type || !title || !price || !description || !spec || !drawer || !sizeOptions || !sizeFeedback || !cartCount || !cartEmpty || !cartList || !imageContainer || !indicatorContainer) return;
+    if (!type || !title || !price || !description || !spec || !drawer || !sizeOptions || !sizeFeedback || !imageContainer || !indicatorContainer) return;
 
+    const order = initMadeToOrder(page);
+    let orderSettings = {};
+    let chosenSize = null;
     let products = [];
     let scene;
     let loading;
@@ -50,7 +46,6 @@ export function initCollections() {
     let imageCount = productImages.length;
     let openPanel = null;
     let readySent = false;
-    const cart = [];
 
     const sendReady = () => {
         if (readySent) return;
@@ -84,6 +79,7 @@ export function initCollections() {
         openPanel = null;
         drawer.classList.remove("is-open");
         drawer.setAttribute("aria-hidden", "true");
+        drawer.inert = true;
         panels.forEach((panel) => { panel.hidden = true; });
         actionButtons.forEach((button) => {
             button.classList.remove("is-active");
@@ -96,6 +92,7 @@ export function initCollections() {
         openPanel = name;
         drawer.classList.add("is-open");
         drawer.setAttribute("aria-hidden", "false");
+        drawer.inert = false;
         panels.forEach((panel) => { panel.hidden = panel.dataset.collectionsPanel !== name; });
         actionButtons.forEach((button) => {
             const active = button.dataset.collectionsAction === name;
@@ -104,57 +101,21 @@ export function initCollections() {
         });
     };
 
-    const closeRoomCart = () => {
-        roomCartDrawer.classList.remove("is-open");
-        roomCartDrawer.setAttribute("aria-hidden", "true");
-        roomCartButton.classList.remove("is-active");
-        roomCartButton.setAttribute("aria-expanded", "false");
-    };
-
-    const toggleRoomCart = () => {
-        const opening = !roomCartDrawer.classList.contains("is-open");
-        closeRoomCart();
-        if (!opening) return;
-        roomCartDrawer.classList.add("is-open");
-        roomCartDrawer.setAttribute("aria-hidden", "false");
-        roomCartButton.classList.add("is-active");
-        roomCartButton.setAttribute("aria-expanded", "true");
-    };
-
-    const fillCartList = (list) => {
-        list.replaceChildren(...cart.map((entry) => {
-            const item = document.createElement("li");
-            item.innerHTML = `<span>${products[entry.productIndex].title}</span><span>SIZE ${entry.size}</span>`;
-            return item;
-        }));
-    };
-
-    const renderCart = () => {
-        cartCount.textContent = String(cart.length);
-        roomCartCount.textContent = String(cart.length);
-        const cartButton = page.querySelector('[data-collections-action="cart"]');
-        cartButton?.setAttribute("aria-label", `Cart, ${cart.length} item${cart.length === 1 ? "" : "s"}`);
-        roomCartButton.setAttribute("aria-label", `Cart, ${cart.length} item${cart.length === 1 ? "" : "s"}`);
-        cartEmpty.hidden = cart.length > 0;
-        roomCartEmpty.hidden = cart.length > 0;
-        fillCartList(cartList);
-        fillCartList(roomCartList);
-    };
-
-    const addToCart = (size) => {
-        cart.push({ productIndex: focused, size });
-        renderCart();
-        sizeFeedback.textContent = `SIZE ${size} ADDED TO CART`;
-        sound("confirm");
-    };
-
     const buildSizes = (product) => {
         sizeOptions.replaceChildren(...product.sizes.map((value) => {
             const button = document.createElement("button");
             button.type = "button";
             button.textContent = value;
-            button.setAttribute("aria-label", `Add size ${value} to cart`);
-            button.addEventListener("click", () => addToCart(value));
+            button.setAttribute("aria-label", `Select size ${value}`);
+            button.setAttribute("aria-pressed", "false");
+            button.addEventListener("click", () => {
+                chosenSize = value;
+                sizeOptions.querySelectorAll("button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+                sizeFeedback.textContent = `SIZE ${value} SELECTED`;
+                page.querySelector('[data-collections-action="size"]').textContent = `SIZE ${value}`;
+                order.size(value);
+                sound("confirm");
+            });
             return button;
         }));
         sizeFeedback.textContent = "";
@@ -164,7 +125,9 @@ export function initCollections() {
         const product = products[index];
         type.textContent = product.type;
         title.textContent = product.title;
-        price.textContent = product.price;
+        chosenSize = null;
+        page.querySelector('[data-collections-action="size"]').textContent = "SIZE";
+        order.product(product, orderSettings);
         description.textContent = product.description;
         spec.textContent = `${product.colours.join(" / ")} · PLACEHOLDER MATERIAL AND CONSTRUCTION DETAILS`;
         imageCount = product.images?.length || placeholderTemplates.length;
@@ -211,7 +174,6 @@ export function initCollections() {
 
     const selectProduct = (index) => {
         if (!products.length) return;
-        closeRoomCart();
         focused = (index + products.length) % products.length;
         selected = focused;
         revealProduct();
@@ -236,7 +198,7 @@ export function initCollections() {
         try {
             const [data, module] = await loading;
             products = data.products;
-            renderCart();
+            orderSettings = data.madeToOrder || {};
             scene = module.mountCollectionsScene(canvas, products, {
                 onLoaded(index, failed) {
                     if (failed) console.warn(`Collection placeholder ${index + 1} could not be loaded.`);
@@ -271,8 +233,16 @@ export function initCollections() {
 
     imagePrevious.addEventListener("click", () => setProductImage(imageIndex - 1));
     imageNext.addEventListener("click", () => setProductImage(imageIndex + 1));
-    roomCartButton.addEventListener("click", toggleRoomCart);
-    actionButtons.forEach((button) => button.addEventListener("click", () => togglePanel(button.dataset.collectionsAction)));
+    actionButtons.forEach((button) => button.addEventListener("click", () => {
+        const name = button.dataset.collectionsAction;
+        if (name === "enquiry" && !chosenSize) {
+            if (openPanel !== "size") togglePanel("size");
+            sizeFeedback.textContent = "CHOOSE YOUR SIZE TO CONTINUE";
+            sizeOptions.querySelector("button")?.focus();
+            return;
+        }
+        togglePanel(name);
+    }));
     back.addEventListener("click", (event) => {
         if (selected < 0) return;
         event.preventDefault();
@@ -282,6 +252,7 @@ export function initCollections() {
     }, true);
 
     room.addEventListener("keydown", (event) => {
+        if (["ArrowLeft", "ArrowRight"].includes(event.key) && event.target.closest("input, select, textarea")) return;
         if (event.key === "ArrowLeft") {
             if (selected < 0) return;
             event.preventDefault();
@@ -291,13 +262,14 @@ export function initCollections() {
             event.preventDefault();
             setProductImage(imageIndex + 1);
         } else if (event.key === "Escape") {
-            if (selected >= 0) {
+            if (openPanel) {
+                event.stopPropagation();
+                const trigger = actionButtons.find((button) => button.dataset.collectionsAction === openPanel);
+                closePanels();
+                trigger?.focus();
+            } else if (selected >= 0) {
                 event.stopPropagation();
                 closeProduct();
-            } else if (roomCartDrawer.classList.contains("is-open")) {
-                event.stopPropagation();
-                closeRoomCart();
-                roomCartButton.focus();
             }
         }
     });
@@ -316,7 +288,6 @@ export function initCollections() {
     window.addEventListener("pog:room-closed", (event) => {
         if (event.detail?.roomId !== ROOM_ID) return;
         scene?.detach();
-        closeRoomCart();
         closeProduct();
     });
 }
