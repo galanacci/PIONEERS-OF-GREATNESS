@@ -223,7 +223,16 @@
 }
 .field-notes-content.archive-heading-right > .room-divider { display: none; }
 .world-room :is(.page-template,.archive-heading-right) > .room-return {
+    width: 82px;
     font-size: 0; display: grid; align-items: center; justify-items: start; text-decoration: none;
+}
+.world-room :is(.page-template,.archive-heading-right) > .room-return::after {
+    content: 'BACK';
+    position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
+    color: #888;
+    font-family: var(--font-brand); font-size: 9px; font-weight: 500;
+    line-height: 1; letter-spacing: .12em;
+    pointer-events: none;
 }
 #field-notes-room .field-notes-content {
     padding-top: max(20px, env(safe-area-inset-top));
